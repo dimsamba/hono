@@ -26,7 +26,7 @@ const SIDEBAR_ITEMS = [
   { name: "Analytics", icon: TrendingUp, color: "#3B82F6", href: "/analytics" },
   { name: "Settings", icon: Settings, color: "#6EE7B7", href: "/settings" },
   { name: "Converter", icon: KeySquare, color: "#EFF3FA", href: "/converter" },
-  { name: "TestTable", icon: KeySquare, color: "#EFF3FA", href: "/testtable" },
+  { name: "Supplier", icon: KeySquare, color: "#EFF3FA", href: "/supplier" },
 ];
 
 const Sidebar = () => {

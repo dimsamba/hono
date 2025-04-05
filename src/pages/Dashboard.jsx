@@ -13,7 +13,7 @@ import AnalyticsPage from "../pages/AnalyticsPage";
 import SettingsPage from "../pages/SettingsPage";
 import TextConvetPage from "../pages/TextConvetPage";
 import InventoryPage from "../pages/InventoryPage";
-import TestTable from "../components/inventory/TestTable"
+import SupplierPage from "../pages/SupplierPage";
 import Topbar from "../components/common/Topbar";
 
 function Dashboard() {
@@ -61,7 +61,7 @@ function Dashboard() {
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="converter" element={<TextConvetPage />} />
                 <Route path="inventory" element={<InventoryPage />} />
-                <Route path="testtable" element={<TestTable />} />
+                <Route path="supplier" element={<SupplierPage />} />
               </Routes>
             </div>{" "}
           </div>

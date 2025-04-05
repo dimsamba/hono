@@ -3,20 +3,19 @@ import StatCard from "../components/common/StatCard";
 import supabase from "../components/supabaseClient";
 import { ShoppingBasket, UserSearch } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import InventoryData from "../components/inventory/inventoryData";  // Note the capital "I"
-// import InventoryForm from "../components/inventory/InventoryForm";
+import SupplierDada from "../components/supplier/SupplierData"; // ✅ Import SupplierData component
 
 // ✅ Import Supabase
-const InventoryPage = () => {
-  const [inventoryData, setInventoryData] = useState([]); // ✅ Define state
+const SupplierPage = () => {
+  const [supplierData, setSupplierData] = useState([]); // ✅ Define state
 
   // Function to fetch inventory data from Supabase
   const fetchData = async () => {
-    const { data, error } = await supabase.from("inventory").select("*");
+    const { data, error } = await supabase.from('inventory').select('*');
     if (error) {
       console.error("Error fetching inventory:", error);
     } else {
-      setInventoryData(data); // ✅ Update state
+      setSupplierData(data); // ✅ Update state
     }
   };
 
@@ -37,7 +36,7 @@ const InventoryPage = () => {
           <StatCard
             name="Total Items"
             icon={ShoppingBasket}
-            value={inventoryData.length}
+            value={SupplierPage.length}
             color="#6366F1"
           />
           <StatCard
@@ -54,9 +53,8 @@ const InventoryPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          {/* Pass inventoryData to FullFeaturedCrudGrid */}
-          <InventoryData />
-
+          {/* ✅ Pass inventory data to the table */}
+          <SupplierDada />
         </motion.div>
 
         {/* ✅ Pass fetchData to the form so it refreshes after insert */}
@@ -73,4 +71,4 @@ const InventoryPage = () => {
   );
 };
 
-export default InventoryPage;
+export default SupplierPage;
