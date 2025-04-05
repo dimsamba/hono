@@ -7,7 +7,7 @@ import FullFeaturedCrudGrid from "../components/inventory/inventoryData";
 // import InventoryForm from "../components/inventory/InventoryForm";
 
 // ✅ Import Supabase
-const InventoryPage = () => {
+const SupplierPage = () => {
   const [inventoryData, setInventoryData] = useState([]); // ✅ Define state
 
   // Function to fetch inventory data from Supabase
@@ -55,7 +55,7 @@ const InventoryPage = () => {
           transition={{ duration: 1 }}
         >
           {/* ✅ Pass inventory data to the table */}
-          <FullFeaturedCrudGrid data={inventoryData} />
+          <FullFeaturedCrudGrid />
         </motion.div>
 
         {/* ✅ Pass fetchData to the form so it refreshes after insert */}
@@ -72,4 +72,4 @@ const InventoryPage = () => {
   );
 };
 
-export default InventoryPage;
+export default SupplierPage;
