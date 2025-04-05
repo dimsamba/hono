@@ -69,8 +69,11 @@ function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
   );
 }
 
-export default function FullFeaturedCrudGrid() {
-  const [rows, setRows] = React.useState([]);
+export default function FullFeaturedCrudGrid({ inventoryData }) {
+  const [rows, setRows] = React.useState(inventoryData);  // Use the passed inventoryData
+  React.useEffect(() => {
+    setRows(inventoryData);  // Update rows whenever inventoryData changes
+  }, [inventoryData]);
   const [rowModesModel, setRowModesModel] = React.useState({});
   const [setNewRowId] = React.useState(null);
 
@@ -242,13 +245,14 @@ export default function FullFeaturedCrudGrid() {
         "Dairy",
         "Dry-food",
         "Frozen-food",
-        "Spices",
+        "Fruits and-vegetables",
         "Meat",
         "Oils-and-fats",
         "Pasta",
         "Produce",
         "Seafood",
         "Snacks",
+        "Spices",
         "Sweets-and-desserts",
       ],
     },

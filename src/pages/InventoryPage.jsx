@@ -12,7 +12,7 @@ const InventoryPage = () => {
 
   // Function to fetch inventory data from Supabase
   const fetchData = async () => {
-    const { data, error } = await supabase.from('inventory').select('*');
+    const { data, error } = await supabase.from("inventory").select("*");
     if (error) {
       console.error("Error fetching inventory:", error);
     } else {
@@ -54,8 +54,8 @@ const InventoryPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          {/* ✅ Pass inventory data to the table */}
-          <FullFeaturedCrudGrid />
+          {/* Pass inventoryData to FullFeaturedCrudGrid */}
+          <FullFeaturedCrudGrid inventoryData={inventoryData} />
         </motion.div>
 
         {/* ✅ Pass fetchData to the form so it refreshes after insert */}
