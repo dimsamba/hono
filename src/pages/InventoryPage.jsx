@@ -3,8 +3,7 @@ import StatCard from "../components/common/StatCard";
 import supabase from "../components/supabaseClient";
 import { ShoppingBasket, UserSearch } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import InventoryData from "../components/inventory/inventoryData";  // Note the capital "I"
-// import InventoryForm from "../components/inventory/InventoryForm";
+import InventoryData from "../components/inventory/InventoryData";  // Note the capital "I"
 
 // ✅ Import Supabase
 const InventoryPage = () => {
