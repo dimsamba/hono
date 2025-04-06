@@ -10,6 +10,7 @@ import {
   Users,
   KeySquare,
   Warehouse,
+  Contact,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -25,8 +26,8 @@ const SIDEBAR_ITEMS = [
   { name: "Orders", icon: ShoppingCart, color: "#F59E0B", href: "/orders" },
   { name: "Analytics", icon: TrendingUp, color: "#3B82F6", href: "/analytics" },
   { name: "Settings", icon: Settings, color: "#6EE7B7", href: "/settings" },
-  { name: "Converter", icon: KeySquare, color: "#EFF3FA", href: "/converter" },
-  { name: "Supplier", icon: KeySquare, color: "#EFF3FA", href: "/supplier" },
+  { name: "Supplier", icon: Contact, color: "#EFF3FA", href: "/supplier" },
+  { name: "Converter", icon: KeySquare, color: "#899CF6", href: "/converter" },
 ];
 
 const Sidebar = () => {
@@ -62,7 +63,9 @@ const Sidebar = () => {
       }`}
       animate={{ width: isSidebarOpen ? 180 : 80 }}
     >
-      <div className="h-full bg-gray-800 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-700">
+      {/* <div className="h-full bg-gray-800 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-700"> */}
+      <div className="h-full bg-gray-800 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-700 overflow-y-auto scrollbar-hide">
+
         {/* Button to open and close Sidebar */}
         <motion.button
           whileHover={{ scale: 1.1 }}
