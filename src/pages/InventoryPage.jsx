@@ -54,7 +54,7 @@ const InventoryPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          {/* Pass inventoryData to FullFeaturedCrudGrid */}
+          {/* Pass InventoryData to FullFeaturedCrudGrid */}
           <InventoryData />
 
         </motion.div>

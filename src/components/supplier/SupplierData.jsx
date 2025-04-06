@@ -69,11 +69,11 @@ function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
   );
 }
 
-export default function FullFeaturedCrudGrid({ supplierData }) {
-  const [rows, setRows] = React.useState(supplierData);  // Use the passed inventoryData
+export default function FullFeaturedCrudGrid({ SupplierData }) {
+  const [rows, setRows] = React.useState(SupplierData);  // Use the passed inventoryData
   React.useEffect(() => {
-    setRows(supplierData);  // Update rows whenever inventoryData changes
-  }, [supplierData]);
+    setRows(SupplierData);  // Update rows whenever inventoryData changes
+  }, [SupplierData]);
   const [rowModesModel, setRowModesModel] = React.useState({});
   const [setNewRowId] = React.useState(null);
 

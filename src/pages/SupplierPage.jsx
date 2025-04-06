@@ -3,7 +3,7 @@ import StatCard from "../components/common/StatCard";
 import supabase from "../components/supabaseClient";
 import { ShoppingBasket, UserSearch } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import SupplierDada from "../components/supplier/SupplierData"; // ✅ Import SupplierData component
+import SupplierData from "../components/supplier/SupplierData"; // ✅ Import SupplierData component
 
 // ✅ Import Supabase
 const SupplierPage = () => {
@@ -36,7 +36,7 @@ const SupplierPage = () => {
           <StatCard
             name="Total Items"
             icon={ShoppingBasket}
-            value={SupplierPage.length}
+            value={supplierData.length}
             color="#6366F1"
           />
           <StatCard
@@ -54,7 +54,7 @@ const SupplierPage = () => {
           transition={{ duration: 1 }}
         >
           {/* ✅ Pass inventory data to the table */}
-          <SupplierDada />
+          <SupplierData />
         </motion.div>
 
         {/* ✅ Pass fetchData to the form so it refreshes after insert */}
