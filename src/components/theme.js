@@ -60,6 +60,17 @@ export const tokens = (mode) => ({
           800: "#2a2d64",
           900: "#151632",
         },
+        orange: {
+          100: "#331500",
+          200: "#663000",
+          300: "#994b00",
+          400: "#cc6600",
+          500: "#ff8000",
+          600: "#ff9933",
+          700: "#ffb266",
+          800: "#ffcc99",
+          900: "#ffe5cc",
+        }
       }
     : {
         grey: {
@@ -117,6 +128,17 @@ export const tokens = (mode) => ({
           800: "#c3c6fd",
           900: "#e1e2fe",
         },
+        orange: {
+          100: "#331500", // Very dark burnt orange
+          200: "#663000", // Dark rust orange
+          300: "#994b00", // Medium-dark orange
+          400: "#cc6600", // Standard strong orange
+          500: "#ff8000", // Bright vibrant orange (base tone)
+          600: "#ff9933", // Lighter vivid orange
+          700: "#ffb266", // Soft light orange
+          800: "#ffcc99", // Very light orange
+          900: "#ffe5cc", // Almost pastel, cream orange
+        }        
       }),
 });
 

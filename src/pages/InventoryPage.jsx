@@ -1,31 +1,47 @@
 import { motion } from "framer-motion";
 import StatCard from "../components/common/StatCard";
 import supabase from "../components/supabaseClient";
-import { ShoppingBasket, UserSearch } from "lucide-react";
-import React, { useState, useEffect } from "react";
-import InventoryData from "../components/inventory/InventoryData";  // Note the capital "I"
+import { ShoppingBasket } from "lucide-react";
+import { useState, useEffect } from "react";
+import InventoryData from "../components/inventory/InventoryData"; // Note the capital "I"
+import { tokens } from "../components/theme";
+import { useTheme } from "@mui/material";
+import { format } from "date-fns";
 
 // ✅ Import Supabase
 const InventoryPage = () => {
-  const [inventoryData, setInventoryData] = useState([]); // ✅ Define state
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const [inventory, setInventory] = useState([]);
+  const [latestEntryDate, setLatestEntryDate] = useState(null);
 
   // Function to fetch inventory data from Supabase
-  const fetchData = async () => {
+  const fetchRecipes = async () => {
     const { data, error } = await supabase.from("inventory").select("*");
+
+    console.log("Inventory raw fetch:", data);
+
     if (error) {
-      console.error("Error fetching inventory:", error);
+      console.error("Fetch error:", error);
     } else {
-      setInventoryData(data); // ✅ Update state
+      setInventory(data);
+      if (data.length > 0) {
+        // fallback: get latest by checking max date manually
+        const latest = data.reduce((a, b) =>
+          new Date(a.created_at) > new Date(b.created_at) ? a : b
+        );
+        setLatestEntryDate(latest.created_at);
+      }
     }
   };
 
   useEffect(() => {
-    fetchData(); // ✅ Fetch inventory data when the page loads
+    fetchRecipes();
   }, []);
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
+      <main className="max-w-10xl mx-auto py-6 px-4 lg:px-8">
         {/* STATS */}
         <motion.div
           className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4 mb-8"
@@ -34,16 +50,25 @@ const InventoryPage = () => {
           transition={{ duration: 1 }}
         >
           <StatCard
-            name="Total Items"
-            icon={ShoppingBasket}
-            value={inventoryData.length}
-            color="#6366F1"
-          />
-          <StatCard
-            name="Total Suppliers"
-            icon={UserSearch}
-            value={89}
-            color="#10B981"
+            icon={
+              <ShoppingBasket
+                sx={{ color: colors.greenAccent[400], fontSize: "26px" }}
+              />
+            }
+            title={"Inventory in Database"}
+            value={`${inventory.length} Items`}
+            subtitle={
+              latestEntryDate
+                ? `Last Entry: ${format(
+                    new Date(latestEntryDate),
+                    "dd-MM-yyyy"
+                  )}`
+                : "No data available"
+            }
+            progress={"none"}
+            sx={{
+              gridColumn: "span 1",
+            }}
           />
         </motion.div>
 
@@ -55,7 +80,6 @@ const InventoryPage = () => {
         >
           {/* Pass InventoryData to FullFeaturedCrudGrid */}
           <InventoryData />
-
         </motion.div>
 
         {/* ✅ Pass fetchData to the form so it refreshes after insert */}

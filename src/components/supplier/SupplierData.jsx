@@ -23,20 +23,16 @@ function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
     const id = Date.now();
     const newRow = {
       id,
-      item_name: "",
-      category: "",
-      unit: "",
-      quantity: 0,
-      price_per_unit: 0,
-      total_cost: 0,
-      supplier: "",
+      name: "",
+      contact: "",
+      company: "",
       isNew: true,
     };
 
     setRows((prev) => [newRow, ...prev]);
     setRowModesModel((prev) => ({
       ...prev,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "item_name" }, // 👈 Focus on new row
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" }, // 👈 Focus on new row
     }));
     setNewRowId(id);
   };
@@ -70,39 +66,39 @@ function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
 }
 
 export default function FullFeaturedCrudGrid({ SupplierData }) {
-  const [rows, setRows] = React.useState(SupplierData);  // Use the passed inventoryData
+  const [rows, setRows] = React.useState(SupplierData);
+
   React.useEffect(() => {
-    setRows(SupplierData);  // Update rows whenever inventoryData changes
+    setRows(SupplierData); // Update rows whenever SupplierData changes
   }, [SupplierData]);
+
   const [rowModesModel, setRowModesModel] = React.useState({});
-  const [setNewRowId] = React.useState(null);
+    const [] = React.useState(null);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const { data, error } = await supabase.from("inventory").select("*");
+    React.useEffect(() => {
+      const fetchData = async () => {
+        const { data, error } = await supabase.from("suppliers").select("*");
+  
+        if (error) {
+          console.error("Supabase SELECT error:", error.message);
+          return;
+        }
+  
+        const formattedData = data.map((item) => ({
+          ...item,
+          id: item.id,
+          name: item.name,
+          contact: item.contact,  
+          company: item.company,
+          isNew: false,
 
-      if (error) {
-        console.error("Fetch error:", error.message);
-        return;
-      }
-
-      const formattedData = data.map((item) => ({
-        ...item,
-        price_per_unit:
-          item.price_per_unit != null && !isNaN(item.price_per_unit)
-            ? `€ ${item.price_per_unit.toFixed(2)}`
-            : "€ 0.00",
-        total_cost:
-          item.total_cost != null && !isNaN(item.total_cost)
-            ? `€ ${item.total_cost.toFixed(2)}`
-            : "€ 0.00",
-      }));
-
-      setRows(formattedData);
-    };
-
-    fetchData();
-  }, []);
+        }));
+  
+        setRows(formattedData);
+      };
+  
+      fetchData();
+    }, []);
 
   const handleRowEditStop = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -130,10 +126,7 @@ export default function FullFeaturedCrudGrid({ SupplierData }) {
     );
     if (!confirmDelete) return;
 
-    const { data, error } = await supabase
-      .from("inventory")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("suppliers").delete().eq("id", id);
     if (error) {
       console.error("Supabase DELETE error:", error.message);
       return;
@@ -157,11 +150,9 @@ export default function FullFeaturedCrudGrid({ SupplierData }) {
   const processRowUpdate = async (newRow) => {
     const { isNew, id, ...cleanRow } = newRow;
 
-    cleanRow.total_cost = cleanRow.quantity * cleanRow.price_per_unit;
-
     if (isNew) {
       const { data, error } = await supabase
-        .from("inventory")
+        .from("suppliers")
         .insert([cleanRow])
         .select();
       if (error) {
@@ -174,7 +165,7 @@ export default function FullFeaturedCrudGrid({ SupplierData }) {
       return inserted;
     } else {
       const { error } = await supabase
-        .from("inventory")
+        .from("suppliers")
         .update(cleanRow)
         .eq("id", id);
       if (error) {
@@ -229,79 +220,21 @@ export default function FullFeaturedCrudGrid({ SupplierData }) {
             ];
       },
     },
-    { field: "item_name", headerName: "Item", width: 180, editable: true },
+    { field: "name", headerName: "Name", width: 180, editable: true },
     {
-      field: "category",
-      headerName: "Category",
+      field: "contact",
+      headerName: "Contact",
       width: 150,
       editable: true,
-      type: "singleSelect",
-      valueOptions: [
-        "Bakery",
-        "Beverages",
-        "Canned-goods",
-        "Charcuterie",
-        "Condiments",
-        "Dairy",
-        "Dry-food",
-        "Frozen-food",
-        "Fruits and-vegetables",
-        "Meat",
-        "Oils-and-fats",
-        "Pasta",
-        "Produce",
-        "Seafood",
-        "Snacks",
-        "Spices",
-        "Sweets-and-desserts",
-      ],
+      align: "center",
+      headerAlign: "center",
     },
     {
-      field: "unit",
-      headerName: "Unit",
-      width: 80,
-      editable: true,
-      type: "singleSelect",
-      valueOptions: [
-        "bag",
-        "botte",
-        "box",
-        "can",
-        "cl",
-        "Carton",
-        "cup",
-        "gm",
-        "jar",
-        "kg",
-        "Lt",
-        "mg",
-        "ml",
-        "packet",
-        "pcs",
-      ],
-    },
-    {
-      field: "quantity",
-      headerName: "Qty",
-      type: "number",
-      width: 80,
+      field: "company",
+      headerName: "Company",
+      width: 150,
       editable: true,
     },
-    {
-      field: "price_per_unit",
-      headerName: "€ Unit",
-      type: "number",
-      width: 100,
-      editable: true,
-    },
-    {
-      field: "total_cost",
-      headerName: "Total €",
-      type: "number",
-      width: 100,
-      editable: false,
-    },
-    { field: "supplier", headerName: "Supplier", width: 180, editable: true },
   ];
 
   return (
@@ -319,35 +252,26 @@ export default function FullFeaturedCrudGrid({ SupplierData }) {
           toolbar: () => (
             <CombinedToolbar
               setRows={setRows}
-              setNewRowId={setNewRowId}
               setRowModesModel={setRowModesModel}
             />
           ),
         }}
         sx={{
-          "& .MuiDataGrid-scrollbar": {
-            overflow: "hidden",
-            scrollBar: "none",
-          },
           "& .MuiDataGrid-cell": {
             fontSize: "0.9rem",
             color: "LightGray",
           },
           "& .MuiDataGrid-columnHeader": {
-          backgroundColor: `#202938 !important`,
+            backgroundColor: `#202938 !important`,
           },
           "& .MuiDataGrid-columnHeaderTitle": {
             color: "White !important",
             fontSize: "0.9rem",
-            fontWeight: "bold",       
+            fontWeight: "bold",
           },
-          "& .MuiDataGrid-filler": {
+          "& .MuiDataGrid-filler, & .MuiDataGrid-scrollbarFiller": {
             backgroundColor: `#202938 !important`,
           },
-          "& .MuiDataGrid-scrollbarFiller": {
-            backgroundColor: `#202938 !important`,
-          },
-         
         }}
       />
     </Box>

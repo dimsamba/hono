@@ -10,13 +10,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@date-io/date-fns": "^2.16.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^6.4.8",
-    "@mui/material": "^6.4.10",
-    "@mui/x-data-grid": "^7.28.2",
+    "@fullcalendar/core": "^6.1.17",
+    "@fullcalendar/daygrid": "^6.1.17",
+    "@fullcalendar/interaction": "^6.1.17",
+    "@fullcalendar/list": "^6.1.17",
+    "@fullcalendar/react": "^6.1.17",
+    "@fullcalendar/timegrid": "^6.1.17",
+    "@mui/icons-material": "^6.4.11",
+    "@mui/material": "^6.4.11",
+    "@mui/x-data-grid": "^7.29.1",
     "@mui/x-data-grid-generator": "^7.28.2",
     "@mui/x-data-grid-pro": "^7.28.2",
+    "@mui/x-date-pickers": "^7.29.1",
+    "@supabase/auth-helpers-react": "^0.5.0",
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/supabase-js": "^2.49.3",
@@ -24,14 +33,16 @@
     "@syncfusion/ej2-data": "^29.1.33",
     "@syncfusion/ej2-react-grids": "^29.1.35",
     "axios": "^1.8.4",
-    "date-fns": "^4.1.0",
+    "chart.js": "^4.4.9",
+    "date-fns": "^2.30.0",
     "formik": "^2.4.6",
     "framer-motion": "^12.6.1",
     "lucide-react": "^0.484.0",
     "react": "^18.3.1",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.4.0",
-    "recharts": "^2.15.1",
+    "recharts": "^2.15.2",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
@@ -44,8 +55,10 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
+    "jsdom": "^26.0.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
-    "vite": "^6.2.0"
+    "vite": "^6.2.0",
+    "vitest": "^3.1.1"
   }
 }

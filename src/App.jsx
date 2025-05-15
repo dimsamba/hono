@@ -1,34 +1,30 @@
-import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
+// Import your pages
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Wrapper from "./pages/Wrapper";
 
-function App() {
+const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* home */}
-        {/* <Route path="/" element={<Home />} /> */}
-
-        {/* register */}
-        {/* <Route path="/register" element={<Register />} /> */}
-
-        {/* login */}
-        <Route path="/login" element={<Login />} />
-
-        {/* dashboard */}
-        <Route
-          path="*"
-          element={
-            <Wrapper>
-              <Dashboard />
-            </Wrapper>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="*"
+            element={
+              <Wrapper>
+                <Dashboard />
+              </Wrapper>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </LocalizationProvider>
   );
-}
+};
 
 export default App;

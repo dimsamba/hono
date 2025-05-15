@@ -25,11 +25,18 @@ function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
       id,
       item_name: "",
       category: "",
-      unit: "",
-      quantity: 0,
-      price_per_unit: 0,
-      total_cost: 0,
+      pack_type: "",
+      qnty_item_pack: "",
+      unit_type: "",
+      unit_per_itm: "",
+      total_units_per_pack: "",
+      price_per_pack: "",
+      price_per_item: "",
+      price_per_unit: "",
+      yield_pct: "",
+      effective_price_per_unit: "",
       supplier: "",
+      note: "",
       isNew: true,
     };
 
@@ -70,32 +77,25 @@ function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
 }
 
 export default function FullFeaturedCrudGrid({ InventoryData }) {
-  const [rows, setRows] = React.useState(InventoryData);  // Use the passed inventoryData
+  const [rows, setRows] = React.useState(InventoryData); // Use the passed inventoryData
+
   React.useEffect(() => {
-    setRows(InventoryData);  // Update rows whenever inventoryData changes
+    setRows(InventoryData); // Update rows whenever inventoryData changes
   }, [InventoryData]);
   const [rowModesModel, setRowModesModel] = React.useState({});
-  const [setNewRowId] = React.useState(null);
+  const [, setNewRowId] = React.useState(null);
 
   React.useEffect(() => {
     const fetchData = async () => {
       const { data, error } = await supabase.from("inventory").select("*");
 
       if (error) {
-        console.error("Fetch error:", error.message);
+        console.error("Supabase SELECT error:", error.message);
         return;
       }
 
       const formattedData = data.map((item) => ({
         ...item,
-        price_per_unit:
-          item.price_per_unit != null && !isNaN(item.price_per_unit)
-            ? `€ ${item.price_per_unit.toFixed(2)}`
-            : "€ 0.00",
-        total_cost:
-          item.total_cost != null && !isNaN(item.total_cost)
-            ? `€ ${item.total_cost.toFixed(2)}`
-            : "€ 0.00",
       }));
 
       setRows(formattedData);
@@ -130,10 +130,8 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
     );
     if (!confirmDelete) return;
 
-    const { data, error } = await supabase
-      .from("inventory")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("inventory").delete().eq("id", id);
+
     if (error) {
       console.error("Supabase DELETE error:", error.message);
       return;
@@ -157,7 +155,13 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
   const processRowUpdate = async (newRow) => {
     const { isNew, id, ...cleanRow } = newRow;
 
-    cleanRow.total_cost = cleanRow.quantity * cleanRow.price_per_unit;
+    cleanRow.total_units_per_pack =
+      cleanRow.qnty_item_pack * cleanRow.unit_per_itm;
+    cleanRow.price_per_unit =
+      cleanRow.price_per_pack / cleanRow.total_units_per_pack;
+    cleanRow.effective_price_per_unit =
+      cleanRow.price_per_unit / (cleanRow.yield_pct / 100);
+    cleanRow.price_per_item = cleanRow.price_per_pack / cleanRow.qnty_item_pack;
 
     if (isNew) {
       const { data, error } = await supabase
@@ -229,11 +233,16 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
             ];
       },
     },
-    { field: "item_name", headerName: "Item", width: 180, editable: true },
+    {
+      field: "item_name",
+      headerName: "Item",
+      width: 180,
+      editable: true,
+    },
     {
       field: "category",
       headerName: "Category",
-      width: 150,
+      width: 120,
       editable: true,
       type: "singleSelect",
       valueOptions: [
@@ -242,6 +251,7 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
         "Canned-goods",
         "Charcuterie",
         "Condiments",
+        "Dry",
         "Dairy",
         "Dry-food",
         "Frozen-food",
@@ -257,51 +267,176 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
       ],
     },
     {
-      field: "unit",
-      headerName: "Unit",
-      width: 80,
+      field: "pack_type",
+      headerName: "Pack Type",
+      width: 100,
       editable: true,
       type: "singleSelect",
       valueOptions: [
         "bag",
-        "botte",
+        "bottle",
         "box",
+        "bucket",
         "can",
-        "cl",
-        "Carton",
-        "cup",
-        "gm",
+        "carton",
+        "case",
+        "container",
+        "crate",
+        "drum",
         "jar",
-        "kg",
-        "Lt",
-        "mg",
-        "ml",
-        "packet",
-        "pcs",
+        "jug",
+        "keg",
+        "pack",
+        "pail",
+        "roll",
+        "sack",
+        "shrink pack",
+        "tin",
+        "tray",
+        "tube",
+        "tub",
+        "wrap",
       ],
     },
     {
-      field: "quantity",
-      headerName: "Qty",
+      field: "qnty_item_pack",
+      headerName: "Qty/Pack",
       type: "number",
-      width: 80,
+      width: 100,
       editable: true,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "unit_type",
+      headerName: "Unit",
+      width: 100,
+      editable: true,
+      align: "center",
+      headerAlign: "center",
+      type: "singleSelect",
+      valueOptions: [
+        "bottle",
+        "cl",
+        "gm",
+        "kg",
+        "lt",
+        "lb",
+        "ml",
+        "oz",
+        "piece",
+        "portion",
+        "sheet",
+        "slice",
+        "sprig",
+        "tbsp",
+        "tsp",
+        "unit",
+      ],
+    },
+    {
+      field: "unit_per_itm",
+      headerName: "Unit/Item",
+      width: 100,
+      type: "number",
+      editable: true,
+      align: "right",
+      headerAlign: "right",
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `${parseFloat(params.value).toFixed(0)}`
+          : "",
+    },
+    {
+      field: "total_units_per_pack",
+      headerName: "Unit/pack",
+      width: 100,
+      type: "number",
+      editable: false,
+      align: "right",
+      headerAlign: "right",
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `${parseFloat(params.value).toFixed(0)}`
+          : "",
+    },
+    {
+      field: "price_per_pack",
+      headerName: "€ Pack",
+      type: "numeric",
+      width: 100,
+      editable: true,
+      align: "right",
+      headerAlign: "right",
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `€ ${parseFloat(params.value).toFixed(2)}`
+          : "",
+    },
+    {
+      field: "price_per_item",
+      headerName: "€ Item",
+      type: "numeric",
+      width: 100,
+      editable: true,
+      align: "right",
+      headerAlign: "right",
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `€ ${parseFloat(params.value).toFixed(2)}`
+          : "",
     },
     {
       field: "price_per_unit",
       headerName: "€ Unit",
-      type: "number",
+      type: "numeric",
       width: 100,
+      editable: false,
+      align: "right",
+      headerAlign: "right",
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `€ ${parseFloat(params.value).toFixed(4)}`
+          : "",
+    },
+    {
+      field: "yield_pct",
+      headerName: "Yield",
+      type: "percent",
+      width: 100,
+      editable: true,
+      align: "right",
+      headerAlign: "right",
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `${parseFloat(params.value).toFixed(0)} %`
+          : "",
+    },
+    {
+      field: "effective_price_per_unit",
+      headerName: "Efective €",
+      type: "numeric",
+      width: 100,
+      editable: false,
+      align: "right",
+      headerAlign: "right",
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `€ ${parseFloat(params.value).toFixed(3)}`
+          : "",
+    },
+    {
+      field: "supplier",
+      headerName: "Supplier",
+      width: 150,
       editable: true,
     },
     {
-      field: "total_cost",
-      headerName: "Total €",
-      type: "number",
-      width: 100,
-      editable: false,
+      field: "note",
+      headerName: "Note",
+      width: 180,
+      editable: true,
     },
-    { field: "supplier", headerName: "Supplier", width: 180, editable: true },
   ];
 
   return (
@@ -334,12 +469,12 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
             color: "LightGray",
           },
           "& .MuiDataGrid-columnHeader": {
-          backgroundColor: `#202938 !important`,
+            backgroundColor: `#202938 !important`,
           },
           "& .MuiDataGrid-columnHeaderTitle": {
             color: "White !important",
             fontSize: "0.9rem",
-            fontWeight: "bold",       
+            fontWeight: "bold",
           },
           "& .MuiDataGrid-filler": {
             backgroundColor: `#202938 !important`,
@@ -347,7 +482,16 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
           "& .MuiDataGrid-scrollbarFiller": {
             backgroundColor: `#202938 !important`,
           },
-         
+          // eliminate columns NUMBER arrow up/down
+          "& input[type=number]::-webkit-inner-spin-button, & input[type=number]::-webkit-outer-spin-button":
+            {
+              WebkitAppearance: "none",
+              margin: 0,
+            },
+          "&. editInputCell": {
+            backgroundColor: "white !important",
+            color: "white !important",
+          },
         }}
       />
     </Box>
