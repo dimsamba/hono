@@ -24,16 +24,16 @@ function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
     const id = Date.now();
     const newRow = {
       id,
-      name: "",
-      contact: "",
-      company: "",
+      item_name: "",
+      item_price: "",
+      details: "",
       isNew: true,
     };
 
     setRows((prev) => [newRow, ...prev]);
     setRowModesModel((prev) => ({
       ...prev,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" }, // 👈 Focus on new row
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: "item_name" }, // 👈 Focus on new row
     }));
     setNewRowId(id);
   };
@@ -41,7 +41,7 @@ function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
   return (
     <GridToolbarContainer>
       <Button color="LightGray" onClick={handleClick} startIcon={<AddIcon />}>
-        Add record
+        Add new Item
       </Button>
     </GridToolbarContainer>
   );
@@ -66,19 +66,19 @@ function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
   );
 }
 
-export default function FullFeaturedCrudGrid({ SupplierData }) {
-  const [rows, setRows] = React.useState(SupplierData);
+export default function FullFeaturedCrudGrid({ ItemsData }) {
+  const [rows, setRows] = React.useState(ItemsData);
 
   React.useEffect(() => {
-    setRows(SupplierData); // Update rows whenever SupplierData changes
-  }, [SupplierData]);
+    setRows(ItemsData); // Update rows whenever SupplierData changes
+  }, [ItemsData]);
 
   const [rowModesModel, setRowModesModel] = React.useState({});
   const [] = React.useState(null);
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const { data, error } = await supabase.from("suppliers").select("*");
+      const { data, error } = await supabase.from("itemsList").select("*");
 
       if (error) {
         console.error("Supabase SELECT error:", error.message);
@@ -88,9 +88,9 @@ export default function FullFeaturedCrudGrid({ SupplierData }) {
       const formattedData = data.map((item) => ({
         ...item,
         id: item.id,
-        name: item.name,
-        contact: item.contact,
-        company: item.company,
+        item_name: item.item_name,
+        item_price: item.item_price,
+        details: item.details,
         isNew: false,
       }));
 
@@ -126,7 +126,7 @@ export default function FullFeaturedCrudGrid({ SupplierData }) {
     );
     if (!confirmDelete) return;
 
-    const { error } = await supabase.from("suppliers").delete().eq("id", id);
+    const { error } = await supabase.from("itemsList").delete().eq("id", id);
     if (error) {
       console.error("Supabase DELETE error:", error.message);
       return;
@@ -152,7 +152,7 @@ export default function FullFeaturedCrudGrid({ SupplierData }) {
 
     if (isNew) {
       const { data, error } = await supabase
-        .from("suppliers")
+        .from("itemsList")
         .insert([cleanRow])
         .select();
       if (error) {
@@ -165,7 +165,7 @@ export default function FullFeaturedCrudGrid({ SupplierData }) {
       return inserted;
     } else {
       const { error } = await supabase
-        .from("suppliers")
+        .from("itemsList")
         .update(cleanRow)
         .eq("id", id);
       if (error) {
@@ -237,19 +237,27 @@ export default function FullFeaturedCrudGrid({ SupplierData }) {
             ];
       },
     },
-    { field: "name", headerName: "Name", width: 180, editable: true },
+    { field: "item_name", headerName: "Item", width: 180, editable: true },
     {
-      field: "contact",
-      headerName: "Contact",
-      width: 150,
+      field: "item_price",
+      headerName: "Price",
+      type: "numeric",
+      align: "right",
+      headerAlign: "right",
+      width: 120,
       editable: true,
-      align: "center",
-      headerAlign: "center",
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `€ ${new Intl.NumberFormat("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(params.value)}`
+          : "",
     },
     {
-      field: "company",
-      headerName: "Company",
-      width: 150,
+      field: "details",
+      headerName: "Details",
+      width: 400,
       editable: true,
     },
   ];

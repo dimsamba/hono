@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   IconButton,
@@ -15,20 +15,18 @@ import {
   Button,
 } from "@mui/material";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import Notification from "../common/Notification";
 import AgendaNotification from "../common/AgendaNotification";
-import { ColorModeContext, tokens } from "../theme";
+import { tokens } from "../theme";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
+import { blue } from "@mui/material/colors";
 
 const Topbar = ({ title }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const colorMode = useContext(ColorModeContext);
   const [invoiceAlerts, setInvoiceAlerts] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -68,22 +66,26 @@ const Topbar = ({ title }) => {
   };
 
   return (
-      <Box display="flex" justifyContent="space-between" p={2}>
-      <Typography variant="h4" color={colors.grey[100]}>
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      p={2}
+      sx={{
+        backgroundColor: "#f3f4f6", // Tailwind's bg-gray-100
+        borderBottom: "1px solid #e5e7eb", // Tailwind's border-gray-200
+      }}
+    >
+      <Typography variant="h4" color={colors.grey[700]}>
         {title}
       </Typography>
 
-      <Box
-        display="flex"
-        backgroundColor={colors.primary[400]}
-        borderRadius="3px"
-      >
+      <Box display="flex" backgroundColor="#f3f4f6" borderRadius="3px">
         {/* Notification Icon */}
         <IconButton
-          sx={{ color: colors.grey[300] }}
-          onClick={(event) => setAnchorEl(event.currentTarget)} // open Menu
+          sx={{ color: colors.grey[700] }}
+          onClick={(event) => setAnchorEl(event.currentTarget)}
         >
-          <Badge badgeContent={invoiceAlerts.length} color="error">
+          <Badge badgeContent={invoiceAlerts.length} sx={{ color: "#3FA89B",}} color="error">
             <NotificationsOutlinedIcon />
           </Badge>
         </IconButton>
@@ -93,10 +95,16 @@ const Topbar = ({ title }) => {
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleCloseMenu}
-          slotProps={{
-            style: {
+          PaperProps={{
+            sx: {
+              backgroundColor: "#f3f4f6", // Tailwind bg-gray-100
               maxHeight: 300,
               width: "300px",
+            },
+          }}
+          MenuListProps={{
+            sx: {
+              backgroundColor: "#f3f4f6", // consistent list background
             },
           }}
         >
@@ -104,23 +112,22 @@ const Topbar = ({ title }) => {
             sx={{
               textAlign: "Left",
               padding: "8px 16px",
-              color: colors.greenAccent[400],
-              backgroundColor: colors.grey[600],
+              color: colors.grey[700],
+              backgroundColor: "#f3f4f6",
             }}
           >
             <Typography variant="h6">
-              {
-                <FileCopyOutlinedIcon
-                  sx={{
-                    color: colors.greenAccent[400],
-                    fontSize: "16px",
-                    mr: 1,
-                  }}
-                />
-              }
+              <FileCopyOutlinedIcon
+                sx={{
+                  color: colors.greenAccent[700],
+                  fontSize: "16px",
+                  mr: 1,
+                }}
+              />
               Invoices
             </Typography>
           </Box>
+
           {invoiceAlerts.length === 0 ? (
             <MenuItem onClick={handleCloseMenu}>No new invoices</MenuItem>
           ) : (
@@ -129,15 +136,18 @@ const Topbar = ({ title }) => {
                 key={invoice.id}
                 onClick={() => handleOpenDialog(invoice)}
                 sx={{
-                  display: "flex", // Use flexbox
+                  display: "flex",
+                  backgroundColor: "#f3f4f6",
+                  color: "#111",
                 }}
               >
                 <Typography
                   variant="body2"
                   sx={{
+                    fontSize: 14,
                     color: dayjs(invoice.invoice_date).isBefore(dayjs(), "day")
-                      ? "#fcba04"
-                      : "inherit",
+                      ? "darkred"
+                      : "#111",
                   }}
                 >
                   {dayjs(invoice.invoice_date).isBefore(dayjs(), "day")
@@ -147,8 +157,8 @@ const Topbar = ({ title }) => {
                     : `due on ${dayjs(invoice.invoice_date).format(
                         "DD-MM-YYYY"
                       )}`}
-                  {" - "}
-                  € {invoice.amount_ttc !== undefined &&
+                  {" - "}€{" "}
+                  {invoice.amount_ttc !== undefined &&
                   invoice.amount_ttc !== null
                     ? new Intl.NumberFormat("en-US", {
                         minimumFractionDigits: 2,
@@ -162,10 +172,24 @@ const Topbar = ({ title }) => {
         </Menu>
 
         {/* Invoice Detail Dialog */}
-        <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-          <DialogTitle>Invoice N. {selectedInvoice?.id}</DialogTitle>
+        <Dialog
+          open={dialogOpen}
+          onClose={handleCloseDialog}
+          PaperProps={{
+            sx: {
+              backgroundColor: "#f3f4f6", // Tailwind's bg-gray-100
+              color: "#111827", // Tailwind's text-gray-900
+            },
+          }}
+        >
+          <DialogTitle sx={{ color: "#111827" }}>
+            Invoice N. {selectedInvoice?.id}
+          </DialogTitle>
+
           <DialogContent>
-            <DialogContentText>
+            <DialogContentText sx={{ color: "#374151" }}>
+              {" "}
+              {/* text-gray-700 */}
               <strong>Due Date:</strong>{" "}
               {dayjs(selectedInvoice?.invoice_date).format("DD-MM-YYYY")}
               <br />
@@ -193,13 +217,19 @@ const Topbar = ({ title }) => {
             </DialogContentText>
           </DialogContent>
 
-          <DialogActions>
+          <DialogActions
+            sx={{
+              backgroundColor: "#f9fafb",
+              borderTop: "1px solid #e5e7eb",
+            }}
+          >
             <Button
               onClick={handleCloseDialog}
               sx={{
-                color: "lightGray", // Change the text color here
+                color: "#374151",
                 "&:hover": {
-                  color: "white",
+                  backgroundColor: "#e5e7eb",
+                  color: "#111827",
                 },
               }}
             >
@@ -210,23 +240,30 @@ const Topbar = ({ title }) => {
 
         {/* Agenda Notifications Icon */}
         <IconButton
-          sx={{ color: colors.grey[300] }}
-          onClick={(event) => setAgendaAnchorEl(event.currentTarget)} // open Menu
-        >
-          <Badge badgeContent={agendaTasks.length} color="error">
-            <EventAvailableOutlinedIcon />
-          </Badge>
-        </IconButton>
+          sx={{ color: colors.grey[700] }}
+            // open Menu on hover
+            onClick={(event) => setAgendaAnchorEl(event.currentTarget)}
+            >
+            <Badge badgeContent={agendaTasks.length} sx={{ color: "#3FA89B",}} color="error">
+              <EventAvailableOutlinedIcon />
+            </Badge>
+            </IconButton> 
 
-        {/* Agenda Dropdown */}
+            {/* Agenda Dropdown */}
         <Menu
           anchorEl={agendaAnchorEl}
           open={Boolean(agendaAnchorEl)}
           onClose={() => setAgendaAnchorEl(null)}
-          slotProps={{
-            style: {
+          PaperProps={{
+            sx: {
+              backgroundColor: "#f3f4f6",
               maxHeight: 300,
               width: "300px",
+            },
+          }}
+          MenuListProps={{
+            sx: {
+              backgroundColor: "#f3f4f6", // sets .MuiList-root background
             },
           }}
           onClick={() => {
@@ -238,14 +275,17 @@ const Topbar = ({ title }) => {
             sx={{
               textAlign: "Left",
               padding: "8px 16px",
-              color: colors.greenAccent[400],
-              backgroundColor: colors.grey[600],
+              color: colors.grey[700],
+              backgroundColor: "#f3f4f6", // Tailwind's bg-gray-100
+              "& .MuiList-root": {
+                backgroundColor: "#f3f4f6", // Tailwind's bg-gray-100
+              },
             }}
           >
             <Typography variant="h6">
               <EventAvailableOutlinedIcon
                 sx={{
-                  color: colors.greenAccent[400],
+                  color: colors.greenAccent[700],
                   fontSize: "16px",
                   mr: 1,
                 }}
@@ -259,33 +299,33 @@ const Topbar = ({ title }) => {
           ) : (
             agendaTasks.map((item) => (
               <MenuItem
-              key={item.id}
-              onClick={() => {
-                navigate("/calendar", {
-                  state: {
-                    taskId: item.id, // optional: task-level targeting
-                    taskDate: item.date, // required: scroll-to-date
-                  },
-                });
-                setAgendaAnchorEl(null);
-              }}
-            >
-              <Typography variant="body2">
-                {dayjs(item.date).format("DD-MM-YYYY")} - {item.entry_name}
-              </Typography>
-            </MenuItem>            
+                key={item.id}
+                onClick={() => {
+                  navigate("/calendar", {
+                    state: {
+                      taskId: item.id, // optional: task-level targeting
+                      taskDate: item.date, // required: scroll-to-date
+                    },
+                  });
+                  setAgendaAnchorEl(null);
+                }}
+                sx={{
+                  backgroundColor: "#f3f4f6", // Tailwind's bg-gray-100
+                  color: "#111",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontSize: 14,
+                  }}
+                >
+                  {dayjs(item.date).format("DD-MM-YYYY")} - {item.entry_name}
+                </Typography>
+              </MenuItem>
             ))
           )}
         </Menu>
-
-        {/* Settings & Profile */}
-         <IconButton onClick={colorMode.toggleColorMode}>
-          {theme.palette.mode === "dark" ? (
-            <DarkModeOutlinedIcon />
-          ) : (
-            <LightModeOutlinedIcon />
-          )}
-        </IconButton>
       </Box>
     </Box>
   );

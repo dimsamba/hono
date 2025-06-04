@@ -24,12 +24,12 @@
 
 /* Hide scrollbar but allow scrolling */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;             /* Chrome, Safari */
+  display: none; /* Chrome, Safari */
 }
 /* Hide scrollbars but keep scroll functionality */
 .hide-scrollbar {
@@ -39,4 +39,21 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
 
+  #receiptPrintArea,
+  #receiptPrintArea * {
+    visibility: visible !important;
+  }
+
+  #receiptPrintArea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+  }
+}

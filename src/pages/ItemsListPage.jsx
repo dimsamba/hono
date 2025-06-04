@@ -5,25 +5,25 @@ import ContactPhoneOutlinedIcon from "@mui/icons-material/ContactPhoneOutlined";
 import { tokens } from "../components/theme";
 import StatCard from "../components/common/StatCard";
 import supabase from "../components/supabaseClient";
-import React, { useState, useEffect } from "react";
-import SupplierData from "../components/supplier/SupplierData"; // ✅ Import SupplierData component
+import { useState, useEffect } from "react";
+import ItemsData from "../components/sales/ItemsData"; // ✅ Import SupplierData component
 
 
 // ✅ Import Supabase
-const SupplierPage = () => {
+const ItemsListPage = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [supplierData, setSupplierData] = useState([]); // ✅ Define state
-  const [supplierlatestEntryDate, setLatestEntryDateSupplier] = useState(null); // Declare the state
+  const [itemsListData, setItemsListDataData] = useState([]); // ✅ Define state
+  const [itemslatestEntryDate, setLatestEntryDateItems] = useState(null); // Declare the state
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   // Function to fetch suppliers data from Supabase
   const fetchData = async () => {
-    const { data, error } = await supabase.from("suppliers").select("*");
+    const { data, error } = await supabase.from("itemsList").select("*");
     if (error) {
-      console.error("Error fetching suppliers:", error);
+      console.error("Error fetching Items List:", error);
     } else {
-      setSupplierData(data); // ✅ Update state
+      setItemsListDataData(data); // ✅ Update state
     }
   };
 
@@ -32,23 +32,23 @@ const SupplierPage = () => {
   }, []);
 
   // Fetch data from supplier table
-  const fetchDataSupplierLE = async () => {
+  const fetchDataItemsLE = async () => {
     const { data, error } = await supabase
-      .from("suppliers")
+      .from("itemsList")
       .select("created_at")
       .order("created_at", { ascending: false })
       .limit(1);
 
     if (error) {
-      console.error("Error fetching suppliers data:", error);
+      console.error("Error fetching items List data:", error);
     } else {
       const date = data[0] ? data[0].created_at : null;
-      setLatestEntryDateSupplier(date); // Set the latest entry date in state
+      setLatestEntryDateItems(date); // Set the latest entry date in state
     }
   };
 
   useEffect(() => {
-    fetchDataSupplierLE(); // Fetch latest inventory entry date on page load
+    fetchDataItemsLE(); // Fetch latest inventory entry date on page load
   }, []);
 
   return (
@@ -75,12 +75,12 @@ const SupplierPage = () => {
                   sx={{ color: "#38a3a5", fontSize: "26px" }}
                 />
               }
-              title={"N. of Suppliers"}
-              value={supplierData.length}
+              title={"N. of Items in database"}
+              value={itemsListData.length}
               subtitle={
-                supplierlatestEntryDate
+                itemslatestEntryDate
                   ? `Last Entry: ${format(
-                      new Date(supplierlatestEntryDate),
+                      new Date(itemslatestEntryDate),
                       "dd-MM-yyyy"
                     )}`
                   : "No data available"
@@ -100,7 +100,7 @@ const SupplierPage = () => {
           transition={{ duration: 1 }}
         >
           {/* ✅ Pass inventory data to the table */}
-          <SupplierData />
+          <ItemsData />
         </motion.div>
 
         {/* ✅ Pass fetchData to the form so it refreshes after insert */}
@@ -117,4 +117,4 @@ const SupplierPage = () => {
   );
 };
 
-export default SupplierPage;
+export default ItemsListPage;

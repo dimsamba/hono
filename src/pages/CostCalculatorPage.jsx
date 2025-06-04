@@ -1,7 +1,7 @@
-import { motion } from "framer-motion";
 import supabase from "../components/supabaseClient";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import CostForm from "../components/costCalculator/CostForm";
+import { motion } from "framer-motion";
 
 // ✅ Import Supabase
 const CostCalculatorPage = () => {
@@ -45,32 +45,21 @@ const CostCalculatorPage = () => {
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <main className="max-w-5xl mx-auto py-0 px-4 lg:px-8 my-0">
-        <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-0"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
+      <main className="max-w-5xl mx-auto">
+            <motion.div
+            className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+          >
           {/* Pass CostData to FullFeaturedCrudGrid */}
           <CostForm
             onRecipeSaved={handleRefresh}
             totalValueFromIngredients={totalValue}
-            //  invItems={invItems}
             setItems={setItems}
             onTotalValueChange={handleTotalValueChange}
           />
-        </motion.div>
-
-        {/* ✅ Pass fetchData to the form so it refreshes after insert */}
-        <motion.div
-          className="grid grid-cols-1 gap-0 sm:grid-cols-1 lg:grid-cols-1 mb-0"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
-          {/* <InventoryForm fetchData={fetchData} /> */}
-        </motion.div>
+          </motion.div>
       </main>
     </div>
   );

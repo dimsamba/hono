@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -12,6 +13,9 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { Chip } from "@mui/material";
 import dayjs from "dayjs";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import {
   GridRowModes,
@@ -100,15 +104,16 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
             variant: "outlined",
             size: "small",
             sx: {
-              backgroundColor: `#121212 !important`,
-              border: "0px solid lightgray",
-              alignContent: "center",
-              padding: "0px",
+              backgroundColor: "#e7ecef !important", // ✅ light red background
               "& .MuiInputBase-input": {
-                color: "white",
+                color: "dimGray", // ✅ text color
                 fontSize: "0.9rem",
-                padding: "15px",
-                border: "0px solid lightgray",
+                fontWeight: 400,
+               padding: "14px", // adjust if needed
+              },
+
+              "& fieldset": {
+               border: "1px solid #777", // optional border styling
               },
             },
           },
@@ -302,6 +307,23 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
     "Work hours",
   ];
 
+  // Customize Toolbar
+  const theme = createTheme({
+    components: {
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            "&.MuiDataGrid-paper": {
+              backgroundColor: "#F2FAF8",
+              color: "#333",
+              fontWeight: 600,
+            },
+          },
+        },
+      },
+    },
+  });
+
   const columns = [
     {
       field: "actions",
@@ -366,6 +388,38 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
       editable: true,
       type: "singleSelect",
       valueOptions: expenseCategories,
+      renderEditCell: (params) => (
+        <Select
+          value={params.value}
+          onChange={(e) =>
+            params.api.setEditCellValue({
+              id: params.id,
+              field: params.field,
+              value: e.target.value,
+            })
+          }
+          fullWidth
+          sx={{
+            color: "dimGray !important",
+            fontSize: "15px",
+            fontWeight: 600, // semibold
+          }}
+          MenuProps={{
+            PaperProps: {
+              sx: {
+                backgroundColor: "#e7ecef",
+                color: "black",
+              },
+            },
+          }}
+        >
+          {params.colDef.valueOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      ),
     },
     {
       field: "amount_ht",
@@ -440,51 +494,88 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box sx={{ height: 900, width: "100%" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          editMode="row"
-          rowModesModel={rowModesModel}
-          onRowModesModelChange={handleRowModesModelChange}
-          onRowEditStop={handleRowEditStop}
-          processRowUpdate={processRowUpdate}
-          getRowId={(row) => row.id}
-          slots={{
-            toolbar: () => (
-              <CombinedToolbar
-                setRows={setRows}
-                setRowModesModel={setRowModesModel}
-              />
-            ),
-          }}
-          sx={{
-            "& .MuiDataGrid-scrollbar": {
-              overflow: "hidden",
-              scrollBar: "none",
-            },
-            "& .MuiDataGrid-cell": {
-              fontSize: "0.9rem",
-              color: "LightGray",
-            },
-            "& .MuiDataGrid-columnHeader": {
-              backgroundColor: `#202938 !important`,
-            },
-            "& .MuiDataGrid-columnHeaderTitle": {
-              color: "White !important",
-              fontSize: "0.9rem",
-              fontWeight: "bold",
-            },
-
-            "& .MuiDataGrid-row.MuiDataGrid-row--editing": {
-              backgroundColor: "white !important", // Light orange for editing rows
-            },
-            "& .MuiDataGrid-scrollbarFiller--header": {
-              backgroundColor: '#202938 !important'
-            }
-          }}
-        />
+      <Box
+        sx={{
+          height: 900,
+          width: "100%",
+          border: "2px solid lightGray",
+          borderRadius: 2,
+          p: 1
+        }}
+      >
+        <ThemeProvider theme={theme}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            editMode="row"
+            rowModesModel={rowModesModel}
+            onRowModesModelChange={handleRowModesModelChange}
+            onRowEditStop={handleRowEditStop}
+            processRowUpdate={processRowUpdate}
+            getRowId={(row) => row.id}
+            slots={{
+              toolbar: () => (
+                <CombinedToolbar
+                  setRows={setRows}
+                  setRowModesModel={setRowModesModel}
+                />
+              ),
+            }}
+            sx={{
+              border: "none",
+              "& .MuiDataGrid-scrollbar": {
+                overflow: "hidden",
+                scrollBar: "none",
+              },
+              "& .MuiDataGrid-cell": {
+                fontSize: "0.9rem",
+                color: "#111", // dark text for light background
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontSize: "0.9rem",
+                fontWeight: "bold",
+              },
+              "& .MuiButtonBase-root": {
+                color: "#111",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "white !important",
+                color: "#111",
+              },
+              "& .MuiDataGrid-scrollbarFiller": {
+                backgroundColor: "white !important",
+              },
+              "& .MuiButton-text": {
+                color: "#0d1b2a !important",
+              },
+              "& .MuiDataGrid-row--editing .MuiDataGrid-cell": {
+                backgroundColor: "#e7ecef !important",
+                // boxShadow: "none", // remove default shadow if needed
+              },
+              "& .MuiDataGrid-row--editing input": {
+                color: "dimGray !important",
+                fontSize: "15px",
+                fontWeight: 600, // semibold
+              },
+              "& .MuiDataGrid-cell": {
+                borderBlockColor: "lightGray",
+                color: "dimGray !important",
+                fontSize: "15px",
+                fontWeight: 400, // semibold
+              },
+              // other global styles...
+              "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='tva_perct']":
+                {
+                  backgroundColor: "red", // light red
+                  color: "#b71c1c", // dark red text
+                  fontWeight: 600,
+                  border: "2px solid #f44336",
+                },
+            }}
+          />
+        </ThemeProvider>
       </Box>
     </LocalizationProvider>
+    // </motion.div>
   );
 }

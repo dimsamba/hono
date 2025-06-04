@@ -6,14 +6,16 @@ import {
   Snackbar,
   Alert,
   useTheme,
+  FormControl,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import supabase from "../supabaseClient"; // Import Supabase client
 import { tokens } from "../theme";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import { GlobalStyles } from "@mui/material";
 
 const StockTakeForm = ({
   onStockTakeSaved,
@@ -408,10 +410,42 @@ const StockTakeForm = ({
     return `${day}-${month}-${year}`;
   };
 
+  // TextField and InputLabel customizations
+  const sharedStyles = {
+    backgroundColor: "#ebf1fa",
+    "& .MuiInputLabel-root": {
+      color: "#007f5f",
+      fontSize: 16,
+      backgroundColor: "#ebf1fa",
+      px: 1,
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        border: "1px solid #60d394",
+      },
+      "&:hover fieldset": {
+        borderColor: "#60d394",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#25a18e",
+      },
+    },
+  };
+
   return (
-    <Box>
+    <Box
+      sx={{
+        height: 3000,
+        width: "100%",
+        border: "2px solid lightGray",
+        borderRadius: 2,
+        padding: 1,
+      }}
+    >
       <form onSubmit={handleSubmit}>
-        <h3 className="text-base mb-2 text-LightGray">Stock take Calculator</h3>
+        <h3 className="text-base mb-2 ml-1 mt-1 text-[#333]">
+          Stock take Calculator
+        </h3>
         <Box
           display="grid"
           gap="15px"
@@ -420,47 +454,97 @@ const StockTakeForm = ({
             "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
           }}
         >
+          <GlobalStyles
+            styles={{
+              ".MuiPickersPopper-root .MuiPaper-root": {
+                backgroundColor: "#f5f5f5 !important",
+                color: "#4a5759 !important",
+                fontSize: "1rem",
+                lineHeight: 1.8,
+                borderRadius: "8px",
+              },
+
+              // Day numbers (default state)
+              ".MuiDayCalendar-weekContainer .MuiPickersDay-root": {
+                color: "#4a5759 !important",
+              },
+
+              // Selected day (override white-on-white)
+              ".MuiDayCalendar-weekContainer .MuiPickersDay-root.Mui-selected":
+                {
+                  backgroundColor: "#2a9d8f !important",
+                  color: "#fff !important",
+                },
+
+              // Today’s date
+              ".MuiDayCalendar-weekContainer .MuiPickersDay-root.MuiDayCalendar-dayWithMargin.MuiPickersDay-today":
+                {
+                  border: "1px solid #2a9d8f",
+                },
+
+              // ✅ Day-of-week headers (top row: S, M, T, etc.)
+              ".MuiDayCalendar-header .MuiTypography-root": {
+                color: "#4a5759 !important",
+                fontWeight: 800,
+              },
+              ".MuiPickersCalendarHeader-root .MuiIconButton-root": {
+                color: "#2a9d8f !important", // or any color you prefer
+              },
+            }}
+          />
+
           {/* stockTake Date */}
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box sx={{ width: "100%" }}>
               <DesktopDatePicker
                 format="DD-MM-YYYY"
-                value={dayjs(stockTakeDate)} // Ensure value is a valid dayjs object
-                onChange={(newValue) => setStockTakeDate(dayjs(newValue))} // Convert newValue to dayjs
-                renderInput={(params) => <TextField {...params} fullWidth />}
-                sx={{
-                  gridColumn: isMobile ? "span 2" : "span 1",
-                    "& .MuiInputBase-root": {
-                      backgroundColor: "#333D49",
-                      "&.Mui-focused": { backgroundColor: "#454B55" },
-                      ":hover": {
-                        backgroundColor: "#3C4553",
+                value={dayjs(stockTakeDate)}
+                onChange={(newValue) => setStockTakeDate(dayjs(newValue))}
+                slotProps={{
+                  textField: {
+                    variant: "outlined",
+                    size: "small",
+                    sx: {
+                      ...sharedStyles,
+                      "& .MuiSvgIcon-root": {
+                        color: "#2a9d8f",
+                      },
+                      "& .MuiInputBase-input": {
+                        color: "#2a9d8f",
+                        fontSize: "1rem",
+                        fontWeight: 500,
                       },
                     },
+                  },
                 }}
               />
             </Box>
           </LocalizationProvider>
 
           {/* Note */}
-          <TextField
+          <FormControl
             fullWidth
-            variant="filled"
-            label="Note"
-            value={stockTakeNote}
-            onChange={(e) => setStockTakeNote(e.target.value)}
-            required
-            multiline
-            minRows={4} // or rows={4} if you want a fixed height
-            sx={{
-              gridColumn: "span 4",
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: colors.greenAccent[100],
+            variant="outlined"
+            sx={{ gridColumn: "span 2" }}
+          >
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Note"
+              value={stockTakeNote}
+              onChange={(e) => setStockTakeNote(e.target.value)}
+              required
+              multiline
+              minRows={2} // or rows={4} if you want a fixed height
+              sx={{
+                ...sharedStyles,
+                "& .MuiInputBase-inputMultiline": {
+                  color: "#333", // ✅ text color for textarea
+                  fontSize: 16,
                 },
-              },
-            }}
-          />
+              }}
+            />
+          </FormControl>
         </Box>
 
         {/* 🧠 Calculated Fields */}
@@ -470,12 +554,13 @@ const StockTakeForm = ({
           alignContent={"center"}
           gridTemplateColumns="repeat(4, minmax(0, 1fr))"
           sx={{
-            mt: 1.1,
-            fontSize: "16px",
-            color: colors.grey[200],
-            textAlign: "center",
-            backgroundColor: "#333D49",
-            height: "40px",
+            ...sharedStyles,
+            mt: 2,
+            pl: 3,
+            py: 2,
+            fontSize: 14,
+            color: "#333",
+            border: "1px solid #60d394",
           }}
         >
           <Box gridColumn="span 2">
@@ -487,84 +572,93 @@ const StockTakeForm = ({
         </Box>
 
         {/* IngredientsTable */}
-        <Box>
-          <Box className="mt-4">
-            <table className="table-auto w-full text-sm bg-gray-500 text-white rounded shadow">
-              <thead>
-                <tr className="bg-[#4B5360]">
-                  <th className="p-2 font-semibold text-white text-left">
-                    Select an Item
-                  </th>
-                  <th className="p-2 font-semibold text-white text-left">
-                    Qty Used
-                  </th>
-                  <th className="p-2 font-semibold text-white text-left">
-                    Unit type
-                  </th>
-                  <th className="p-2 font-semibold text-white text-left">
-                    Unit p/ Item
-                  </th>
-                  <th className="p-2 font-semibold text-white text-left">
-                    Price/Unit
-                  </th>
-                  <th className="p-2 font-semibold text-white text-left">
-                    Value
-                  </th>
-                  <th className="p-2">Del</th>
+        <Box
+          sx={{
+            ...sharedStyles,
+            mt: 2,
+            px: "5px",
+            pb: "5px",
+            fontSize: 14,
+            border: "1px solid #60d394",
+            "& .bg-gray-200": {
+              backgroundColor: "#ebf1fa",
+            },
+            "& .text-white": {
+              color: "#007f5f",
+            },
+          }}
+        >
+          <table className="table-auto w-full text-sm bg-[#ebf1fa] text-[#333] rounded shadow">
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="p-2 font-semibold text-white text-left">
+                  Select an Item
+                </th>
+                <th className="p-2 font-semibold text-white text-left">
+                  Qty Used
+                </th>
+                <th className="p-2 font-semibold text-white text-left">
+                  Unit type
+                </th>
+                <th className="p-2 font-semibold text-white text-left">
+                  Unit p/ Item
+                </th>
+                <th className="p-2 font-semibold text-white text-left">
+                  Price/Unit
+                </th>
+                <th className="p-2 font-semibold text-white text-left">
+                  Value
+                </th>
+                <th className="p-2">Del</th>
+              </tr>
+            </thead>
+            <tbody>
+              {invItems.map((item, index) => (
+                <tr key={index} className="border-b border-gray-600">
+                  <td className="p-2">
+                    <select
+                      className="bg-gray-500 p-1 rounded w-full"
+                      value={item.item_id}
+                      onChange={(e) =>
+                        handleItemsChange(index, "item_id", e.target.value)
+                      }
+                    >
+                      <option value="">Select</option>
+                      {inventoryItems.map((item) => (
+                        <option key={item.item_name} value={item.item_name}>
+                          {item.item_name}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="p-2">
+                    <input
+                      type="number"
+                      min="0"
+                      className="bg-gray-500 p-1 rounded w-20"
+                      value={item.counted_qty}
+                      onChange={(e) =>
+                        handleItemsChange(index, "counted_qty", e.target.value)
+                      }
+                    />
+                  </td>
+                  <td className="p-2">{item.unit_type}</td>
+                  <td className="p-2">{item.unit_per_itm}</td>
+                  <td className="p-2">€{item.price_per_unit?.toFixed(5)}</td>
+                  <td className="p-2">€{item.value?.toFixed(4)}</td>
+                  <td className="p-2 text-right">
+                    <button
+                      type="button" // <<<<< THIS is critical
+                      onClick={() => removeItemsRow(index)}
+                      className="hover:text-red-400 text-lightGray font-semibold px-2 py-1 rounded"
+                    >
+                      𝘅
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {invItems.map((item, index) => (
-                  <tr key={index} className="border-b border-gray-600">
-                    <td className="p-2">
-                      <select
-                        className="bg-gray-500 p-1 rounded w-full"
-                        value={item.item_id}
-                        onChange={(e) =>
-                          handleItemsChange(index, "item_id", e.target.value)
-                        }
-                      >
-                        <option value="">Select</option>
-                        {inventoryItems.map((item) => (
-                          <option key={item.item_name} value={item.item_name}>
-                            {item.item_name}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="p-2">
-                      <input
-                        type="number"
-                        min="0"
-                        className="bg-gray-500 p-1 rounded w-20"
-                        value={item.counted_qty}
-                        onChange={(e) =>
-                          handleItemsChange(
-                            index,
-                            "counted_qty",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td>
-                    <td className="p-2">{item.unit_type}</td>
-                    <td className="p-2">{item.unit_per_itm}</td>
-                    <td className="p-2">€{item.price_per_unit?.toFixed(5)}</td>
-                    <td className="p-2">€{item.value?.toFixed(4)}</td>
-                    <td className="p-2 text-right">
-                      <button
-                        type="button" // <<<<< THIS is critical
-                        onClick={() => removeItemsRow(index)}
-                        className="hover:text-red-400 text-lightGray font-semibold px-2 py-1 rounded"
-                      >
-                        𝘅
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Box>
+              ))}
+            </tbody>
+          </table>
 
           {/* Finish item Table */}
         </Box>
@@ -583,13 +677,13 @@ const StockTakeForm = ({
             sx={{
               gridColumn: isMobile ? "span 2" : "span 2",
               backgroundColor: "#26A889",
-                  color: "white",
-                  fontSize: 14,
-                  "&:hover": {
-                    backgroundColor: "#62CDB4",
-                  },
-                  marginTop: isMobile ? 2 : 2,
-                  height: 40,
+              color: "white",
+              fontSize: 14,
+              "&:hover": {
+                backgroundColor: "#62CDB4",
+              },
+              marginTop: isMobile ? 2 : 2,
+              height: 40,
             }}
           >
             <span
@@ -621,7 +715,7 @@ const StockTakeForm = ({
               height: 40,
             }}
           >
-            {loading ? "Saving..." : "Save StockTake"}
+            {loading ? "Saving..." : "Save"}
           </Button>
 
           {/* Update stockTake Button */}
@@ -642,7 +736,7 @@ const StockTakeForm = ({
               height: 40,
             }}
           >
-            {loading ? "Saving..." : "Update StockTake"}
+            {loading ? "Saving..." : "Update"}
           </Button>
 
           {/* Delete stockTake */}
@@ -706,7 +800,7 @@ const StockTakeForm = ({
 
       {/* stockTake List  */}
       <Box>
-        <div className="p-4 bg-[#333D49] text-white rounded-lg shadow mt-6">
+        <div className="p-4 bg-gray-100 text-[#444] my-2 ">
           <h2 className="text-xl mb-4">Saved Stock Take</h2>
 
           {loading ? (
@@ -716,19 +810,27 @@ const StockTakeForm = ({
           ) : (
             <div className="overflow-x-auto max-h-[600px] overflow-y-auto hide-scrollbar">
               <table className="table-auto w-full text-sm">
-              <thead className="bg-[#2a303a] sticky top-0 z-10">
+                <thead className="bg-[#2a303a] sticky top-0 z-10">
                   <tr>
-                    <th className="p-2 text-left">Date</th>
-                    <th className="p-2 text-center">Item Qty</th>
-                    <th className="p-2 text-right">Total (€)</th>
-                    <th className="p-2 text-left">Note</th>
+                    <th className="p-2 text-left text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                      Date
+                    </th>
+                    <th className="p-2 text-center text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                      Item Qty
+                    </th>
+                    <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                      Total (€)
+                    </th>
+                    <th className="p-2 text-left text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                      Note
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {stockTake.map((stockTake) => (
                     <tr
                       key={stockTake.id}
-                      className="border-b border-gray-700 hover:bg-gray-800"
+                      className="border-b border-gray-700 hover:bg-gray-200"
                       onClick={() => handleStockTakeSelect(stockTake.id)} // 👈 Add this line
                     >
                       <td className="p-2"> {formatDate(stockTake.date)}</td>

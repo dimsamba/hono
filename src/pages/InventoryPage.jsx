@@ -41,10 +41,10 @@ const InventoryPage = () => {
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <main className="max-w-10xl mx-auto py-6 px-4 lg:px-8">
+      <main className="max-w-10xl py-6 px-4 lg:px-8">
         {/* STATS */}
         <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4 mb-8"
+          className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4 mb-3"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
@@ -52,7 +52,7 @@ const InventoryPage = () => {
           <StatCard
             icon={
               <ShoppingBasket
-                sx={{ color: colors.greenAccent[400], fontSize: "26px" }}
+              sx={{ color: "#38a3a5", fontSize: "26px" }}
               />
             }
             title={"Inventory in Database"}
@@ -72,24 +72,15 @@ const InventoryPage = () => {
           />
         </motion.div>
 
+        {/* Inventory Data grid */}
         <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-0"
+          className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
           {/* Pass InventoryData to FullFeaturedCrudGrid */}
           <InventoryData />
-        </motion.div>
-
-        {/* ✅ Pass fetchData to the form so it refreshes after insert */}
-        <motion.div
-          className="grid grid-cols-1 gap-0 sm:grid-cols-1 lg:grid-cols-1 mb-0"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
-          {/* <InventoryForm fetchData={fetchData} /> */}
         </motion.div>
       </main>
     </div>

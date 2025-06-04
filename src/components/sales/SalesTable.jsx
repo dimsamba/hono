@@ -1,37 +1,35 @@
 import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
-import { Stack } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Typography, useMediaQuery, useTheme } from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import { Typography, useMediaQuery } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import { Stack, useTheme } from "@mui/material";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { GlobalStyles } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
+import { tokens } from "../theme";
 
 import {
   GridRowModes,
   DataGrid,
-  GridToolbar,
-  GridToolbarContainer,
   GridActionsCellItem,
   GridRowEditStopReasons,
+  GridToolbar,
+  GridToolbarContainer,
 } from "@mui/x-data-grid";
 import supabase from "../supabaseClient";
-
-// Enable plugins once
-dayjs.extend(isSameOrAfter);
-dayjs.extend(isSameOrBefore);
 
 // 🔧 Toolbar for adding new rows
 function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
@@ -59,9 +57,9 @@ function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
 
   return (
     <GridToolbarContainer>
-      <Button color="LightGray" onClick={handleClick} startIcon={<AddIcon />}>
+      {/* <Button color="LightGray" onClick={handleClick} startIcon={<AddIcon />}>
         Add record
-      </Button>
+      </Button> */}
     </GridToolbarContainer>
   );
 }
@@ -85,74 +83,64 @@ function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
   );
 }
 
+// Enable plugins once
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
+
 export default function FullFeaturedCrudGrid({ SalesTable }) {
-  const isNonMobile = useMediaQuery("(min-width:600px)");
   const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const isNonMobile = useMediaQuery("(min-width:600px)");
   const [rows, setRows] = React.useState(SalesTable); // Use the passed SalesTable
   const [recipes, setRecipes] = React.useState([]);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
+  const [, setNewRowId] = React.useState(null);
 
-   // 👇 Define custom editable date field
-    const MyDateField = (params) => {
-      const { id, field, value, api } = params;
-      const dateValue = value ? dayjs(value) : dayjs();
-  
-      return (
-        <DatePicker
-          value={dateValue}
-          onChange={(newValue) => {
-            api.setEditCellValue(
-              { id, field, value: newValue?.toISOString() },
-              event
-            ); // or without `event` if not available
-          }}
-          format="DD-MM-YYYY"
-          slotProps={{
-            textField: {
-              variant: "outlined",
-              size: "small",
-              sx: {
-                backgroundColor: `#121212 !important`,
-                border: "0px solid lightgray",
-                alignContent: "center",
-                padding: "0px",
-                "& .MuiInputBase-input": {
-                  color: "white",
-                  fontSize: "0.9rem",
-                  padding: "15px",
-                  border: "0px solid lightgray",
-                },
+  // 👇 Define custom editable date field
+  const MyDateField = (params) => {
+    const { id, field, value, api } = params;
+    const dateValue = value ? dayjs(value) : dayjs();
+
+    return (
+      <DatePicker
+        value={dateValue}
+        onChange={(newValue) => {
+          api.setEditCellValue(
+            { id, field, value: newValue?.toISOString() },
+            event
+          ); // or without `event` if not available
+        }}
+        format="DD-MM-YYYY"
+        slotProps={{
+          textField: {
+            variant: "outlined",
+            size: "small",
+            sx: {
+              backgroundColor: "#e7ecef !important", // ✅ light red background
+              "& .MuiInputBase-input": {
+                color: "dimGray", // ✅ text color
+                fontSize: "0.9rem",
+                fontWeight: 400,
+                padding: "14px", // adjust if needed
+              },
+
+              "& fieldset": {
+                border: "1px solid #777", // optional border styling
               },
             },
-          }}
-        />
-      );
-    };
+          },
+        }}
+      />
+    );
+  };
 
   React.useEffect(() => {
     setRows(SalesTable); // Update rows whenever SalesTable changes
   }, [SalesTable]);
   const [rowModesModel, setRowModesModel] = React.useState({});
-  const [, setNewRowId] = React.useState(null);
 
-  // Fetch Recipes when component mounts
-  React.useEffect(() => {
-    const fetchRecipes = async () => {
-      const { data, error } = await supabase
-        .from("recipes")
-        .select("id, recipe_name, recipe_type, actual_sale_price");
-      if (error) {
-        console.error("Supabase Recipes fetch error:", error.message);
-        return;
-      }
-      setRecipes(data || []);
-    };
-
-    fetchRecipes();
-  }, []);
-
-  // Fetch Recipes ddata
+  // Fetch Sales data
   React.useEffect(() => {
     const fetchData = async () => {
       const { data, error } = await supabase.from("sales").select("*");
@@ -162,9 +150,36 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
         return;
       }
 
-      const formattedData = data.map((item) => ({
-        ...item,
-      }));
+      const formattedData = data.map((item) => {
+        let itemsString = "";
+
+        try {
+          const parsedItems =
+            typeof item.items === "string"
+              ? JSON.parse(item.items)
+              : item.items;
+
+          itemsString = parsedItems
+            .map((i) => {
+              const unitPrice = i["disc-price"] ?? i.price;
+              const isDiscounted = !!i["disc-price"];
+              return `${i.quantity} x ${i.name} €${parseFloat(
+                unitPrice
+              ).toFixed(2)}${isDiscounted ? "" : ""} = €${parseFloat(
+                i.total
+              ).toFixed(2)}`;
+            })
+            .join("\n"); // Line breaks for each item
+        } catch (err) {
+          console.warn("Failed to parse items:", item.items, err);
+          itemsString = "";
+        }
+
+        return {
+          ...item,
+          items_display: itemsString,
+        };
+      });
 
       setRows(formattedData);
     };
@@ -223,8 +238,6 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
   const processRowUpdate = async (newRow) => {
     const { isNew, id, ...cleanRow } = newRow;
 
-    cleanRow.total_value_item = cleanRow.quantity_sold * cleanRow.sale_price;
-
     if (isNew) {
       const { data, error } = await supabase
         .from("sales")
@@ -275,10 +288,13 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
   // Filter between dates
   // Get value between dates
   const filteredRows = (rows || []).filter((row) => {
-    const rowDate = dayjs(row.sale_date);
-  
+    const rowDate = dayjs(row.date);
+
     if (fromDate && toDate) {
-      return rowDate.isSameOrAfter(fromDate, "day") && rowDate.isSameOrBefore(toDate, "day");
+      return (
+        rowDate.isSameOrAfter(fromDate, "day") &&
+        rowDate.isSameOrBefore(toDate, "day")
+      );
     }
     if (fromDate) {
       return rowDate.isSameOrAfter(fromDate, "day");
@@ -287,14 +303,20 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
       return rowDate.isSameOrBefore(toDate, "day");
     }
     return true;
-  });  
+  });
+
+  // Count number of Items
+  const totalItemsCount = filteredRows.reduce((sum, row) => {
+    const value = Number(row.total_items);
+    return sum + (isNaN(value) ? 0 : value);
+  }, 0);
 
   // Count entries between dates
   const entryCount = filteredRows.length;
 
-  // Sum total_value_item
+  // Sum sale_total_disc
   const filteredTotalValue = filteredRows.reduce(
-    (sum, row) => sum + (row.total_value_item || 0),
+    (sum, row) => sum + (row.sale_total_disc || 0),
     0
   );
 
@@ -305,34 +327,51 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
     maximumFractionDigits: 2,
   }).format(filteredTotalValue);
 
+  // Customize Toolbar
+  const themeGrid = createTheme({
+    components: {
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            "&.MuiDataGrid-paper": {
+              backgroundColor: "#F2FAF8",
+              color: "#333",
+              fontWeight: 600,
+            },
+          },
+        },
+      },
+    },
+  });
+
   const columns = [
     {
       field: "actions",
       type: "actions",
-      headerName: "Actions",
+      headerName: "Delete",
       width: 100,
       cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
         return isInEditMode
           ? [
-              <GridActionsCellItem
-                icon={<SaveIcon />}
-                label="Save"
-                onClick={handleSaveClick(id)}
-              />,
-              <GridActionsCellItem
-                icon={<CancelIcon />}
-                label="Cancel"
-                onClick={handleCancelClick(id)}
-              />,
+              // <GridActionsCellItem
+              //   icon={<SaveIcon />}
+              //   label="Save"
+              //   onClick={handleSaveClick(id)}
+              // />,
+              // <GridActionsCellItem
+              //   icon={<CancelIcon />}
+              //   label="Cancel"
+              //   onClick={handleCancelClick(id)}
+              // />,
             ]
           : [
-              <GridActionsCellItem
-                icon={<EditIcon />}
-                label="Edit"
-                onClick={handleEditClick(id)}
-              />,
+              // <GridActionsCellItem
+              //   icon={<EditIcon />}
+              //   label="Edit"
+              //   onClick={handleEditClick(id)}
+              // />,
               <GridActionsCellItem
                 icon={<DeleteIcon />}
                 label="Delete"
@@ -342,102 +381,80 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
       },
     },
     {
-      field: "sale_date",
+      field: "date",
       headerName: "Date",
-      width: 180,
+      width: 260,
       editable: true,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
         const date = new Date(params.value);
-        return <span>{formatDate(date)}</span>;
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+
+        const formattedDate = `${day}-${month}-${year} | ${hours}:${minutes}`;
+
+        return <span>{formattedDate}</span>;
       },
+
       renderEditCell: (params) => <MyDateField {...params} />,
     },
     {
-      field: "item_name",
-      headerName: "Item",
-      width: 150,
-      align: "left",
-      headerAlign: "left",
-      editable: true,
-      renderEditCell: (params) => {
-        const handleChange = (event) => {
-          const selectedRecipeName = event.target.value;
-          const selectedRecipe = recipes.find(
-            (r) => r.recipe_name === selectedRecipeName
-          );
-
-          if (selectedRecipe) {
-            params.api.setEditCellValue(
-              {
-                id: params.id,
-                field: "item_name",
-                value: selectedRecipe.recipe_name,
-              },
-              event
-            );
-            params.api.setEditCellValue(
-              {
-                id: params.id,
-                field: "item_type",
-                value: selectedRecipe.recipe_type,
-              },
-              event
-            );
-            params.api.setEditCellValue(
-              {
-                id: params.id,
-                field: "sale_price",
-                value: selectedRecipe.actual_sale_price,
-              },
-              event
-            );
+      field: "items_display",
+      headerName: "Items",
+      width: 350,
+      renderCell: (params) => (
+        <Tooltip
+          title={
+            <pre
+              style={{
+                fontSize: 18,
+                whiteSpace: "pre-wrap",
+                fontWeight: 300,
+                lineHeight: 1.2,
+              }}
+            >
+              {params.row.items_display}
+            </pre>
           }
-        };
-
-        return (
-          <Select
-            value={params.value || ""}
-            onChange={handleChange}
-            fullWidth
-            sx={{
-              color: "lightgray",
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: "#202938" },
+          arrow
+          placement="top"
+          slotProps={{
+            tooltip: {
+              sx: {
+                fontSize: 16,
+                fontWeight: 400,
+                backgroundColor: "#edf6f9", // optional
+                color: "#006d77", // optional
+                border: "1px solid #006d77", // optional
+                borderRadius: 2, // optional
+                padding: "10px", // optional
+                minWidth: "400px", // optional
+              },
+            },
+          }}
+        >
+          <span
+            style={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "block",
+              maxWidth: "100%",
             }}
           >
-            {recipes.map((recipe) => (
-              <MenuItem key={recipe.id} value={recipe.recipe_name}>
-                {recipe.recipe_name}
-              </MenuItem>
-            ))}
-          </Select>
-        );
-      },
+            {params.value}
+          </span>
+        </Tooltip>
+      ),
     },
     {
-      field: "item_type",
-      headerName: "Type",
-      width: 150,
-      editable: true,
-    },
-    {
-      field: "sale_price",
-      headerName: "Price",
-      align: "right",
-      headerAlign: "right",
-      width: 100,
-      editable: true,
-      renderCell: (params) =>
-        params.value && !isNaN(params.value)
-          ? `€ ${new Intl.NumberFormat("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(params.value)}`
-          : "",      
-    },
-    {
-      field: "quantity_sold",
+      field: "total_items",
       headerName: "Qty",
       align: "center",
       headerAlign: "center",
@@ -445,11 +462,59 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
       editable: true,
     },
     {
-      field: "total_value_item",
-      headerName: "Total €",
+      field: "sales_total",
+      headerName: "Sales Total",
+      align: "right",
+      headerAlign: "right",
       type: "numeric",
-      width: 100,
-      editable: false,
+      width: 150,
+      editable: true,
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `€ ${new Intl.NumberFormat("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(params.value)}`
+          : "",
+    },
+    {
+      field: "sale_total_disc",
+      headerName: "Sales w/ Disc",
+      type: "numeric",
+      align: "right",
+      headerAlign: "right",
+      width: 150,
+      editable: true,
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `€ ${new Intl.NumberFormat("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(params.value)}`
+          : "",
+    },
+    {
+      field: "discount_perc",
+      headerName: "Disc %",
+      align: "right",
+      headerAlign: "right",
+      width: 110,
+      editable: true,
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `${new Intl.NumberFormat("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(params.value)}%`
+          : "",
+    },
+
+    {
+      field: "received_amount",
+      headerName: "Paid €",
+      type: "numeric",
+      width: 110,
+      editable: true,
       align: "right",
       headerAlign: "right",
       renderCell: (params) =>
@@ -458,147 +523,321 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             }).format(params.value)}`
-          : "",      
+          : "",
+    },
+    {
+      field: "change_given",
+      headerName: "Change",
+      type: "numeric",
+      width: 110,
+      editable: true,
+      align: "right",
+      headerAlign: "right",
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `€ ${new Intl.NumberFormat("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(params.value)}`
+          : "",
     },
 
-    { field: "notes", headerName: "Notes", width: 250, editable: true },
+    {
+      field: "payment_type",
+      headerName: "Type",
+      width: 110,
+      editable: true,
+    },
+    { field: "comment", headerName: "Comment", width: 180, editable: true },
   ];
 
   return (
-    <Box sx={{ height: 900, width: "100%" }}>
+    <Box
+      sx={{
+        height: "100%",
+        width: "100%",
+        border: "2px solid lightGray",
+        borderRadius: 2,
+        p: 1,
+      }}
+    >
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Box
           display="grid"
-          gap="15px"
+          gap="5px"
           gridTemplateColumns="repeat(4, minmax(0, 1fr))"
           sx={{
             "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-            mb: "20px",
+            mb: "5px",
           }}
         >
-           <DesktopDatePicker  
-            label="From Date"
-            value={fromDate}
-            onChange={(newValue) => setFromDate(dayjs(newValue))}
-            renderInput={(params) => <TextField {...params} fullWidth/>}
-            format="DD-MM-YYYY"
-            sx={{
-              gridColumn: "span 1",
+          <GlobalStyles
+            styles={{
+              ".MuiPickersPopper-root .MuiPaper-root": {
+                backgroundColor: "#f5f5f5 !important",
+                color: "#4a5759 !important",
+                fontSize: "1rem",
+                lineHeight: 1.8,
+                borderRadius: "8px",
+              },
+
+              // Day numbers (default state)
+              ".MuiDayCalendar-weekContainer .MuiPickersDay-root": {
+                color: "#4a5759 !important",
+              },
+
+              // Selected day (override white-on-white)
+              ".MuiDayCalendar-weekContainer .MuiPickersDay-root.Mui-selected":
+                {
+                  backgroundColor: "#2a9d8f !important",
+                  color: "#fff !important",
+                },
+
+              // Today’s date
+              ".MuiDayCalendar-weekContainer .MuiPickersDay-root.MuiDayCalendar-dayWithMargin.MuiPickersDay-today":
+                {
+                  border: "1px solid #2a9d8f",
+                },
+
+              // ✅ Day-of-week headers (top row: S, M, T, etc.)
+              ".MuiDayCalendar-header .MuiTypography-root": {
+                color: "#4a5759 !important",
+                fontWeight: 800,
+              },
+              ".MuiPickersCalendarHeader-root .MuiIconButton-root": {
+                color: "#2a9d8f !important", // or any color you prefer
+              },
             }}
           />
+
+          <DesktopDatePicker
+            label="From Date"
+            value={fromDate}
+            onChange={(newValue) => {
+              const selectedDate = dayjs(newValue);
+              setFromDate(selectedDate);
+
+              // If toDate is empty or equal to old fromDate, update it too
+              if (!toDate || toDate.isSame(fromDate, "day")) {
+                setToDate(selectedDate);
+              }
+            }}
+            format="DD-MM-YYYY"
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                sx: {
+                  "& .MuiInputBase-input": {
+                    color: "dimGray !important",
+                    fontSize: "16px",
+                    fontWeight: 500,
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#38a3a5",
+                    fontSize: "16px",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#38a3a5",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "darkGreen",
+                    },
+                  },
+                  "& .MuiSvgIcon-root": {
+                    color: "#38a3a5",
+                  },
+                },
+              },
+            }}
+          />
+
           <DesktopDatePicker
             label="To Date"
             value={toDate}
             onChange={(newValue) => setToDate(dayjs(newValue))}
-            renderInput={(params) => <TextField {...params} fullWidth/>}
             format="DD-MM-YYYY"
-            sx={{
-              gridColumn: "span 1",
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                sx: {
+                  "& .MuiInputBase-input": {
+                    color: "dimGray !important",
+                    fontSize: "16px",
+                    fontWeight: 500, // semibold
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#38a3a5",
+                    fontSize: "16px",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#38a3a5", // default border
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "darkGreen", // hover border
+                    },
+                  },
+                  "& .MuiSvgIcon-root": {
+                    color: "#38a3a5",
+                  },
+                },
+              },
             }}
           />
-          <Box
+        </Box>
+        <Box
+          display="flex"
+          flexDirection={{ xs: "column", sm: "row" }} // column on mobile, row on larger screens
+          justifyContent="center"
+          alignItems="center"
+          sx={{
+            gridColumn: "span 2",
+            border: "1px solid #38a3a5",
+            borderRadius: "5px",
+            height: { xs: "auto", sm: "56px" }, // auto height for stacking
+            p: 1, // add some padding for breathing room
+            gap: 1, // space between items
+            textAlign: "center",
+          }}
+        >
+          <Button
+            variant="outlined"
+            width="100%"
             sx={{
-              display: "flex", // Enable flexbox layout
-              justifyContent: "left", // Center horizontally
-              alignItems: "center", // Center vertically
-              height: "100%", // Make sure Box takes up the full height
-              gridColumn: "span 2",
+              //  width: "100%",
+              color: colors.orange[500],
+              backgroundColor: "white",
+              fontSize: "14px",
+              fontWeight: 500,
+              border: "2px solid",
+              borderColor: colors.orange[500],
+              "&:hover": {
+                fontWeight: 600,
+                border: "3px solid",
+                borderColor: colors.orange[500],
+              },
+            }}
+            onClick={() => {
+              setFromDate(null);
+              setToDate(null);
             }}
           >
-            <Button
-              color="LightGray"
-              onClick={() => {
-                setFromDate(null);
-                setToDate(null);
-              }}
-              startIcon={<AutorenewIcon sx={{ ml: "11px", scale: 1.3 }} />}
-              sx={{
-                height: "45px",
-                width: "10%", // Full width button
-                "&:hover": {
-                  scale: 1.15, // Scale up on hover
-                  border: "1px solid white", // Change this to the color you want on hover
-                  color: "#white", // Change this to the color you want on hover
-                  cursor: "pointer", // Make the cursor pointer to show it's clickable
-                },
-              }}
-            ></Button>
-
+            Reset
+          </Button>
+          <Box gridColumn={"span 2"} display="flex" alignItems="center">
             <Typography
-              variant="h5"
-              color="lightGray"
-              fontWeight="bold"
               sx={{
-                ml: "20px",
+                color: "#38a3a5",
+                fontSize: "24px",
+                fontWeight: 600,
               }}
             >
               € {formattedFilteredTotalValue}
             </Typography>
+          </Box>
+
+          <Box
+            gridColumn={"span 2"}
+            //  width="50%"
+            display="flex"
+            alignItems="center"
+          >
             <Typography
-              variant="h5"
-              color="lightGray"
-              fontWeight="bold"
               sx={{
-                ml: "20px",
+                color: "#555",
+                fontSize: "18px",
+                fontWeight: 500,
+                mr: 1,
               }}
             >
-              Total from {entryCount} Sales
+              | {`${entryCount}`} Sales
+            </Typography>
+
+            <Typography
+              sx={{
+                color: "#555",
+                fontSize: "18px",
+                fontWeight: 500,
+              }}
+            >
+              | {` ${totalItemsCount}`} Items
             </Typography>
           </Box>
         </Box>
-        <DataGrid
-          rows={filteredRows}
-          columns={columns}
-          editMode="row"
-          rowModesModel={rowModesModel}
-          onRowModesModelChange={handleRowModesModelChange}
-          onRowEditStop={handleRowEditStop}
-          processRowUpdate={processRowUpdate}
-          getRowId={(row) => row.id}
-          slots={{
-            toolbar: () => (
-              <CombinedToolbar
-                setRows={setRows}
-                setNewRowId={setNewRowId}
-                setRowModesModel={setRowModesModel}
-              />
-            ),
-          }}
-          sx={{
-            "& .MuiDataGrid-scrollbar": {
-              overflow: "hidden",
-              scrollBar: "none",
-            },
-            "& .MuiDataGrid-cell": {
-              fontSize: "0.9rem",
-              color: "LightGray",
-            },
-            "& .MuiDataGrid-columnHeader": {
-              backgroundColor: `#202938 !important`,
-            },
-            "& .MuiDataGrid-columnHeaderTitle": {
-              color: "White !important",
-              fontSize: "0.9rem",
-              fontWeight: "bold",
-            },
-            "& .MuiDataGrid-filler": {
-              backgroundColor: `#202938 !important`,
-            },
-            "& .MuiDataGrid-scrollbarFiller": {
-              backgroundColor: `#202938 !important`,
-            },
-            // eliminate columns NUMBER arrow up/down
-            "& input[type=number]::-webkit-inner-spin-button, & input[type=number]::-webkit-outer-spin-button":
-              {
-                WebkitAppearance: "none",
-                margin: 0,
+
+        {/* </Box> */}
+        <ThemeProvider theme={themeGrid}>
+          <DataGrid
+            rows={filteredRows}
+            columns={columns}
+            editMode="row"
+            rowModesModel={rowModesModel}
+            onRowModesModelChange={handleRowModesModelChange}
+            onRowEditStop={handleRowEditStop}
+            processRowUpdate={processRowUpdate}
+            getRowId={(row) => row.id}
+            slots={{
+              toolbar: () => (
+                <CombinedToolbar
+                  setRows={setRows}
+                  setNewRowId={setNewRowId}
+                  setRowModesModel={setRowModesModel}
+                />
+              ),
+            }}
+            sx={{
+              border: "none",
+              "& .MuiDataGrid-scrollbar": {
+                overflow: "hidden",
+                scrollBar: "none",
               },
-            "&. editInputCell": {
-              backgroundColor: "white !important",
-              color: "white !important",
-            },
-          }}
-        />
+              "& .MuiDataGrid-cell": {
+                fontSize: "0.9rem",
+                color: "#111", // dark text for light background
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontSize: "0.9rem",
+                fontWeight: "bold",
+              },
+              "& .MuiButtonBase-root": {
+                color: "#111",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "white !important",
+                color: "#111",
+              },
+              "& .MuiDataGrid-scrollbarFiller": {
+                backgroundColor: "white !important",
+              },
+              "& .MuiButton-text": {
+                color: "#0d1b2a !important",
+              },
+              "& .MuiDataGrid-row--editing .MuiDataGrid-cell": {
+                backgroundColor: "#e7ecef !important",
+                // boxShadow: "none", // remove default shadow if needed
+              },
+              "& .MuiDataGrid-row--editing input": {
+                color: "dimGray !important",
+                fontSize: "15px",
+                fontWeight: 600, // semibold
+              },
+              "& .MuiDataGrid-cell": {
+                borderBlockColor: "lightGray",
+                color: "dimGray !important",
+                fontSize: "15px",
+                fontWeight: 400, // semibold
+              },
+              // other global styles...
+              "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='sale_total_disc']":
+                {
+                  backgroundColor: "red", // light red
+                  color: "#b71c1c", // dark red text
+                  fontWeight: 600,
+                },
+            }}
+          />
+        </ThemeProvider>
       </LocalizationProvider>
     </Box>
   );

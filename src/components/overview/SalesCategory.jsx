@@ -1,100 +1,159 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
-	BarChart,
-	Bar,
-	XAxis,
-	YAxis,
-	Tooltip,
-	ResponsiveContainer,
-	CartesianGrid,
-	LabelList,
-	Cell
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  LabelList,
+  Cell,
 } from "recharts";
 import supabase from "../supabaseClient"; // adjust path if needed
+import { isOverflown } from "@mui/x-data-grid/utils/domUtils";
 
-const COLORS = ["#ff9f1c", "#4cc9f0", "#f15bb5", "#EF4444", "#8338ec", "#f2cc8f", "#EF4444"];
+const COLORS = [
+  "#FFB5E8", // pastel pink
+  "#B28DFF", // pastel purple
+  "#A0E7E5", // pastel cyan
+  "#C3F584", // pastel green
+  "#FFDAC1", // pastel peach
+  "#FFABAB", // pastel red
+  "#D5AAFF", // light lavender
+  "#FFD6E0", // light rose
+  "#B5EAD7", // soft mint
+  "#FF9AA2", // soft pink-red
+  "#E2F0CB", // light lime
+  "#C7CEEA", // light periwinkle
+  "#FBE7C6", // soft cream
+  "#FFF5BA", // pastel yellow
+  "#AEC6CF", // pastel blue-gray
+];
 
 const SalesCategory = () => {
-	const [categoryData, setCategoryData] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
 
-	useEffect(() => {
-		const fetchData = async () => {
-			const { data, error } = await supabase.from("sales").select("item_name");
+  //Fetch from sales table
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data, error } = await supabase.from("sales").select("items");
 
-			if (error) {
-				console.error("Error fetching sales data:", error.message);
-				return;
-			}
+      if (error) {
+        console.error("Error fetching sales data:", error.message);
+        return;
+      }
 
-			// Group by item_name
-			const counts = {};
-			data.forEach(({ item_name }) => {
-				if (item_name) {
-					counts[item_name] = (counts[item_name] || 0) + 1;
-				}
-			});
+      const itemCounts = {};
 
-			// Total for percentage
-			const total = Object.values(counts).reduce((sum, val) => sum + val, 0);
+      data.forEach(({ items }) => {
+        if (items) {
+          let parsedItems;
 
-			// Format: name, value, percent
-			const formatted = Object.entries(counts).map(([name, value]) => ({
-				name,
-				value,
-				percent: ((value / total) * 100).toFixed(1), // as string, e.g. "23.5"
-			}));
+          try {
+            // Supabase might return items already as an object, or as a JSON string
+            parsedItems = typeof items === "string" ? JSON.parse(items) : items;
+          } catch (e) {
+            console.error("Error parsing item JSON:", e);
+            return;
+          }
 
-			setCategoryData(formatted);
-		};
+          parsedItems.forEach(({ name, quantity }) => {
+            if (!name || !quantity) return;
+            itemCounts[name] = (itemCounts[name] || 0) + Number(quantity);
+          });
+        }
+      });
 
-		fetchData();
-	}, []);
+      const total = Object.values(itemCounts).reduce(
+        (sum, val) => sum + val,
+        0
+      );
 
-	return (
-		<motion.div
-			className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700'
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ delay: 0.3 }}
-		>
-			<h2 className='text-lg font-medium mb-4 text-gray-100'>Items Sold</h2>
-			<div className='h-80'>
-				<ResponsiveContainer width="100%" height="100%">
-					<BarChart
-						data={categoryData}
-						layout="vertical"
-						margin={{ top: 10, right: 30, left: 40, bottom: 5 }}
-					>
-						<CartesianGrid strokeDasharray="0.5 1" />
-						<XAxis type="number" stroke="lightGray" />
-						<YAxis dataKey="name" type="category" stroke="lightGray" width={100} />
-						<Tooltip
-						cursor={false}
-							contentStyle={{
-								backgroundColor: "rgba(31, 41, 55, 0.8)",
-								borderColor: "#4B5563",
-							}}
-							itemStyle={{ color: "#E5E7EB" }}
-							formatter={(value, _name, props) => [`${value} sales`, props.payload.name]}
-						/>
-						{/* <Legend /> */}
-						<Bar dataKey="value">
-							{categoryData.map((_entry, index) => (
-								<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-							))}
-							<LabelList
-								dataKey="percent"
-								position="right"
-								formatter={(val) => `${val}%`}
-								fill="#E5E7EB"
-							/>
-						</Bar>
-					</BarChart>
-				</ResponsiveContainer>
-			</div>
-		</motion.div>
-	);
+      const formatted = Object.entries(itemCounts).map(([name, value]) => ({
+        name,
+        value,
+        percent: ((value / total) * 100).toFixed(1),
+      }));
+
+      setCategoryData(formatted);
+    };
+
+    fetchData();
+  }, []);
+
+  return (
+    <motion.div className="bg-gray-100 bg-opacity-50 backdrop-blur-md rounded-xl p-6 border border-gray-100">
+      <h2 className="text-lg font-medium mb-4 text-[#111]">Items Sold</h2>
+      <div className="w-full h-full">
+        <ResponsiveContainer width="100%" height={categoryData.length * 25 + 10}>
+          <BarChart
+            data={categoryData}
+            layout="vertical"
+            height={categoryData.length * 40} // 40px per item (adjust if needed)
+            margin={{ top: 1, right: 50, left: 5, bottom: 1 }}
+          >
+            <CartesianGrid strokeMiterlimit="1 1" stroke="lightGray" />
+            <XAxis type="number" stroke="dimGray" />
+            <YAxis
+              dataKey="name"
+              type="category"
+              stroke="#111"
+              interval={0} // Force show all
+              width={140} // Increased from 100
+              style={{ fontSize: 12, fill: "#111" }}
+              tickLine={false}
+            />
+
+            <Tooltip
+              cursor={true}
+              contentStyle={{
+                backgroundColor: "#f3f4f6",
+                borderColor: "#4B5563",
+              }}
+              itemStyle={{ color: "dimGray" }}
+              formatter={(value, name) => [`${name}: ${value} sales`]} // Shows name and value only
+            />
+            {/* <Legend /> */}
+            <Bar
+              dataKey="value"
+              fill="#4cc9f0"
+              barSize={25}
+              isAnimationActive={true}
+              height={categoryData.length * 40} // Adjust height based on number of items
+            >
+              {categoryData.map((_entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+              <LabelList
+                content={(props) => {
+                  const { x, y, width, height, index } = props;
+                  const name = categoryData[index]?.name;
+                  const percent = categoryData[index]?.percent;
+
+                  return (
+                    <text
+                      x={x + width + 5}
+                      y={y + height / 3}
+                      fill="#555"
+                      fontSize={13}
+                      dominantBaseline="middle"
+                    >
+                      {`${percent}%`}
+                    </text>
+                  );
+                }}
+              />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </motion.div>
+  );
 };
 
 export default SalesCategory;

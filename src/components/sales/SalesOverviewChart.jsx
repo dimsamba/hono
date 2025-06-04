@@ -7,6 +7,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 import { useState, useEffect } from "react";
 import supabase from "../supabaseClient";
@@ -27,7 +28,7 @@ const SalesOverviewChart = () => {
       { data: sales, error: salesError },
       { data: invoices, error: invError },
     ] = await Promise.all([
-      supabase.from("sales").select("sale_date, total_value_item"),
+      supabase.from("sales").select("date, sale_total_disc"),
       supabase.from("invoices").select("invoice_date, amount_ttc"),
     ]);
 
@@ -57,7 +58,7 @@ const SalesOverviewChart = () => {
     };
 
     // 3) Filter each set
-    const filteredSales = sales.filter((s) => inRange(s.sale_date));
+    const filteredSales = sales.filter((s) => inRange(s.date));
     const filteredInvoices = invoices.filter((i) => inRange(i.invoice_date));
 
     if (!filteredSales.length && !filteredInvoices.length) {
@@ -93,14 +94,14 @@ const SalesOverviewChart = () => {
     }
 
     // 5) Sum sales
-    filteredSales.forEach(({ sale_date, total_value_item }) => {
-      const d = new Date(sale_date);
+    filteredSales.forEach(({ date, sale_total_disc }) => {
+      const d = new Date(date);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
         2,
         "0"
       )}`;
       const rec = monthMap.get(key);
-      if (rec) rec.sales += parseFloat(total_value_item) || 0;
+      if (rec) rec.sales += parseFloat(sale_total_disc) || 0;
     });
 
     // 6) Sum expenses
@@ -135,18 +136,13 @@ const SalesOverviewChart = () => {
   };
 
   return (
-    <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
-    >
+    <motion.div className="bg-gray-100 bg-opacity-50 backdrop-blur-md rounded-xl p-6 border border-gray-100">
       <div className="flex items-center justify-between mb-6 w-full">
-        <h2 className="text-lg font-medium mb-4 text-gray-100">
+        <h2 className="text-lg font-medium mb-4 text-[#111]">
           Sales vs. Expenses
         </h2>
         <select
-          className="bg-gray-700 text-white rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="bg-gray-200 text-[#111] rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
           value={selectedTimeRange}
           onChange={(e) => setSelectedTimeRange(e.target.value)}
         >
@@ -164,7 +160,7 @@ const SalesOverviewChart = () => {
             <XAxis dataKey="month" stroke="#9CA3AF" />
             <YAxis stroke="#9CA3AF" />
             <Tooltip
-             cursor={false}
+              cursor={false}
               formatter={(value, name) => [
                 `€${value.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
@@ -173,28 +169,42 @@ const SalesOverviewChart = () => {
                 name === "value" ? "Net Profit" : name,
               ]}
               contentStyle={{
-                backgroundColor: "rgba(31,41,55,0.8)",
+                backgroundColor: "#f3f4f6",
                 borderColor: "#4B5563",
               }}
-              itemStyle={{ color: "#E5E7EB" }}
+              itemStyle={{ color: "#111" }}
             />
-            {/* Sales */}
-            <Area
-              type="monotone"
-              dataKey="sales"
-              name="Sales"
-              stroke="#edf6f9"
-              fill="#00afb9"
-              fillOpacity={0.3}
+            <Legend
+              payload={[
+                { value: "Expenses", type: "triangle", color: "#ff006e" },
+                { value: "Sales", type: "triangle", color: "#00afb9" },
+              ]}
+              align="right"
+              formatter={(value) => {
+                return (
+                  <span style={{ color: "#444", fontSize: "14px" }}>
+                    {value}
+                  </span>
+                );
+              }}
             />
 
-            {/* Expenses */}
+            {/* Sales */}
+
             <Area
               type="monotone"
               dataKey="expenses"
               name="Expenses"
               stroke="#ff006e"
               fill="#ff006e"
+              fillOpacity={0.3}
+            />
+            <Area
+              type="monotone"
+              dataKey="sales"
+              name="Sales"
+              stroke="#edf6f9"
+              fill="#00afb9"
               fillOpacity={0.3}
             />
           </AreaChart>

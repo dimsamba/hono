@@ -59,21 +59,16 @@ const RevenueSummary = () => {
   }, []);
 
   return (
-    <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 lg:col-span-2 border border-gray-700"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 }}
-    >
-      <h2 className="text-lg font-medium mb-4 text-gray-100">
+    <div>
+      <h2 className="text-lg font-medium mb-4 text-[#111]">
         Monthly Net Profit
       </h2>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData}>
-            <CartesianGrid stroke="#4B5563" strokeDasharray="3 3" />
-            <XAxis dataKey="month" stroke="lightGray" />
-            <YAxis stroke="lightGray" />
+            <CartesianGrid stroke="lightGray" strokeDasharray="3 3" />
+            <XAxis dataKey="month" stroke="dimGray" />
+            <YAxis stroke="dimGray" />
             <Tooltip
               cursor={false}
               formatter={(value, name) => [
@@ -93,23 +88,37 @@ const RevenueSummary = () => {
               }}
               itemStyle={{ color: "#E5E7EB" }}
             />
-            <Legend
+            {/* <Legend
               formatter={(value) => {
                 if (value === "total_revenue") return "Gross Revenue";
                 if (value === "net_profit") return "Net Profit";
                 return value;
               }}
+            /> */}
+            <Legend
+              payload={[
+                { value: "Gross Revenue", type: "triangle", color: "#ff006e" },
+                { value: "Net Profit", type: "triangle", color: "#00afb9" },
+              ]}
+              align="right"
+              formatter={(value) => {
+                return (
+                  <span style={{ color: "#444", fontSize: "14px" }}>
+                    {value}
+                  </span>
+                );
+              }}
             />
 
             <Bar
               dataKey="total_revenue"
-              fill="#ff9f1c"
+              fill="#FF9AA2"
               barSize={30}
               label={({ x, y, value }) => (
                 <text
                   x={x + 15}
                   y={y - 10}
-                  fill="lightGray"
+                  fill="#333"
                   fontSize={12}
                   textAnchor="right"
                 >
@@ -122,13 +131,13 @@ const RevenueSummary = () => {
             />
             <Bar
               dataKey="net_profit"
-              fill="#00afb9"
+              fill="#A0E7E5"
               barSize={30}
               label={({ x, y, value }) => (
                 <text
                   x={x + 15}
                   y={y - 10}
-                  fill="lightGray"
+                  fill="#333"
                   fontSize={12}
                   textAnchor="right"
                 >
@@ -142,7 +151,7 @@ const RevenueSummary = () => {
           </BarChart>
         </ResponsiveContainer>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

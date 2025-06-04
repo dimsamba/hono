@@ -11,110 +11,75 @@ const StatCard = ({
   increase,
   subtitle,
   subtitle2,
-  subtitleRed
+  subtitleRed,
 }) => {
-
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
-    <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md overflow-hidden shadow-lg rounded-xl border border-gray-700"
-      whileHover={{ y: 1, boxShadow: "0 10px 25px -15px rgba(0, 2, 0, 1.5)" }}
-    > 
-    <div className="flex justify-between px-1 py-2 sm:p-6">
-  <Box width="100%" display="flex" justifyContent="space-between" alignItems="center">
-    {/* Left Side: Icon, Title, Value, Subtitle */}
-    <Box display="flex" flexDirection="column" gap="6px">
-      <Box display="flex" alignItems="center" gap="8px">
-        <Box>{icon}</Box>
-        <Typography variant="h5" sx={{ color: colors.greenAccent[400] }}>
-          {title}
-        </Typography>
-      </Box>
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        sx={{ color: colors.grey[100] }}
+    // <motion.div
+    //   className="bg-gray-100 bg-opacity-80 backdrop-blur-md overflow-hidden shadow-lg rounded-xl border border-gray-300"
+    //   whileHover={{ y: 1, boxShadow: "0 10px 25px -15px rgba(0, 2, 0, 1.5)" }}
+    // >
+    <div className="flex justify-between px-1 py-2 sm:p-6 border-2 border-gray-300 rounded-lg">
+      <Box
+        width="100%"
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
       >
-        {value}
-      </Typography>
-      <Typography variant="h5" sx={{ color: colors.grey[100] }}>
-        {subtitle}
-      </Typography>
-      <Typography variant="h5" sx={{ color: colors.grey[100] }}>
-        {subtitle2}
-      </Typography>
-      <Typography variant="h5" sx={{ color: colors.orange[600] }}>
-        {subtitleRed}
-      </Typography>
-    </Box>
-
-    {/* Right Side: Progress + Increase */}
-    <Box display="flex" flexDirection="column" marginTop="10px" alignItems="center" gap="8px">
-      <ProgressCircle progress={progress} />
-      <Typography
-        variant="h6"
-        fontStyle="italic"
-        sx={{ 
-          color: colors.greenAccent[400],
-          mr: 1.5
-         }}
-      >
-        {increase}
-      </Typography>
-    </Box>
-  </Box>
-</div>
-
-
-
-
-
-
-    {/* <div className="flex justify-between px-1 py-2 sm:p-6">
-       <Box width="100%" m="0 30px">
-      <Box display="flex-2 " justifyContent="space-between">
-        <Box>
-         <p className="mb-2">{icon}</p> 
-         <Typography variant="h5" sx={{ color: colors.blueAccent[200] }}>
-            {title}
-          </Typography>
-        </Box>
-        <Box>
+        {/* Left Side: Icon, Title, Value, Subtitle */}
+        <Box display="flex" flexDirection="column" gap="6px">
+          <Box display="flex" alignItems="center" gap="8px">
+            <Box>{icon}</Box>
+            <Typography variant="h5" sx={{ color: colors.greenAccent[600] }}>
+              {title}
+            </Typography>
+          </Box>
           <Typography
             variant="h4"
             fontWeight="bold"
-            sx={{ color: colors.grey[100], mb:0.5 }}
+            sx={{  color: colors.orange[500]}}
           >
             {value}
           </Typography>
+          <Typography variant="h5" sx={{ color: colors.grey[600] }}>
+            {subtitle}
+          </Typography>
+          <Typography variant="h5" sx={{ color: colors.grey[600] }}>
+            {subtitle2}
+          </Typography>
+          <Typography variant="h5" sx={{ color: colors.orange[500] }}>
+            {subtitleRed}
+          </Typography>
         </Box>
-        <Box>
-          <ProgressCircle progress={progress} />
-        </Box>
-      </Box>
-      <Box display="flex" justifyContent="space-between" mt="2px">
-        <Typography variant="h5" sx={{ color: colors.blueAccent[200] }}>
-          {subtitle}
-        </Typography>
-        <Typography
-          variant="h4"
-          fontStyle="italic"
-          sx={{ color: colors.greenAccent[400] }}
+
+        {/* Right Side: Progress + Increase */}
+        <Box
+          display="flex"
+          flexDirection="column"
+          marginTop="10px"
+          alignItems="center"
+          gap="8px"
         >
-          {increase}
-        </Typography>
+          <ProgressCircle progress={progress} />
+          <Typography
+            variant="h6"
+            fontStyle="italic"
+            sx={{
+              color: colors.greenAccent[600],
+              mr: 1.5,
+            }}
+          >
+            {increase}
+          </Typography>
+        </Box>
       </Box>
-    </Box>
-    </div> */}
-    </motion.div>
+    </div>
+    // </motion.div>
   );
 };
 
 export default StatCard;
-
-
-
 
 // <motion.div
 // className="bg-gray-800 bg-opacity-50 backdrop-blur-md overflow-hidden shadow-lg rounded-xl border border-gray-700"

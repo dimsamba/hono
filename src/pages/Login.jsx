@@ -37,9 +37,9 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-900">
+    <div className="min-h-screen flex justify-center items-center bg-gray-100">
       <motion.div
-        className="bg-gray-900 p-8 rounded-lg shadow-lg w-full max-w-md"
+        className="bg-gray-100 p-8 rounded-lg shadow-lg w-full max-w-md"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
@@ -48,7 +48,7 @@ function Login() {
           <span className="block text-red-400 text-center mb-4">{message}</span>
         )}
 
-        <h2 className="text-xl font-bold text-center text-blue-100 mb-6">
+        <h2 className="text-xl font-bold text-center text-[#0a9396] mb-6">
           Log In
         </h2>
 
@@ -107,24 +107,11 @@ function Login() {
           />
 
           <button
-            className="px-6 py-3 min-w-full text-lg font-semibold text-center text-blue-100 bg-gray-700 hover:bg-green-500 rounded-lg shadow-md hover:text-white transition"
+            className="px-6 py-3 min-w-full text-lg font-semibold text-center text-blue-100 bg-gray-500 hover:bg-green-500 rounded-lg shadow-md hover:text-white transition"
             type="submit"
           >
             Log in
           </button>
-
-          {/* <div className="flex flex-col sm:flex-row-2 items-center justify-center gap-4 mt-4">
-            <Link
-              to="/register"
-              className="px-6 py-3 min-w-full sm:w-auto text-lg font-semibold text-center text-blue-100 bg-gray-700 hover:bg-blue-500 rounded-lg shadow-md hover:text-white transition"
-              onClick={() => {
-                setEmail("");
-                setPassword("");
-              }}
-            >
-              Create new Account
-            </Link>
-          </div> */}
         </form>
       </motion.div>
     </div>

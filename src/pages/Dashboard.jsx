@@ -15,6 +15,8 @@ import RecipePage from "../pages/RecipePage";
 import CalendarPage from "../pages/CalendarPage";
 import StockTackPage from "./StockTakePage";
 import CostCalculatorPage from "./CostCalculatorPage";
+import ItemsListPage from "./itemsListPage";
+import POSPage from "./POSPage";
 
 function Dashboard() {
   const [theme] = useMode();
@@ -29,46 +31,48 @@ function Dashboard() {
     "/inventory": "Inventory",
     "/supplier": "Suppliers",
     "/invoice": "Expenses",
-    "/recipe": "Recipe",   
+    "/recipe": "Recipe",
     "/calendar": "Agenda",
     "/stockTake": "Stock Take",
     "/cost": "Cost Calculator",
+    "/posPage": "Vendor",
+    "/items": "Items List",
   };
 
   return (
-   // <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <div className="flex h-screen bg-gray-800 text-gray-100 overflow-hidden">
-          {/* Sidebar */}
-          <Sidebar isSidebarOpen={isSidebar} />
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <div className="flex h-screen bg-gray-100 text-[#311] overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar isSidebarOpen={isSidebar} />
 
-          {/* Main content area */}
-          <div className="flex flex-col flex-1">
-            {/* Topbar */}
-            <Topbar
-              setIsSidebar={setIsSidebar}
-              title={pageTitles[location.pathname] || "Dashboard"}
-            />
-            {/* Page content */}
-            <div className="flex-1 overflow-y-scroll p-4 scrollbar-hide">
-              <Routes>
-                <Route path="overview" element={<OverviewPage />} />
-                <Route path="cost" element={<CostCalculatorPage />} />
-                <Route path="sales" element={<SalesPage />} />
-                <Route path="converter" element={<TextConvetPage />} />
-                <Route path="inventory" element={<InventoryPage />} />
-                <Route path="supplier" element={<SupplierPage />} />
-                <Route path="invoice" element={<InvoicePage />} />
-                <Route path="recipe" element={<RecipePage />} />
-                <Route path="calendar" element={<CalendarPage />} />
-                <Route path="stockTake" element={<StockTackPage />} />
-              </Routes>
-            </div>{" "}
-          </div>
+        {/* Main content area */}
+        <div className="flex flex-col flex-1">
+          {/* Topbar */}
+          <Topbar
+            setIsSidebar={setIsSidebar}
+            title={pageTitles[location.pathname] || "Dashboard"}
+          />
+          {/* Page content */}
+          <div className="flex-1 overflow-y-scroll p-4 scrollbar-hide">
+            <Routes>
+              <Route path="overview" element={<OverviewPage />} />
+              <Route path="cost" element={<CostCalculatorPage />} />
+              <Route path="sales" element={<SalesPage />} />
+              <Route path="converter" element={<TextConvetPage />} />
+              <Route path="inventory" element={<InventoryPage />} />
+              <Route path="supplier" element={<SupplierPage />} />
+              <Route path="invoice" element={<InvoicePage />} />
+              <Route path="recipe" element={<RecipePage />} />
+              <Route path="calendar" element={<CalendarPage />} />
+              <Route path="stockTake" element={<StockTackPage />} />
+              <Route path="vendor" element={<POSPage />} />
+              <Route path="items" element={<ItemsListPage />} />
+            </Routes>
+          </div>{" "}
         </div>
-      </ThemeProvider>
-   // </ColorModeContext.Provider>
+      </div>
+    </ThemeProvider>
   );
 }
 

@@ -9,6 +9,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
 import supabase from "../supabaseClient"; // update the path as needed
 import dayjs from "dayjs"; // if not already imported
+import { GlobalStyles, FormControl } from "@mui/material";
 
 const CostForm = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -314,82 +315,110 @@ const CostForm = () => {
     }
   };
 
+  // TextField and InputLabel customizations
+  const sharedStyles = {
+    backgroundColor: "#ebf1fa",
+    "& .MuiInputLabel-root": {
+      color: "#007f5f",
+      fontSize: 14,
+      backgroundColor: "#ebf1fa",
+      px: 1,
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        border: "1px solid #60d394",
+      },
+      "&:hover fieldset": {
+        borderColor: "#60d394",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#25a18e",
+      },
+    },
+  };
+
   return (
     <div className="flex-1 overflow-hidden relative z-10 bg-primary-700">
       <main className="max-w-5xl mx-auto py-6 px-4 lg:px-8 scrollbar-hide">
-        <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+        <Box
+          display="grid"
+          gap="15px"
+          gridTemplateColumns="repeat(2, minmax(0, 1fr))"
+          sx={{
+            "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+          }}
         >
-          <Box
-            display="grid"
-            gap="15px"
-            gridTemplateColumns="repeat(2, minmax(0, 1fr))"
+          {/* Grand Expenses & Grand Revenue */}
+          <StatCard
+            icon={
+              <EuroSymbolOutlinedIcon
+                sx={{ color: "#38a3a5", fontSize: "26px" }}
+              />
+            }
+            title={"Sumary between dates"}
+            value={
+              <span className={netProfitFromDates < 0 ? "text-red-400" : ""}>
+                Net Profit: € {formatCurrency(netProfitFromDates)}
+              </span>
+            }
+            subtitle={`Revenue: € ${formatCurrency(totalRevenue)}`}
+            subtitle2={`Expenses: € ${formatCurrency(totalExpenses)}`}
+            progress={profitMarginBetwnDates} // Ensures it's a valid number for the progress bar
+            increase={
+              <span
+                className={profitMarginBetwnDates < 0 ? "text-red-400" : ""}
+              >
+                {`${(profitMarginBetwnDates * 100).toFixed(2)} %`}
+              </span>
+            }
             sx={{
-              "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+              gridColumn: "span 1",
             }}
-          >
-            {/* Grand Expenses & Grand Revenue */}
-            <StatCard
-              icon={
-                <EuroSymbolOutlinedIcon
-                  sx={{ color: colors.greenAccent[400], fontSize: "26px" }}
-                />
-              }
-              title={"Sumary between dates"}
-              value={
-                <span className={netProfitFromDates < 0 ? "text-red-400" : ""}>
-                  Net Profit: € {formatCurrency(netProfitFromDates)}
-                </span>
-              }
-              subtitle={`Revenue: € ${formatCurrency(totalRevenue)}`}
-              subtitle2={`Expenses: € ${formatCurrency(totalExpenses)}`}
-              progress={profitMarginBetwnDates} // Ensures it's a valid number for the progress bar
-              increase={
-                <span className={profitMarginBetwnDates < 0 ? "text-red-400" : ""}>
-                  {`${(profitMarginBetwnDates * 100).toFixed(2)} %`}
-                </span>
-              }
-              sx={{
-                gridColumn: "span 1",
-              }}
-            />
+          />
 
-            {/* Grand Net Revenue */}
-            <StatCard
-              icon={
-                <EuroSymbolOutlinedIcon
-                  sx={{ color: colors.greenAccent[400], fontSize: "26px" }}
-                />
-              }
-              title={"Latest Entry"}
-              value={
-                <span className={netProfit < 0 ? "text-red-400" : ""}>
-                  Net Profit: € {formatCurrency(netProfit)}
-                </span>
-              }
-              subtitle={`Revenue: € ${formatCurrency(revenue)}`}
-              subtitle2={`Expenses: € ${formatCurrency(expenses)}`}
-              progress={profitMargin} // Ensures it's a valid number for the progress bar
-              increase={
-                <span className={profitMargin < 0 ? "text-red-400" : ""}>
-                  {`${(profitMargin * 100).toFixed(2)} %`}
-                </span>
-              }
-              sx={{
-                gridColumn: "span 1",
-              }}
-            />
-          </Box>
-        </motion.div>
-        <Box>
+          {/* Grand Net Revenue */}
+          <StatCard
+            icon={
+              <EuroSymbolOutlinedIcon
+                sx={{ color: "#38a3a5", fontSize: "26px" }}
+              />
+            }
+            title={"Latest Entry"}
+            value={
+              <span className={netProfit < 0 ? "text-red-400" : ""}>
+                Net Profit: € {formatCurrency(netProfit)}
+              </span>
+            }
+            subtitle={`Revenue: € ${formatCurrency(revenue)}`}
+            subtitle2={`Expenses: € ${formatCurrency(expenses)}`}
+            progress={profitMargin} // Ensures it's a valid number for the progress bar
+            increase={
+              <span className={profitMargin < 0 ? "text-red-400" : ""}>
+                {`${(profitMargin * 100).toFixed(2)} %`}
+              </span>
+            }
+            sx={{
+              gridColumn: "span 1",
+            }}
+          />
+        </Box>
+        <Box
+          sx={{
+            height: 1200,
+            width: "100%",
+            border: "2px solid lightGray",
+            borderRadius: 2,
+            padding: 1,
+            mt: 2,
+          }}
+        >
           <form onSubmit={(e) => e.preventDefault()}>
-            <h3 className="text-base mb-2 text-LightGray">Expenses System</h3>
+            <h3 className="text-base mb-2 ml-1 mt-1 text-[#333]">
+              Expenses System
+            </h3>
             <Box
               display="grid"
-              gap="10px"
+              gap="15px"
               gridTemplateColumns={
                 isMobile ? "repeat(2, 1fr)" : "repeat(2, 1fr)"
               }
@@ -397,6 +426,44 @@ const CostForm = () => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 2" },
               }}
             >
+              <GlobalStyles
+                styles={{
+                  ".MuiPickersPopper-root .MuiPaper-root": {
+                    backgroundColor: "#f5f5f5 !important",
+                    color: "#4a5759 !important",
+                    fontSize: "1rem",
+                    lineHeight: 1.8,
+                    borderRadius: "8px",
+                  },
+
+                  // Day numbers (default state)
+                  ".MuiDayCalendar-weekContainer .MuiPickersDay-root": {
+                    color: "#4a5759 !important",
+                  },
+
+                  // Selected day (override white-on-white)
+                  ".MuiDayCalendar-weekContainer .MuiPickersDay-root.Mui-selected":
+                    {
+                      backgroundColor: "#2a9d8f !important",
+                      color: "#fff !important",
+                    },
+
+                  // Today’s date
+                  ".MuiDayCalendar-weekContainer .MuiPickersDay-root.MuiDayCalendar-dayWithMargin.MuiPickersDay-today":
+                    {
+                      border: "1px solid #2a9d8f",
+                    },
+
+                  // ✅ Day-of-week headers (top row: S, M, T, etc.)
+                  ".MuiDayCalendar-header .MuiTypography-root": {
+                    color: "#4a5759 !important",
+                    fontWeight: 800,
+                  },
+                  ".MuiPickersCalendarHeader-root .MuiIconButton-root": {
+                    color: "#2a9d8f !important", // or any color you prefer
+                  },
+                }}
+              />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DesktopDatePicker
                   label="Date From"
@@ -404,13 +471,20 @@ const CostForm = () => {
                   onChange={(newValue) => setFromDate(newValue)}
                   renderInput={(params) => <TextField {...params} fullWidth />}
                   format="DD-MM-YYYY"
-                  sx={{
-                    gridColumn: isMobile ? "span 2" : "span 1",
-                    "& .MuiInputBase-root": {
-                      backgroundColor: "#333D49",
-                      "&.Mui-focused": { backgroundColor: "#454B55" },
-                      ":hover": {
-                        backgroundColor: "#3C4553",
+                  slotProps={{
+                    textField: {
+                      variant: "outlined",
+                      size: "small",
+                      sx: {
+                        ...sharedStyles,
+                        "& .MuiSvgIcon-root": {
+                          color: "#2a9d8f",
+                        },
+                        "& .MuiInputBase-input": {
+                          color: "#2a9d8f",
+                          fontSize: "1rem",
+                          fontWeight: 500,
+                        },
                       },
                     },
                   }}
@@ -421,98 +495,118 @@ const CostForm = () => {
                   onChange={(newValue) => setToDate(newValue)}
                   renderInput={(params) => <TextField {...params} fullWidth />}
                   format="DD-MM-YYYY"
-                  sx={{
-                    gridColumn: isMobile ? "span 2" : "span 1",
-                    "& .MuiInputBase-root": {
-                      backgroundColor: "#333D49",
-                      "&.Mui-focused": { backgroundColor: "#454B55" },
-                      ":hover": {
-                        backgroundColor: "#3C4553",
+                  slotProps={{
+                    textField: {
+                      variant: "outlined",
+                      size: "small",
+                      sx: {
+                        ...sharedStyles,
+                        "& .MuiSvgIcon-root": {
+                          color: "#2a9d8f",
+                        },
+                        "& .MuiInputBase-input": {
+                          color: "#2a9d8f",
+                          fontSize: "1rem",
+                          fontWeight: 500,
+                        },
                       },
                     },
                   }}
                 />
               </LocalizationProvider>
 
-              <TextField
+              <FormControl
                 fullWidth
-                label="Expenses from Invoices"
-                variant="filled"
-                value={`€ ${formatCurrency(expensesFromInvoices)}`}
-                slotProps={{ readOnly: true }}
-                sx={{
-                  gridColumn: isMobile ? "span 1" : "span 1",
-                  "& .MuiInputLabel-root": {
-                    "&.Mui-focused": {
-                      color: colors.greenAccent[100],
-                    },
-                  },
-                }}
-              />
-              <TextField
+                variant="outlined"
+                sx={{ gridColumn: "span 2" }}
+              >
+                <TextField
+                  fullWidth
+                  label="Expenses from Invoices"
+                  variant="outlined"
+                  value={`€ ${formatCurrency(expensesFromInvoices)}`}
+                  slotProps={{ readOnly: true }}
+                  sx={{
+                    ...sharedStyles,
+                    input: { color: "#333", fontSize: 16 },
+                  }}
+                />
+              </FormControl>
+              <FormControl
                 fullWidth
-                label="Other Expenses"
-                variant="filled"
-                value={otherExpenses}
-                onChange={handleOtherExpenses}
-                sx={{
-                  gridColumn: isMobile ? "span 1" : "span 1",
-                  "& .MuiInputLabel-root": {
-                    "&.Mui-focused": {
-                      color: colors.greenAccent[100],
-                    },
-                  },
-                }}
-              />
+                variant="outlined"
+                sx={{ gridColumn: "span 2" }}
+              >
+                <TextField
+                  fullWidth
+                  label="Other Expenses"
+                  variant="outlined"
+                  value={otherExpenses}
+                  onChange={handleOtherExpenses}
+                  sx={{
+                    ...sharedStyles,
+                    input: { color: "#333", fontSize: 16 },
+                  }}
+                />
+              </FormControl>
+              <FormControl
+                fullWidth
+                variant="outlined"
+                sx={{ gridColumn: "span 2" }}
+              >
+                <TextField
+                  fullWidth
+                  label="Revenue from Sales"
+                  variant="outlined"
+                  value={`€ ${formatCurrency(amountFromSales)}`}
+                  slotProps={{ readOnly: true }}
+                  sx={{
+                    ...sharedStyles,
+                    input: { color: "#333", fontSize: 16 },
+                  }}
+                />
+              </FormControl>
+              <FormControl
+                fullWidth
+                variant="outlined"
+                sx={{ gridColumn: "span 2" }}
+              >
+                <TextField
+                  fullWidth
+                  label="Other Revenue"
+                  variant="outlined"
+                  value={otherRevenue}
+                  onChange={handleOtherRevenueChange}
+                  sx={{
+                    ...sharedStyles,
+                    input: { color: "#333", fontSize: 16 },
+                  }}
+                />
+              </FormControl>
+              <FormControl
+                fullWidth
+                variant="outlined"
+                sx={{ gridColumn: "span 2" }}
+              >
+                <TextField
+                  fullWidth
+                  label="Comment"
+                  variant="outlined"
+                  multiline
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  minRows={2}
+                  sx={{
+                    ...sharedStyles,
+                    gridColumn: isMobile ? "span 2" : "span 2",
 
-              <TextField
-                fullWidth
-                label="Revenue from Sales"
-                variant="filled"
-                value={`€ ${formatCurrency(amountFromSales)}`}
-                slotProps={{ readOnly: true }}
-                sx={{
-                  gridColumn: isMobile ? "span 1" : "span 1",
-                  "& .MuiInputLabel-root": {
-                    "&.Mui-focused": {
-                      color: colors.greenAccent[100],
+                    "& .MuiInputBase-inputMultiline": {
+                      color: "#333", // ✅ text color for textarea
+                      fontSize: 16,
                     },
-                  },
-                }}
-              />
-              <TextField
-                fullWidth
-                label="Other Revenue"
-                variant="filled"
-                value={otherRevenue}
-                onChange={handleOtherRevenueChange}
-                sx={{
-                  gridColumn: isMobile ? "span 1" : "span 1",
-                  "& .MuiInputLabel-root": {
-                    "&.Mui-focused": {
-                      color: colors.greenAccent[100],
-                    },
-                  },
-                }}
-              />
-
-              <TextField
-                fullWidth
-                label="Comment"
-                variant="filled"
-                multiline
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                rows={3}
-                sx={{
-                  gridColumn: isMobile ? "span 2" : "span 2",
-                  "& .MuiInputLabel-root": {
-                    "&.Mui-focused": {
-                      color: colors.greenAccent[100],
-                    },
-                  },
-                }}
-              />
+                  }}
+                />
+              </FormControl>
             </Box>
 
             {/* Buttons */}
@@ -602,26 +696,38 @@ const CostForm = () => {
 
           {/* Saved Stock Takes */}
           <Box>
-            <div className="p-4 bg-[#333D49] text-white rounded-lg shadow mt-5">
+            <div className="p-4 bg-gray-100 text-[#444] my-2 ">
               <h2 className="text-xl mb-4">Saved Financials</h2>
 
-              <div className="overflow-x-auto max-h-[400px] overflow-y-auto hide-scrollbar">
+              <div className="overflow-x-auto max-h-[500px] overflow-y-auto hide-scrollbar">
                 <table className="table-auto w-full text-sm">
                   <thead className="bg-[#2a303a] sticky top-0 z-10">
                     <tr>
-                      <th className="p-2 text-center">From</th>
-                      <th className="p-2 text-center">To</th>
-                      <th className="p-2 text-right">Expenses (€)</th>
-                      <th className="p-2 text-right">Revenue (€)</th>
-                      <th className="p-2 text-right">Profit (€)</th>
-                      <th className="p-2 text-left">Comment</th>
+                      <th className="p-2 text-center text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                        From
+                      </th>
+                      <th className="p-2 text-center text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                        To
+                      </th>
+                      <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                        Expenses (€)
+                      </th>
+                      <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                        Revenue (€)
+                      </th>
+                      <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                        Profit (€)
+                      </th>
+                      <th className="p-2 text-left text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                        Comment
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {financialsData.map((item, index) => (
                       <tr
                         key={index}
-                        className="border-b border-gray-700 hover:bg-gray-800"
+                        className="border-b border-gray-700 hover:bg-gray-200"
                         onClick={() => handleCostSelect(item.id)} // 👈 Add this line
                       >
                         <td className="p-2 text-center">

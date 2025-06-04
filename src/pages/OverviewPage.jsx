@@ -50,13 +50,13 @@ const OverviewPage = () => {
     setTotalExpenses(invoiceVal + otherVal);
   }, [expensesFromInvoices, otherExpenses]);
 
- // Filter sales from last 30 days
+  // Filter sales from last 30 days
   const now = new Date();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(now.getDate() - 30);
 
   const salesLastMonth = sales.filter((sale) => {
-    const saleDate = new Date(sale.sale_date);
+    const saleDate = new Date(sale.date);
 
     // Debug log to verify filtering
     const isInLast30Days = saleDate >= thirtyDaysAgo && saleDate <= now;
@@ -66,12 +66,12 @@ const OverviewPage = () => {
   });
 
   const totalSalesValue = sales.reduce(
-    (sum, sale) => sum + parseFloat(sale.total_value_item || 0),
+    (sum, sale) => sum + parseFloat(sale.sale_total_disc || 0),
     0
   );
 
   const totalSalesValue30Days = salesLastMonth.reduce(
-    (sum, sale) => sum + parseFloat(sale.total_value_item || 0),
+    (sum, sale) => sum + parseFloat(sale.sale_total_disc || 0),
     0
   );
 
@@ -87,7 +87,7 @@ const OverviewPage = () => {
 
       const formattedData = data.map((row) => ({
         ...row,
-        sale_date: row.sale_date ? new Date(row.sale_date) : new Date(),
+        date: row.date ? new Date(row.date) : new Date(),
       }));
 
       setSales(formattedData); // Update rows state with the fetched data
@@ -173,7 +173,7 @@ const OverviewPage = () => {
     >
       <main className="max-w-9xl mx-auto py-6 px-4 lg:px-8">
         <motion.div
-          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8"
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mb-5"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
@@ -182,7 +182,7 @@ const OverviewPage = () => {
           <StatCard
             icon={
               <EuroSymbolOutlinedIcon
-                sx={{ color: colors.greenAccent[400], fontSize: "26px" }}
+                sx={{ color: "#38a3a5", fontSize: "26px" }}
               />
             }
             title={"30 days Financial Summary"}
@@ -203,31 +203,29 @@ const OverviewPage = () => {
 
           {/* Sales */}
           <StatCard
-              icon={
-                <PointOfSaleIcon
-                  sx={{ color: colors.greenAccent[400], fontSize: "26px" }}
-                />
-              }
-              title={`${sales.length} Sales`}
-              value={`€ ${totalSalesValue.toFixed(2)}`}
-              subtitle={`${
-                salesLastMonth.filter((sale) => {
-                  const today = new Date();
-                  const thirtyDaysAgo = new Date();
-                  thirtyDaysAgo.setDate(today.getDate() - 30);
+            icon={
+              <PointOfSaleIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
+            }
+            title={`${sales.length} Sales`}
+            value={`€ ${formatCurrency(totalSalesValue)}`}
+            subtitle={`${
+              salesLastMonth.filter((sale) => {
+                const today = new Date();
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(today.getDate() - 30);
 
-                  const saleDate = new Date(sale.sale_date); // or sale.sale_date
-                  return saleDate >= thirtyDaysAgo && saleDate <= today;
-                }).length
-              } Sales in last 30 Days`}
-              subtitle2={`€ ${totalSalesValue30Days.toFixed(2)}`}
-            />
+                const saleDate = new Date(sale.date); // or sale.date
+                return saleDate >= thirtyDaysAgo && saleDate <= today;
+              }).length
+            } Sales in last 30 Days`}
+            subtitle2={`€ ${formatCurrency(totalSalesValue30Days)}`}
+          />
 
           {/* Inventory */}
           <StatCard
             icon={
               <InventoryOutlinedIcon
-                sx={{ color: colors.greenAccent[400], fontSize: "26px" }}
+                sx={{ color: "#38a3a5", fontSize: "26px" }}
               />
             }
             title={"Inventory in Database"}
@@ -246,9 +244,7 @@ const OverviewPage = () => {
           {/* Recipes */}
           <StatCard
             icon={
-              <RamenDiningIcon
-                sx={{ color: colors.greenAccent[400], fontSize: "26px" }}
-              />
+              <RamenDiningIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
             }
             title={"Recipe in Database"}
             value={`${recipes.length} Recipes`}
@@ -265,10 +261,31 @@ const OverviewPage = () => {
         </motion.div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <SalesOverviewChart />
-          <SalesCategory />
-          <RevenueSumary />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <motion.div
+            className="bg-gray-100 border-2 p-1 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-lg border-gray-300"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+          >
+            <SalesOverviewChart />
+          </motion.div>
+          <motion.div
+            className="bg-gray-100 border-2 p-6 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-lg border-gray-300"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+          >
+            <RevenueSumary />
+          </motion.div>
+          <motion.div
+            className="col-span-1 lg:col-span-2 bg-gray-100 border-2 p-1 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-lg border-gray-300"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+          >
+            <SalesCategory />
+          </motion.div>
         </div>
       </main>
     </div>

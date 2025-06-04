@@ -1,33 +1,38 @@
-import {
-  BarChart2,
-  DollarSign,
-  LogOutIcon,
-  Menu,
-  TrendingUp,
-  KeySquare,
-  Warehouse,
-  Contact,
-  ReceiptEuro,
-  CookingPot,
-  CalendarSearch,
-} from "lucide-react";
+import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
+import LocalAtmOutlinedIcon from '@mui/icons-material/LocalAtmOutlined';
+import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
+import PostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
+import ContactPhoneOutlinedIcon from '@mui/icons-material/ContactPhoneOutlined';
+import OutdoorGrillOutlinedIcon from '@mui/icons-material/OutdoorGrillOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
+import EuroOutlinedIcon from '@mui/icons-material/EuroOutlined';
+import DateRangeOutlinedIcon from '@mui/icons-material/DateRangeOutlined';
+import SyncProblemOutlinedIcon from '@mui/icons-material/SyncProblemOutlined';
+
+import {
+  LogOutIcon,
+  Menu
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../supabaseClient";
 
 const SIDEBAR_ITEMS = [
-  { name: "Overview", icon: BarChart2, color: "#65CABD", href: "/overview" },
-  { name: "Inventory", icon: Warehouse, color: "#65CABD", href: "/inventory" },
-  { name: "Expenses", icon: ReceiptEuro, color: "#65CABD", href: "/invoice" },
-  { name: "Suppliers", icon: Contact, color: "#65CABD", href: "/supplier" },
-  { name: "Recipe", icon: CookingPot, color: "#65CABD", href: "/recipe" },
-  { name: "Stock Take", icon: InventoryOutlinedIcon, color: "#65CABD", href: "/stockTake" },
-  { name: "Sales", icon: DollarSign, color: "#65CABD", href: "/sales" },
-  { name: "Cost Calculator", icon: TrendingUp, color: "#65CABD", href: "/cost" },
-  { name: "Agenda", icon: CalendarSearch, color: "#65CABD", href: "/calendar" },
-  { name: "Converter", icon: KeySquare, color: "#65CABD", href: "/converter" }, 
+  { name: "Overview", icon: InsertChartOutlinedIcon, color: "#3FA89B", href: "/overview" },
+  { name: "Vendor", icon: StorefrontOutlinedIcon, color: "#3FA89B", href: "/vendor" },
+  { name: "Item's List", icon: PostAddOutlinedIcon, color: "#3FA89B", href: "/items" },
+  { name: "Inventory", icon: Inventory2OutlinedIcon, color: "#3FA89B", href: "/inventory" },
+  { name: "Expenses", icon: ReceiptLongOutlinedIcon, color: "#3FA89B", href: "/invoice" },
+  { name: "Suppliers", icon: ContactPhoneOutlinedIcon, color: "#3FA89B", href: "/supplier" },
+  { name: "Recipe", icon: OutdoorGrillOutlinedIcon, color: "#3FA89B", href: "/recipe" },
+  { name: "Stock Take", icon: InventoryOutlinedIcon, color: "#3FA89B", href: "/stockTake" },
+  { name: "Sales", icon: LocalAtmOutlinedIcon, color: "#3FA89B", href: "/sales" },
+  { name: "Cost Calculator", icon: EuroOutlinedIcon, color: "#3FA89B", href: "/cost" },
+  { name: "Agenda", icon: DateRangeOutlinedIcon, color: "#3FA89B", href: "/calendar" },
+  { name: "Converter", icon: SyncProblemOutlinedIcon, color: "#3FA89B", href: "/converter" }, 
 ];
 
 const Sidebar = () => {
@@ -61,30 +66,31 @@ const Sidebar = () => {
       }`}
       animate={{ width: isSidebarOpen ? 175 : 65 }}
     >
-      <div className="h-full bg-gray-800 bg-opacity-50 backdrop-blur-md p-3 flex flex-col border-r border-gray-700 overflow-y-auto scrollbar-hide">
+      <div className="h-full bg-gray-100 bg-opacity-100 p-3 flex flex-col border-r border-gray-200 overflow-y-auto scrollbar-hide">
         {/* Sidebar Toggle Button */}
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="p-2 rounded-full hover:bg-gray-700 transition-colors max-w-fit"
+          className="p-2 rounded-full hover:bg-gray-200 transition-colors max-w-fit"
         >
-          <Menu className="text-[16px] sm:text-[24px]" />
+         <Menu className="text-[16px] sm:text-[24px] text-gray-800" />
+
         </motion.button>
 
         {/* Navigation */}
         <nav className="mt-8 flex-grow">
           {SIDEBAR_ITEMS.map((item) => (
             <Link key={item.href} to={item.href}>
-              <motion.div className="flex items-center p-3 pl-2 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2">
+              <motion.div className="flex items-center p-2 pl-2 text-sm font-medium rounded-lg hover:bg-gray-300 transition-colors mb-2">
                 <item.icon
                   className="text-[16px] sm:text-[20px]"
-                  style={{ color: item.color, minWidth: "16px" }}
+                  style={{ color: item.color ?? "#333", minWidth: "16px" }}
                 />
                 <AnimatePresence>
                   {isSidebarOpen && (
                     <motion.span
-                      className="ml-4 whitespace-nowrap"
+                      className="ml-4 whitespace-nowrap text-gray-700"
                       initial={{ opacity: 0, width: 0 }}
                       animate={{ opacity: 1, width: "auto" }}
                       exit={{ opacity: 0, width: 0 }}
@@ -101,14 +107,14 @@ const Sidebar = () => {
           {/* Logout Button */}
           <button
             onClick={signOut}
-            className="flex items-center p-3 pl-2 text-sm font-medium rounded-lg hover:bg-orange-700 transition-colors mb-2 w-full"
+            className="flex items-center p-3 pl-2 text-sm font-medium rounded-lg hover:bg-orange-400 transition-colors mb-2 w-full"
           >
             <LogOutIcon
               className="text-[16px] sm:text-[20px]"
-              style={{ color: "#F66F6F", minWidth: "16px" }}
+              style={{ color: "#CC4444", minWidth: "16px" }}
             />
             {isSidebarOpen && (
-              <span className="ml-4 whitespace-nowrap">Log out</span>
+              <span className="ml-4 whitespace-nowrap text-gray-700">Log out</span>
             )}
           </button>
         </nav>

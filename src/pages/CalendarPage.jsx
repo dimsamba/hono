@@ -1,9 +1,9 @@
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { useRef } from "react";
 
@@ -137,171 +137,245 @@ const CalendarPage = () => {
   };
 
   return (
-    <div className="flex-1 overflow-auto relative z-10 bg-primary-700">
+    <div className="flex-1 overflow-auto relative z-10 bg-gray-100">
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          {/* Title */}
-          <Typography
-            variant="h6"
-            color="white"
-            gutterBottom
-            sx={{
-              display: "flex",
-              color: "white",
-              fontSize: "18px",
-            }}
-          >
-            Appointments
-          </Typography>
-
-          <TextField
-            label="Number of Appointments"
-            value={events.length}
-            slotProps={{ readOnly: true }}
-            sx={{
-              ml: 2,
-              mb: 2,
-              width: 200,
-              input: { color: "white" },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: colors.greenAccent[400] },
-                "&:hover fieldset": { borderColor: colors.greenAccent[300] },
-              },
-              "& .MuiInputLabel-root": { color: "white" },
-            }}
-          />
-        </Box>
-
         <motion.div
-          className="grid grid-cols-1 gap-5 sm:grid-cols-1 lg:grid-cols-2 mb-5"
+          className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <FormLabel sx={{ color: "lightGray" }}>Events</FormLabel>
-            <List
-              dense
+          <div className="flex flex-col gap-5 lg:flex-row">
+            <div className="w-full lg:w-1/2 max-h-[250px] bg-gray-100 pt-4 pr-4 pl-4 pb-2 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-xl border border-gray-300">
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                {/* Title */}
+                <Typography
+                  variant="h6"
+                  color="white"
+                  gutterBottom
+                  sx={{
+                    display: "flex",
+                    color: "#111",
+                    fontSize: "14px",
+                    mt: 2,
+                  }}
+                >
+                  Appointments
+                </Typography>
+
+                <TextField
+                  value={events.length}
+                  slotProps={{ readOnly: true }}
+                  sx={{
+                    ml: 2,
+                    width: 200,
+                    input: {
+                      color: "#111",
+                      textAlign: "right", // ✅ Apply text alignment here
+                    },
+                    "& .MuiOutlinedInput-root": {},
+                    "& .MuiInputLabel-root": {
+                      color: "#333",
+                      fontSize: 16,
+                    },
+                  }}
+                />
+              </Box>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <List
+                  dense
+                  sx={{
+                    height: 150,
+                    border: "1px solid lightGray",
+                    borderRadius: 1,
+                    overflowY: "auto",
+                    backgroundColor: "#F9F9F9",
+                    "&::-webkit-scrollbar": { display: "none" },
+                    height: "160px",
+                  }}
+                >
+                  {events.map((event) => (
+                    <ListItem key={event.id} disablePadding>
+                      <ListItemButton
+                        onClick={() => setSelectedTask(event.task)}
+                        sx={{
+                          "&:hover": {
+                            backgroundColor: "#f0f0f9", // or any light color for hover
+                          },
+                          py: 0.1, // optional: reduce vertical padding on the button itself
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            width: "100%",
+                            color: "#333",
+                          }}
+                        >
+                          <Box sx={{ width: "70%" }}>
+                            <ListItemText
+                              primary={event.title}
+                              primaryTypographyProps={{
+                                fontSize: 14,
+                                color: "#444",
+                                lineHeight: 1.4,
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            />
+                          </Box>
+
+                          <Box sx={{ width: "30%", textAlign: "right" }}>
+                            <ListItemText
+                              primary={new Date(event.date).toLocaleDateString(
+                                "fr-FR"
+                              )}
+                              primaryTypographyProps={{
+                                fontSize: 14,
+                                color: "#444",
+                                lineHeight: 1.4,
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </FormControl>
+            </div>
+
+            <div className="w-full lg:w-1/2 max-h-[250px] bg-gray-100 pt-4 pr-4 pl-4 pb-2 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-xl border border-gray-300">
+              {/* Text Box with task descriptions */}
+              <FormControl fullWidth sx={{ mb: 0 }}>
+                <FormLabel sx={{ color: "#555", fontSize: 14, mt: 2, mb: 2 }}>
+                  Description
+                </FormLabel>
+                <TextField
+                  fullWidth
+                  multiline
+                  readOnly
+                  rows={6}
+                  value={selectedTask}
+                  onChange={(e) => setSelectedTask(e.target.value)}
+                  sx={{
+                    backgroundColor: "#FAFAFA",
+                    "& .MuiOutlinedInput-root": {
+                      alignItems: "flex-start",
+                      "& textarea": {
+                        color: "#444",
+                        fontSize: 16,
+                        padding: "2px", // optional, improves layout
+                      },
+                      "& fieldset": {
+                        borderColor: "lightGray",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "lightGray",
+                      },
+                    },
+                  }}
+                />
+              </FormControl>
+            </div>
+          </div>
+          {/* Calendar */}
+          <div className="w-full lg:w-122 bg-gray-100 pt-4 pr-4 mt-3 pl-4 pb-2 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-xl border border-gray-300">
+            <Box
               sx={{
-                height: 150,
-                border: `1px solid ${colors.greenAccent[400]}`,
-                borderRadius: 1,
-                overflowY: "auto",
-                "&::-webkit-scrollbar": { display: "none" },
+                flex: 1,
+                "& .fc-theme-standard td": {
+                  color: "#333",
+                },
+                "& .fc table": {
+                  background: "#FAFAFA",
+                  borderColor: "#CCC",
+                },
+                "& .fc": {
+                  backgroundColor: "#ffffff",
+                  color: "#111111",
+                  fontFamily: `'Inter', sans-serif`,
+                },
+                "& .fc .fc-toolbar-title": {
+                  color: "#111111",
+                  fontWeight: 400,
+                },
+                "& .fc .fc-button": {
+                  backgroundColor: "#f3f4f6 !important",
+                  color: "#111111 !important",
+                  border: "1px solid #d1d5db !important",
+                  textTransform: "capitalize",
+                  fontSize: "14px",
+                },
+                "& .fc .fc-button:hover": {
+                  backgroundColor: "#e5e7eb !important",
+                },
+                "& .fc .fc-daygrid-day-number": {
+                  color: "#111111",
+                  fontWeight: 500,
+                },
+                "& .fc .fc-col-header-cell": {
+                  backgroundColor: "#f9fafb",
+                  color: "#4b5563",
+                  fontWeight: 600,
+                },
+                "& .fc .fc-event": {
+                  backgroundColor: "#bae6fd !important",
+                  color: "#111 !important",
+                  border: "none !important",
+                  padding: "2px 6px",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                },
+                "& .fc-h-event .fc-event-main": {
+                  color: "#333 !important",
+                  fontSize: 16,
+                },
+                "& .fc .fc-event": {
+                  backgroundColor: "#c7f9cc !important",
+                },
               }}
             >
-              {events.map((event) => (
-                <ListItem key={event.id} disablePadding>
-                  <ListItemButton onClick={() => setSelectedTask(event.task)}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        width: "100%",
-                      }}
-                    >
-                      <Box sx={{ width: "70%" }}>
-                        <ListItemText primary={event.title} />
-                      </Box>
-                      <Box sx={{ width: "30%", textAlign: "right" }}>
-                        <ListItemText
-                          primary={new Date(event.date).toLocaleDateString(
-                            "fr-FR"
-                          )}
-                        />
-                      </Box>
-                    </Box>
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-          </FormControl>
-
-          {/* Text Box with task descriptions */}
-          <FormControl fullWidth sx={{ mb: 0 }}>
-          <FormLabel sx={{ color: "lightGray" }}>Description</FormLabel>
-          <TextField
-            fullWidth
-            multiline
-            InputProps={{
-              readOnly: true,
-            }}
-            rows={6}
-            value={selectedTask}
-            onChange={(e) => setSelectedTask(e.target.value)}
-            slotProps={{
-              style: { color: "white" },
-            }}
-            sx={{
-              scrollbarWidth: "none", // Firefox
-              msOverflowStyle: "none", // IE
-              "& .MuiOutlinedInput-root": {
-                alignItems: "flex-start", // Top-align text
-                "& fieldset": {
-                  borderColor: colors.greenAccent[400],
-                },
-                "&:hover fieldset": {
-                  borderColor: colors.greenAccent[300],
-                },
-              },
-            }}
-          />
-          </FormControl>
+              <FullCalendar
+                ref={calendarRef}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                headerToolbar={{
+                  left: "prev,next today",
+                  center: "title",
+                  right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+                }}
+                initialView="dayGridMonth"
+                events={events}
+                dateClick={handleDateClick}
+                editable={true}
+                selectable={true}
+                selectMirror={true}
+                height="auto"
+                eventClick={handleEventClick}
+                initialEvents={[
+                  {
+                    id: "12315",
+                    title: "All-day event",
+                    date: "2022-09-14",
+                  },
+                  {
+                    id: "5123",
+                    title: "Timed event",
+                    date: "2022-09-28",
+                  },
+                ]}
+              />
+            </Box>
+          </div>
         </motion.div>
-
-        {/* Calendar */}
-        <Box
-          sx={{
-            flex: 1,
-            border: "black",
-            "& .fc-theme-standard td": {
-              color: "lightGray",
-              borderColor: "dimGray",
-            },
-            "& .fc table": {
-              background: "#2D3E50",
-              borderColor: "dimGray",
-              border: `1px solid ${colors.greenAccent[400]}`,
-              borderRadius: 1,
-            },
-          }}
-        >
-          <FullCalendar
-            ref={calendarRef}
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            headerToolbar={{
-              left: "prev,next today",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
-            }}
-            initialView="dayGridMonth"
-            events={events}
-            dateClick={handleDateClick}
-            editable={true}
-            selectable={true}
-            selectMirror={true}
-            height="auto"
-            eventClick={handleEventClick}
-               initialEvents={[
-              {
-                id: "12315",
-                title: "All-day event",
-                date: "2022-09-14",
-              },
-              {
-                id: "5123",
-                title: "Timed event",
-                date: "2022-09-28",
-              },
-            ]}
-          />
-        </Box>
       </main>
     </div>
   );

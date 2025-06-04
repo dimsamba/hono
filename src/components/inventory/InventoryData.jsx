@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -7,6 +8,9 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import { Stack } from "@mui/material";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import {
   GridRowModes,
   DataGrid,
@@ -196,6 +200,23 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
   const handleRowModesModelChange = (newModel) => {
     setRowModesModel(newModel);
   };
+  
+ // Customize Toolbar 
+  const theme = createTheme({
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          "&.MuiDataGrid-paper": {
+            backgroundColor: "#F2FAF8",
+            color: "#333",
+            fontWeight: 600,
+          },
+        },
+      },
+    },
+  },
+});
 
   const columns = [
     {
@@ -212,11 +233,17 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
                 icon={<SaveIcon />}
                 label="Save"
                 onClick={handleSaveClick(id)}
+                sx={{
+                  color: "#333 !important",
+                }}
               />,
               <GridActionsCellItem
                 icon={<CancelIcon />}
                 label="Cancel"
                 onClick={handleCancelClick(id)}
+                sx={{
+                  color: "#333 !important",
+                }}
               />,
             ]
           : [
@@ -224,11 +251,17 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
                 icon={<EditIcon />}
                 label="Edit"
                 onClick={handleEditClick(id)}
+                sx={{
+                  color: "#333 !important",
+                }}
               />,
               <GridActionsCellItem
                 icon={<DeleteIcon />}
                 label="Delete"
                 onClick={handleDeleteClick(id)}
+                sx={{
+                  color: "#333 !important",
+                }}
               />,
             ];
       },
@@ -242,7 +275,7 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
     {
       field: "category",
       headerName: "Category",
-      width: 120,
+      width: 200,
       editable: true,
       type: "singleSelect",
       valueOptions: [
@@ -265,11 +298,43 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
         "Spices",
         "Sweets-and-desserts",
       ],
+      renderEditCell: (params) => (
+        <Select
+          value={params.value}
+          onChange={(e) =>
+            params.api.setEditCellValue({
+              id: params.id,
+              field: params.field,
+              value: e.target.value,
+            })
+          }
+          fullWidth
+          sx={{
+            color: "dimGray !important",
+            fontSize: "15px",
+            fontWeight: 600, // semibold
+          }}
+          MenuProps={{
+            PaperProps: {
+              sx: {
+                backgroundColor: "#e7ecef",
+                color: "black",
+              },
+            },
+          }}
+        >
+          {params.colDef.valueOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      ),
     },
     {
       field: "pack_type",
       headerName: "Pack Type",
-      width: 100,
+      width: 150,
       editable: true,
       type: "singleSelect",
       valueOptions: [
@@ -297,6 +362,38 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
         "tub",
         "wrap",
       ],
+      renderEditCell: (params) => (
+        <Select
+          value={params.value}
+          onChange={(e) =>
+            params.api.setEditCellValue({
+              id: params.id,
+              field: params.field,
+              value: e.target.value,
+            })
+          }
+          fullWidth
+          sx={{
+            color: "dimGray !important",
+            fontSize: "15px",
+            fontWeight: 600, // semibold
+          }}
+          MenuProps={{
+            PaperProps: {
+              sx: {
+                backgroundColor: "#e7ecef",
+                color: "black",
+              },
+            },
+          }}
+        >
+          {params.colDef.valueOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      ),
     },
     {
       field: "qnty_item_pack",
@@ -310,7 +407,7 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
     {
       field: "unit_type",
       headerName: "Unit",
-      width: 100,
+      width: 120,
       editable: true,
       align: "center",
       headerAlign: "center",
@@ -333,6 +430,38 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
         "tsp",
         "unit",
       ],
+      renderEditCell: (params) => (
+        <Select
+          value={params.value}
+          onChange={(e) =>
+            params.api.setEditCellValue({
+              id: params.id,
+              field: params.field,
+              value: e.target.value,
+            })
+          }
+          fullWidth
+          sx={{
+            color: "dimGray !important",
+            fontSize: "15px",
+            fontWeight: 600, // semibold
+          }}
+          MenuProps={{
+            PaperProps: {
+              sx: {
+                backgroundColor: "#e7ecef",
+                color: "black",
+              },
+            },
+          }}
+        >
+          {params.colDef.valueOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      ),
     },
     {
       field: "unit_per_itm",
@@ -440,7 +569,16 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
   ];
 
   return (
-    <Box sx={{ height: 900, width: "100%" }}>
+    <Box
+      sx={{
+        height: 900,
+        width: "100%",
+        border: "2px solid lightGray",
+        borderRadius: 2,
+        p: 1
+      }}
+    >
+      <ThemeProvider theme={theme}>
       <DataGrid
         rows={rows}
         columns={columns}
@@ -450,6 +588,7 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
         onRowEditStop={handleRowEditStop}
         processRowUpdate={processRowUpdate}
         getRowId={(row) => row.id}
+        disableVirtualization
         slots={{
           toolbar: () => (
             <CombinedToolbar
@@ -460,40 +599,73 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
           ),
         }}
         sx={{
+          border: "none",
           "& .MuiDataGrid-scrollbar": {
             overflow: "hidden",
             scrollBar: "none",
           },
           "& .MuiDataGrid-cell": {
             fontSize: "0.9rem",
-            color: "LightGray",
-          },
-          "& .MuiDataGrid-columnHeader": {
-            backgroundColor: `#202938 !important`,
+            color: "#111", // dark text for light background
           },
           "& .MuiDataGrid-columnHeaderTitle": {
-            color: "White !important",
             fontSize: "0.9rem",
             fontWeight: "bold",
           },
-          "& .MuiDataGrid-filler": {
-            backgroundColor: `#202938 !important`,
+          "& .MuiButtonBase-root": {
+            color: "#111",
+          },
+          "& .MuiDataGrid-columnHeader": {
+            backgroundColor: "white !important",
+            color: "#111",
           },
           "& .MuiDataGrid-scrollbarFiller": {
-            backgroundColor: `#202938 !important`,
-          },
-          // eliminate columns NUMBER arrow up/down
-          "& input[type=number]::-webkit-inner-spin-button, & input[type=number]::-webkit-outer-spin-button":
-            {
-              WebkitAppearance: "none",
-              margin: 0,
-            },
-          "&. editInputCell": {
             backgroundColor: "white !important",
-            color: "white !important",
           },
+          "& .MuiButton-text": {
+            color: "#0d1b2a !important",
+          },
+          "& .MuiDataGrid-row--editing .MuiDataGrid-cell": {
+            backgroundColor: "#e7ecef !important",
+            // boxShadow: "none", // remove default shadow if needed
+          },
+          "& .MuiDataGrid-row--editing input": {
+            color: "dimGray !important",
+            fontSize: "15px",
+            fontWeight: 600, // semibold
+          },
+          "& .MuiDataGrid-cell": {
+            borderBlockColor: "lightGray",
+            color: "dimGray !important",
+            fontSize: "15px",
+            fontWeight: 400, // semibold
+          },
+          // other global styles...
+          "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='total_units_per_pack']":
+            {
+              backgroundColor: "red", // light red
+              color: "#b71c1c", // dark red text
+              fontWeight: 600,
+              border: "2px solid #f44336",
+            },
+          "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='price_per_unit']":
+            {
+              backgroundColor: "red", // light red
+              color: "#b71c1c", // dark red text
+              fontWeight: 600,
+              border: "2px solid #f44336",
+            },
+          "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='effective_price_per_unit']":
+            {
+              backgroundColor: "red", // light red
+              color: "#b71c1c", // dark red text
+              fontWeight: 600,
+              border: "2px solid #f44336",
+            },
         }}
       />
+      </ThemeProvider>
     </Box>
+    // </motion.div>
   );
 }
