@@ -1,3 +1,5 @@
+// Version: 1.2.3
+
 import React from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { useMode } from "../components/theme";
