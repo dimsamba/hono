@@ -15,7 +15,7 @@ import RecipePage from "../pages/RecipePage";
 import CalendarPage from "../pages/CalendarPage";
 import StockTackPage from "./StockTakePage";
 import CostCalculatorPage from "./CostCalculatorPage";
-import ItemsListPage from "./itemsListPage";
+import ItemsListPage from "./ItemsListPage";
 import POSPage from "./POSPage";
 
 function Dashboard() {

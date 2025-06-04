@@ -197,7 +197,6 @@ const CalendarPage = () => {
                     overflowY: "auto",
                     backgroundColor: "#F9F9F9",
                     "&::-webkit-scrollbar": { display: "none" },
-                    height: "160px",
                   }}
                 >
                   {events.map((event) => (
@@ -338,9 +337,6 @@ const CalendarPage = () => {
                 "& .fc-h-event .fc-event-main": {
                   color: "#333 !important",
                   fontSize: 16,
-                },
-                "& .fc .fc-event": {
-                  backgroundColor: "#c7f9cc !important",
                 },
               }}
             >
