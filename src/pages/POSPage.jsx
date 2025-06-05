@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid"; // NEW: for unique order item keys
 import StatCard from "../components/common/StatCard";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 // Add to the top of the file:
-import { color, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import React, { useEffect, useState, useMemo } from "react";
 import supabase from "../components/supabaseClient";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
@@ -23,6 +23,8 @@ import {
   Grid,
   FormControl,
   useMediaQuery,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import { Add, Print, Save } from "@mui/icons-material";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
@@ -38,6 +40,9 @@ const POSPage = () => {
   const [resetFlag, setResetFlag] = useState(false);
   const [paymentType, setPaymentType] = useState("cash");
   const [sampleMenu, setSampleMenu] = useState([]);
+  const [selectedTab, setSelectedTab] = useState(0);
+  const categories = ["Food", "Beverage", "Produces"];
+  const currentCategory = categories[selectedTab];
   const formattedDate = `${today.getDate().toString().padStart(2, "0")}-${(
     today.getMonth() + 1
   )
@@ -49,7 +54,8 @@ const POSPage = () => {
     const fetchMenuItems = async () => {
       const { data, error } = await supabase
         .from("itemsList")
-        .select("id, item_name, item_price");
+        .select("*")
+        .eq("category", currentCategory); // Only fetch active items
 
       if (error) {
         console.error("Error fetching itemsList:", error.message);
@@ -59,14 +65,16 @@ const POSPage = () => {
           name: item.item_name,
           price: item.item_price,
           originalPrice: item.item_price,
-          originalName: item.item_name, // Add this line
+          originalName: item.item_name,
+          category: item.category, // ✅ Add this line
         }));
+
         setSampleMenu(formatted);
       }
     };
 
     fetchMenuItems();
-  }, []);
+  }, [currentCategory]); // ✅ Now it fetches each time the tab changes
 
   const addToOrder = (menuItem) => {
     const newItem = {
@@ -507,6 +515,18 @@ const POSPage = () => {
     }, 0);
   }, [todaysSales]);
 
+  // Change IconButtons color based on category type
+  const getCategoryColor = (category) => {
+    switch (category.toLowerCase()) {
+      case "beverage":
+        return "#47126b"; // warm orange tone
+      case "produces":
+        return "#156064 "; // rich green tone
+      default:
+        return "#1d4e89"; // default purple tone
+    }
+  };
+
   return (
     <div className="flex-1 overflow-hidden relative z-10 bg-primary-700">
       <main className="max-w-8xl mx-auto py-1 px-1 lg:px-8 scrollbar-hide">
@@ -531,10 +551,7 @@ const POSPage = () => {
           </Box>
 
           {/* Box 2 */}
-          <Box
-            gridColumn="span 1"
-            sx={{ borderRadius: 2, px: 1, py: 0 }}
-          >
+          <Box gridColumn="span 1" sx={{ borderRadius: 2, px: 1, py: 0 }}>
             <Box className="flex-1 mb-2 mt-2.5 mx-1">
               <FormControl fullWidth>
                 <TextField
@@ -747,13 +764,38 @@ const POSPage = () => {
               width="100%"
               container
               alignContent={"top"}
-            //  display="grid"
+              //  display="grid"
               sx={{
                 gridColumn: "span 2",
                 borderRadius: 2,
                 p: 0.5,
               }}
             >
+              <Tabs
+                value={selectedTab}
+                onChange={(_e, newValue) => setSelectedTab(newValue)}
+                indicatorColor="primary"
+                variant="fullWidth"
+                sx={{ mb: 1 }}
+              >
+                {categories.map((cat, index) => (
+                  <Tab
+                    label={cat}
+                    key={index}
+                    sx={{
+                      fontSize: 14,
+                      fontWeight: 400,
+                      color: "#6f725a",
+                      "&.Mui-selected": {
+                        color: "#007f5f",
+                        fontWeight: 700,
+                        fontSize: 18,
+                      },
+                    }}
+                  />
+                ))}
+              </Tabs>
+
               <Grid2 container spacing={0.5}>
                 {sampleMenu.map((item) => (
                   <Grid2
@@ -769,7 +811,7 @@ const POSPage = () => {
                         pl: 1,
                         pt: 1,
                         pb: 1,
-                        backgroundColor: "#003249",
+                        backgroundColor: getCategoryColor(item.category),
                         color: "white",
                         border: "1px solid #6fffe9",
                         borderRadius: 2,

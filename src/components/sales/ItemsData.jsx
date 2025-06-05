@@ -239,6 +239,20 @@ export default function FullFeaturedCrudGrid({ ItemsData }) {
     },
     { field: "item_name", headerName: "Item", width: 180, editable: true },
     {
+      field: "category",
+      headerName: "Category",
+      width: 120,
+      editable: true,
+      align: "left",
+      headerAlign: "left",
+      type: "singleSelect",
+      valueOptions: [
+        "Food",
+        "Beverage",
+        "Produces",
+      ],
+    },
+    {
       field: "item_price",
       headerName: "Price",
       type: "numeric",
