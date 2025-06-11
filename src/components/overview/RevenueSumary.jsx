@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import {
   BarChart,
-  Bar,
-  Line,
-  XAxis,
+  Bar, XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
+  Legend
 } from "recharts";
 import supabase from "../supabaseClient";
 
@@ -18,6 +15,7 @@ const RevenueSummary = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      
       const { data, error } = await supabase
         .from("financials")
         .select("net_profit, total_revenue, date_to");
@@ -60,8 +58,8 @@ const RevenueSummary = () => {
 
   return (
     <div>
-      <h2 className="text-lg font-medium mb-4 text-[#111]">
-        Monthly Net Profit
+      <h2 className="text-lg font-medium mb-4 text-[#3FA89B]">
+        MONTHLY NET PROFIT
       </h2>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
@@ -88,13 +86,6 @@ const RevenueSummary = () => {
               }}
               itemStyle={{ color: "#E5E7EB" }}
             />
-            {/* <Legend
-              formatter={(value) => {
-                if (value === "total_revenue") return "Gross Revenue";
-                if (value === "net_profit") return "Net Profit";
-                return value;
-              }}
-            /> */}
             <Legend
               payload={[
                 { value: "Gross Revenue", type: "triangle", color: "#ff006e" },

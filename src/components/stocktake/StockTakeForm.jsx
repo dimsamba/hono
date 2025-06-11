@@ -443,8 +443,8 @@ const StockTakeForm = ({
       }}
     >
       <form onSubmit={handleSubmit}>
-        <h3 className="text-base mb-2 ml-1 mt-1 text-[#333]">
-          Stock take Calculator
+        <h3 className="text-base mb-2 ml-1 mt-1 text-[#3FA89B] font-bold">
+          STOCK TAKE CALCULATOR
         </h3>
         <Box
           display="grid"

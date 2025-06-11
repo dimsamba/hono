@@ -1,21 +1,17 @@
 import { motion } from "framer-motion";
-import { useTheme, useMediaQuery, Box } from "@mui/material";
-import { tokens } from "../components/theme";
+import { useMediaQuery, Box } from "@mui/material";
 import StatCard from "../components/common/StatCard";
 import MoneyOffCsredIcon from "@mui/icons-material/MoneyOffCsred";
 import MoneyOffIcon from "@mui/icons-material/MoneyOff";
 import supabase from "../components/supabaseClient";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import FullFeaturedCrudGrid from "../components/invoices/InvoiceData";
 
 // ✅ Import Supabase
 const invoicePaga = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [invoicesData, setInvoiceData] = useState([]); // ✅ Define state
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const [refreshKey, setRefreshKey] = useState(0); // used to force re-render
-  const today = new Date();
+  const [refreshKey, setRefreshKey] = useState(); // used to force re-render
 
   // Function to fetch inventory data from Supabase
   const fetchData = async () => {

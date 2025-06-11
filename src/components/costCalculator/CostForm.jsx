@@ -1,9 +1,7 @@
 import { Box, Button, TextField, useTheme, useMediaQuery } from "@mui/material";
 import EuroSymbolOutlinedIcon from "@mui/icons-material/EuroSymbolOutlined";
-import { motion } from "framer-motion";
-import { tokens } from "../theme";
 import StatCard from "../common/StatCard";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
@@ -14,11 +12,10 @@ import { GlobalStyles, FormControl } from "@mui/material";
 const CostForm = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
-  const [expensesFromInvoices, setExpensesFromInvoices] = useState(""); // already exists
+  const [expensesFromInvoices, setExpensesFromInvoices] = useState(0); // already exists
   const [otherExpenses, setOtherExpenses] = useState("");
   const [totalExpenses, setTotalExpenses] = useState("");
   const [amountFromSales, setAmountFromSales] = useState(""); // already exists
@@ -29,7 +26,7 @@ const CostForm = () => {
   const [userId, setUserId] = useState(null); // Should be set from Supabase auth
   const [financialsData, setFinancialsData] = useState([]);
   const [netProfitFromDates, setNetProfit] = useState(0);
-  const [costSelected, setCostSelected] = useState(false);
+  const [, setCostSelected] = useState(false);
 
   // Extract the last "NET profit" value
   const netProfit =
@@ -65,59 +62,79 @@ const CostForm = () => {
 
   // Fetch "Paid "invoices between dates
   useEffect(() => {
-    if (!fromDate || !toDate) return; // ⛔️ Don't fetch if dates aren't ready
+    const fetchData = async () => {
+      // Log fromDate and toDate before processing
+      console.log("From Date:", fromDate);
+      console.log("To Date:", toDate);
 
-    const fetchInvoiceExpenses = async () => {
-      if (!dayjs(fromDate).isValid() || !dayjs(toDate).isValid()) {
-        console.error("Invalid date input", { fromDate, toDate });
-        return;
+      // Ensure fromDate and toDate are not null and fallback to defaults
+      const validFromDate = fromDate
+        ? dayjs(fromDate)
+        : dayjs().startOf("month"); // Default to current month's start
+      const validToDate = toDate ? dayjs(toDate) : dayjs().endOf("month"); // Default to current month's end
+
+      // Log whether the dates are valid
+      console.log("Is 'fromDate' valid:", validFromDate.isValid());
+      console.log("Is 'toDate' valid:", validToDate.isValid());
+
+      // If either date is invalid, log an error
+      if (!validFromDate.isValid() || !validToDate.isValid()) {
+        console.error("Invalid date value detected:", fromDate, toDate);
+        return; // Exit if the dates are invalid
       }
+
+      const start = validFromDate.startOf("day").toISOString();
+      const end = validToDate.endOf("day").toISOString();
 
       const { data, error } = await supabase
         .from("invoices")
         .select("amount_ttc")
-        .gte("invoice_date", dayjs(fromDate).format("YYYY-MM-DD"))
-        .lte("invoice_date", dayjs(toDate).format("YYYY-MM-DD"))
+        .gte("invoice_date", start)
+        .lte("invoice_date", end)
         .eq("paid", true);
 
       if (error) {
-        console.error("Error fetching invoices:", error);
-        setExpensesFromInvoices("");
+        console.error("Supabase SELECT error:", error.message);
         return;
       }
 
-      const total = data.reduce((sum, item) => sum + (item.amount_ttc || 0), 0);
-      setExpensesFromInvoices(total.toFixed(2));
+      console.log("Fetching invoices between", start, "and", end);
+
+      const total = data.reduce((acc, curr) => acc + (curr.amount_ttc || 0), 0);
+      setExpensesFromInvoices(total);
     };
 
-    fetchInvoiceExpenses();
+    fetchData();
   }, [fromDate, toDate]);
 
-  // Fetch Total sales amount between dates
+  // Fetch Total sales Sales amount between dates
   useEffect(() => {
-    const fetchSalesAmount = async () => {
+    const fetchData = async () => {
       if (!fromDate || !toDate) return;
+
+      const start = dayjs(fromDate).format("YYYY-MM-DD");
+      const end = dayjs(toDate).format("YYYY-MM-DD");
 
       const { data, error } = await supabase
         .from("sales")
-        .select("total_value_item")
-        .gte("sale_date", dayjs(fromDate).format("YYYY-MM-DD"))
-        .lte("sale_date", dayjs(toDate).format("YYYY-MM-DD"));
+        .select("sale_total_disc")
+        .gte("date", start)
+        .lte("date", end);
 
       if (error) {
-        console.error("Error fetching sales:", error);
-        fetchSalesAmount("");
+        console.error("Supabase SELECT error:", error.message);
         return;
       }
+      console.log("Fetching sales between", start, "and", end);
 
       const total = data.reduce(
-        (sum, item) => sum + (item.total_value_item || 0),
+        (acc, curr) => acc + (curr.sale_total_disc || 0),
         0
       );
-      setAmountFromSales(total.toFixed(2)); // Format as string with 2 decimals
+      setAmountFromSales(total);
     };
 
-    fetchSalesAmount();
+    fetchData();
   }, [fromDate, toDate]);
 
   // Fetch Financials
@@ -185,7 +202,7 @@ const CostForm = () => {
     }
 
     // Insert into Supabase
-    const { data, error } = await supabase.from("financials").insert([
+    const { error } = await supabase.from("financials").insert([
       {
         user_id: userId,
         date_from: dayjs(fromDate).format("YYYY-MM-DD"),
@@ -413,8 +430,8 @@ const CostForm = () => {
           }}
         >
           <form onSubmit={(e) => e.preventDefault()}>
-            <h3 className="text-base mb-2 ml-1 mt-1 text-[#333]">
-              Expenses System
+            <h3 className="text-base mb-2 ml-1 mt-1 text-[#3FA89B] font-bold">
+              COST CALCULATOR
             </h3>
             <Box
               display="grid"
@@ -468,13 +485,20 @@ const CostForm = () => {
                 <DesktopDatePicker
                   label="Date From"
                   value={fromDate}
-                  onChange={(newValue) => setFromDate(newValue)}
+                  onChange={(newValue) => {
+                    const selectedDate = dayjs(newValue);
+                    setFromDate(selectedDate);
+                    // If toDate is empty or equal to old fromDate, update it too
+                    if (!toDate || toDate.isSame(fromDate, "day")) {
+                      setToDate(selectedDate);
+                    }
+                  }}
                   renderInput={(params) => <TextField {...params} fullWidth />}
                   format="DD-MM-YYYY"
                   slotProps={{
                     textField: {
                       variant: "outlined",
-                      size: "small",
+
                       sx: {
                         ...sharedStyles,
                         "& .MuiSvgIcon-root": {
@@ -492,13 +516,13 @@ const CostForm = () => {
                 <DesktopDatePicker
                   label="Date To"
                   value={toDate}
-                  onChange={(newValue) => setToDate(newValue)}
+                  onChange={(newValue) => setToDate(dayjs(newValue))}
                   renderInput={(params) => <TextField {...params} fullWidth />}
                   format="DD-MM-YYYY"
                   slotProps={{
                     textField: {
                       variant: "outlined",
-                      size: "small",
+                      // size: "small",
                       sx: {
                         ...sharedStyles,
                         "& .MuiSvgIcon-root": {
@@ -525,7 +549,7 @@ const CostForm = () => {
                   label="Expenses from Invoices"
                   variant="outlined"
                   value={`€ ${formatCurrency(expensesFromInvoices)}`}
-                  slotProps={{ readOnly: true }}
+                  InputProps={{ readOnly: true }}
                   sx={{
                     ...sharedStyles,
                     input: { color: "#333", fontSize: 16 },
@@ -566,6 +590,7 @@ const CostForm = () => {
                   }}
                 />
               </FormControl>
+
               <FormControl
                 fullWidth
                 variant="outlined"

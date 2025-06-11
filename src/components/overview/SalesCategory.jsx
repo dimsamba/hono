@@ -12,7 +12,6 @@ import {
   Cell,
 } from "recharts";
 import supabase from "../supabaseClient"; // adjust path if needed
-import { isOverflown } from "@mui/x-data-grid/utils/domUtils";
 
 const COLORS = [
   "#FFB5E8", // pastel pink
@@ -85,7 +84,7 @@ const SalesCategory = () => {
 
   return (
     <motion.div className="bg-gray-100 bg-opacity-50 backdrop-blur-md rounded-xl p-6 border border-gray-100">
-      <h2 className="text-lg font-medium mb-4 text-[#111]">Items Sold</h2>
+      <h2 className="text-lg font-medium mb-4 text-[#3FA89B]">ITEMS SOLD</h2>
       <div className="w-full h-full">
         <ResponsiveContainer width="100%" height={categoryData.length * 25 + 10}>
           <BarChart
@@ -132,7 +131,6 @@ const SalesCategory = () => {
               <LabelList
                 content={(props) => {
                   const { x, y, width, height, index } = props;
-                  const name = categoryData[index]?.name;
                   const percent = categoryData[index]?.percent;
 
                   return (

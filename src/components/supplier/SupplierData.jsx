@@ -6,7 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
-import { Stack } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import {
   GridRowModes,
@@ -40,8 +40,13 @@ function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
 
   return (
     <GridToolbarContainer>
-      <Button color="LightGray" onClick={handleClick} startIcon={<AddIcon />}>
-        Add record
+        <Button
+        onClick={handleClick}
+        startIcon={<AddIcon sx={{ color: "#3FA89B" }} />}
+      >
+        <Typography sx={{ color: "#3FA89B", fontWeight: 600 }}>
+          Add supplier
+        </Typography>
       </Button>
     </GridToolbarContainer>
   );

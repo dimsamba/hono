@@ -1,5 +1,4 @@
 import ProgressCircle from "./ProgressCircle";
-import { motion } from "framer-motion";
 import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
@@ -28,17 +27,30 @@ const StatCard = ({
         alignItems="center"
       >
         {/* Left Side: Icon, Title, Value, Subtitle */}
-        <Box display="flex" flexDirection="column" gap="6px">
+        <Box
+          display="flex"
+          flexDirection="column"
+          gap="6px"
+          sx={{
+            pl: {
+              xs: "10px", // applies on extra-small screens and up
+              sm: 0, // removes padding on small screens and up
+            },
+          }}
+        >
           <Box display="flex" alignItems="center" gap="8px">
             <Box>{icon}</Box>
-            <Typography variant="h5" sx={{ color: colors.greenAccent[600] }}>
+            <Typography
+              variant="h5"
+              sx={{ color: "#3FA89B", fontWeight: "bold" }}
+            >
               {title}
             </Typography>
           </Box>
           <Typography
             variant="h4"
             fontWeight="bold"
-            sx={{  color: colors.orange[500]}}
+            sx={{ color: colors.orange[500] }}
           >
             {value}
           </Typography>
@@ -66,7 +78,7 @@ const StatCard = ({
             variant="h6"
             fontStyle="italic"
             sx={{
-              color: colors.greenAccent[600],
+              color: "#3FA89B",
               mr: 1.5,
             }}
           >
@@ -80,43 +92,3 @@ const StatCard = ({
 };
 
 export default StatCard;
-
-// <motion.div
-// className="bg-gray-800 bg-opacity-50 backdrop-blur-md overflow-hidden shadow-lg rounded-xl border border-gray-700"
-// whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}
-// >
-// <div className="flex justify-between px-4 py-5 sm:p-6">
-//   {/* Span hold Label and value */}
-//   <span className="Flex items-center justify-between text-sm font-medium text-gray-300">
-//     {/* <Icon size={20} className="mr-2" style={{ color }} /> */}
-//     <p className="text-1xl mt-1 text-sm font-medium text-gray-300">
-//       {name}
-//     </p>
-//     <p className="mt-1 text-2xl font-semibold text-gray-100">{value}</p>
-//   </span>
-
-//   {/* Span hold Sublabel and Second value */}
-//   <span>
-//     <p className="text-1xl mt-1 text-sm font-medium text-gray-300">
-//       {subLabel}
-//     </p>
-//     <p className="mt-1 text-2xl font-semibold text-gray-100">
-//       {secondaryValue}
-//     </p>
-//   </span>
-
-//   {/* Progressive Circle */}
-//   <span>
-//     <p className="mt-4 text-2xl font-semibold text-gray-300">
-//       {increase}
-//     </p>
-//   </span>
-
-//   {/* Progressive Circle */}
-//   <span>
-//     <p className="mt-2.5">
-//       <ProgressCircle progress={progress} />
-//     </p>
-//   </span>
-// </div>
-// </motion.div>

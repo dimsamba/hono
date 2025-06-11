@@ -10,6 +10,12 @@ const CostCalculatorPage = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(false); // optional
   const [, setItems] = useState([]); // Initialize ingredients state
 
+  // Define state for the fetched cost data
+  const [costData, setCost] = useState([]); // This will store your fetched data
+
+  // Define state for the latest entry date
+  const [latestEntryDate, setLatestEntryDate] = useState(null); // Initialize state for latest entry date
+
   // Function to handle total cost changes
   const handleTotalValueChange = (total) => {
     console.log("Total Value: €" + total.toFixed(2));
@@ -28,13 +34,13 @@ const CostCalculatorPage = () => {
     if (error) {
       console.error("Fetch error:", error);
     } else {
-      setCost(data);
+      setCost(data); // Now `setCost` will correctly update the state with fetched data
       if (data.length > 0) {
         // fallback: get latest by checking max date manually
         const latest = data.reduce((a, b) =>
           new Date(a.created_at) > new Date(b.created_at) ? a : b
         );
-        setLatestEntryDate(latest.created_at);
+        setLatestEntryDate(latest.created_at); // Now this will work since we defined the `setLatestEntryDate` state
       }
     }
   };

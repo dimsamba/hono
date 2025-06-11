@@ -1,17 +1,12 @@
 import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
-import AutorenewIcon from "@mui/icons-material/Autorenew";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { Typography, useMediaQuery } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 import { Stack, useTheme } from "@mui/material";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
@@ -27,42 +22,11 @@ import {
   GridActionsCellItem,
   GridRowEditStopReasons,
   GridToolbar,
-  GridToolbarContainer,
 } from "@mui/x-data-grid";
 import supabase from "../supabaseClient";
 
 // 🔧 Toolbar for adding new rows
-function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
-  const handleClick = () => {
-    const id = Date.now();
-    const newRow = {
-      id,
-      sale_date: new Date(), // <<== Pre-fill today's date
-      item_name: "",
-      item_type: "",
-      sale_price: "",
-      total_value_item: "",
-      quantity_sold: "",
-      notes: "",
-      isNew: true,
-    };
-
-    setRows((prev) => [newRow, ...prev]);
-    setRowModesModel((prev) => ({
-      ...prev,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "sale_date" }, // 👈 Focus on new row
-    }));
-    setNewRowId(id);
-  };
-
-  return (
-    <GridToolbarContainer>
-      {/* <Button color="LightGray" onClick={handleClick} startIcon={<AddIcon />}>
-        Add record
-      </Button> */}
-    </GridToolbarContainer>
-  );
-}
+function EditToolbar() {}
 
 // 🔧 Combines custom toolbar + MUI toolbar
 function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
@@ -92,7 +56,6 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [rows, setRows] = React.useState(SalesTable); // Use the passed SalesTable
-  const [recipes, setRecipes] = React.useState([]);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [, setNewRowId] = React.useState(null);
@@ -193,20 +156,6 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
     }
   };
 
-  const handleEditClick = (id) => () => {
-    setRowModesModel((prev) => ({
-      ...prev,
-      [id]: { mode: GridRowModes.Edit },
-    }));
-  };
-
-  const handleSaveClick = (id) => () => {
-    setRowModesModel((prev) => ({
-      ...prev,
-      [id]: { mode: GridRowModes.View },
-    }));
-  };
-
   const handleDeleteClick = (id) => async () => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this row?"
@@ -221,18 +170,6 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
     }
 
     setRows((prevRows) => prevRows.filter((row) => row.id !== id));
-  };
-
-  const handleCancelClick = (id) => () => {
-    setRowModesModel((prev) => ({
-      ...prev,
-      [id]: { mode: GridRowModes.View, ignoreModifications: true },
-    }));
-
-    const row = rows.find((r) => r.id === id);
-    if (row?.isNew) {
-      setRows((prev) => prev.filter((r) => r.id !== id));
-    }
   };
 
   const processRowUpdate = async (newRow) => {
@@ -271,18 +208,6 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
 
   const handleRowModesModelChange = (newModel) => {
     setRowModesModel(newModel);
-  };
-
-  // Format date for display
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-
-    return `${day}-${month}-${year}`;
   };
 
   // Filter between dates
@@ -354,24 +279,8 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
         return isInEditMode
-          ? [
-              // <GridActionsCellItem
-              //   icon={<SaveIcon />}
-              //   label="Save"
-              //   onClick={handleSaveClick(id)}
-              // />,
-              // <GridActionsCellItem
-              //   icon={<CancelIcon />}
-              //   label="Cancel"
-              //   onClick={handleCancelClick(id)}
-              // />,
-            ]
+          ? []
           : [
-              // <GridActionsCellItem
-              //   icon={<EditIcon />}
-              //   label="Edit"
-              //   onClick={handleEditClick(id)}
-              // />,
               <GridActionsCellItem
                 icon={<DeleteIcon />}
                 label="Delete"
@@ -616,7 +525,6 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
             onChange={(newValue) => {
               const selectedDate = dayjs(newValue);
               setFromDate(selectedDate);
-
               // If toDate is empty or equal to old fromDate, update it too
               if (!toDate || toDate.isSame(fromDate, "day")) {
                 setToDate(selectedDate);
@@ -725,6 +633,7 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
           >
             Reset
           </Button>
+         
           <Box gridColumn={"span 2"} display="flex" alignItems="center">
             <Typography
               sx={{

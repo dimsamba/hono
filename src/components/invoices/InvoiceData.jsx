@@ -1,5 +1,4 @@
-import { motion } from "framer-motion";
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
@@ -7,16 +6,20 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
-import { Stack } from "@mui/material";
+import { IconButton, Stack } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Chip } from "@mui/material";
+import { Chip, useMediaQuery, Typography, GlobalStyles } from "@mui/material";
 import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-
+import StatCardinfo from "../common/StatCardinfo";
+import CachedIcon from "@mui/icons-material/Cached";
 import {
   GridRowModes,
   DataGrid,
@@ -26,6 +29,10 @@ import {
   GridRowEditStopReasons,
 } from "@mui/x-data-grid";
 import supabase from "../supabaseClient";
+
+// Enable plugins once
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 // 🔧 Toolbar for adding new rows
 function EditToolbar({ setRows, setRowModesModel }) {
@@ -55,8 +62,13 @@ function EditToolbar({ setRows, setRowModesModel }) {
 
   return (
     <GridToolbarContainer>
-      <Button color="LightGray" onClick={handleClick} startIcon={<AddIcon />}>
-        Add record
+      <Button
+        onClick={handleClick}
+        startIcon={<AddIcon sx={{ color: "#3FA89B" }} />}
+      >
+        <Typography sx={{ color: "#3FA89B", fontWeight: 600 }}>
+          Add record
+        </Typography>
       </Button>
     </GridToolbarContainer>
   );
@@ -83,6 +95,9 @@ function CombinedToolbar({ setRows, setRowModesModel }) {
 
 export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
   const [rows, setRows] = React.useState(InvoiceData); // Use the passed inventoryData
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  const [, setExpensesFromInvoices] = React.useState(0);
 
   // 👇 Define custom editable date field
   const MyDateField = (params) => {
@@ -109,11 +124,11 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
                 color: "dimGray", // ✅ text color
                 fontSize: "0.9rem",
                 fontWeight: 400,
-               padding: "14px", // adjust if needed
+                padding: "14px", // adjust if needed
               },
 
               "& fieldset": {
-               border: "1px solid #777", // optional border styling
+                border: "1px solid #777", // optional border styling
               },
             },
           },
@@ -128,25 +143,52 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
   const [rowModesModel, setRowModesModel] = React.useState({});
   const [] = React.useState(null);
 
+  // Fetch "Paid "invoices between dates
   React.useEffect(() => {
     const fetchData = async () => {
-      const { data, error } = await supabase.from("invoices").select("*");
+      // Log fromDate and toDate before processing
+      console.log("From Date:", fromDate);
+      console.log("To Date:", toDate);
+
+      // Ensure fromDate and toDate are not null and fallback to defaults
+      const validFromDate = fromDate
+        ? dayjs(fromDate)
+        : dayjs().startOf("month"); // Default to current month's start
+      const validToDate = toDate ? dayjs(toDate) : dayjs().endOf("month"); // Default to current month's end
+
+      // Log whether the dates are valid
+      console.log("Is 'fromDate' valid:", validFromDate.isValid());
+      console.log("Is 'toDate' valid:", validToDate.isValid());
+
+      // If either date is invalid, log an error
+      if (!validFromDate.isValid() || !validToDate.isValid()) {
+        console.error("Invalid date value detected:", fromDate, toDate);
+        return; // Exit if the dates are invalid
+      }
+
+      const start = validFromDate.startOf("day").toISOString();
+      const end = validToDate.endOf("day").toISOString();
+
+      const { data, error } = await supabase
+        .from("invoices")
+        .select("amount_ttc")
+        .gte("invoice_date", start)
+        .lte("invoice_date", end)
+        .eq("paid", true);
 
       if (error) {
         console.error("Supabase SELECT error:", error.message);
         return;
       }
 
-      const formattedData = data.map((item) => ({
-        ...item,
-        id: item.id || crypto.randomUUID(), // Ensure each row has a unique id
-      }));
+      console.log("Fetching invoices between", start, "and", end);
 
-      setRows(formattedData);
+      const total = data.reduce((acc, curr) => acc + (curr.amount_ttc || 0), 0);
+      setExpensesFromInvoices(total);
     };
 
     fetchData();
-  }, []);
+  }, [fromDate, toDate]);
 
   const handleRowEditStop = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -209,33 +251,48 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
       (cleanRow.amount_ttc - cleanRow.amount_ht) / cleanRow.amount_ht;
     cleanRow.tva_perct = cleanRow.tva_perct ? cleanRow.tva_perct * 100 : 0;
 
-    if (isNew) {
-      const { data, error } = await supabase
-        .from("invoices")
-        .insert([cleanRow])
-        .select();
-      if (error) {
-        console.error("Insert error:", error.message);
-        return newRow;
-      }
+    // ❗ Manual validation + reject edit
+    if (
+      newRow.amount_ttc === null ||
+      newRow.amount_ttc === undefined ||
+      newRow.amount_ttc === ""
+    ) {
+      setSnackbar({ children: "Amount TTC is required", severity: "error" }); // optional
+      throw new Error("Amount TTC is required");
+    }
 
-      const [inserted] = data;
-      setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
-      return inserted;
-    } else {
-      const { error } = await supabase
-        .from("invoices")
-        .update(cleanRow)
-        .eq("id", id);
-      if (error) {
-        console.error("Update error:", error.message);
-        return newRow;
-      }
+    if (isNaN(newRow.amount_ttc)) {
+      setSnackbar({
+        children: "Amount TTC must be a number",
+        severity: "error",
+      }); // optional
+      throw new Error("Amount TTC must be a number");
+    }
 
-      setRows((prev) =>
-        prev.map((row) => (row.id === id ? { ...cleanRow, id } : row))
-      );
-      return { ...cleanRow, id };
+    try {
+      if (isNew) {
+        const { data, error } = await supabase
+          .from("invoices")
+          .insert([cleanRow])
+          .select();
+        if (error) throw error;
+        const [inserted] = data;
+        setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
+        return inserted;
+      } else {
+        const { error } = await supabase
+          .from("invoices")
+          .update(cleanRow)
+          .eq("id", id);
+        if (error) throw error;
+        setRows((prev) =>
+          prev.map((row) => (row.id === id ? { ...cleanRow, id } : row))
+        );
+        return { ...cleanRow, id };
+      }
+    } catch (error) {
+      console.error("❌ Failed in processRowUpdate:", error.message);
+      throw error; // triggers DataGrid to reject the update
     }
   };
 
@@ -307,6 +364,65 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
     "Work hours",
   ];
 
+  // Filter between dates
+  // Get value between dates
+  const filteredRows = (rows || []).filter((row) => {
+    const rowDate = dayjs(row.invoice_date);
+
+    if (fromDate && toDate) {
+      return (
+        rowDate.isSameOrAfter(fromDate, "day") &&
+        rowDate.isSameOrBefore(toDate, "day")
+      );
+    }
+    if (fromDate) {
+      return rowDate.isSameOrAfter(fromDate, "day");
+    }
+    if (toDate) {
+      return rowDate.isSameOrBefore(toDate, "day");
+    }
+    return true;
+  });
+
+  // Count entries between dates
+  const entryCount = filteredRows.length;
+
+  // Sum amount_ttc
+  const filteredTotalValue = filteredRows.reduce(
+    (sum, row) => sum + (row.amount_ttc || 0),
+    0
+  );
+
+  // Sum only paid invoices (paid === true)
+  const filteredPaidValue = filteredRows
+    .filter((row) => row.paid === true)
+    .reduce((sum, row) => sum + (row.amount_ttc || 0), 0);
+
+  // Sum only unpaid invoices (paid === false)
+  const filteredUnpaidValue = filteredRows
+    .filter((row) => row.paid === false)
+    .reduce((sum, row) => sum + (row.amount_ttc || 0), 0);
+
+  // Format values
+  const formattedFilteredPaidValue = new Intl.NumberFormat("en-US", {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(filteredPaidValue);
+
+  const formattedFilteredUnpaidValue = new Intl.NumberFormat("en-US", {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(filteredUnpaidValue);
+
+  // Format value to 2 decimal places
+  const formattedFilteredTotalValue = new Intl.NumberFormat("en-US", {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(filteredTotalValue);
+
   // Customize Toolbar
   const theme = createTheme({
     components: {
@@ -323,6 +439,48 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
       },
     },
   });
+  const isNonMobile = useMediaQuery("(min-width:600px)");
+
+  // TextField and InputLabel customizations
+  const sharedStyles = {
+    backgroundColor: "#ebf1fa",
+    "& .MuiInputLabel-root": {
+      color: "#007f5f",
+      fontSize: 14,
+      backgroundColor: "#ebf1fa",
+      px: 1,
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        border: "1px solid #60d394",
+      },
+      "&:hover fieldset": {
+        borderColor: "#60d394",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#25a18e",
+      },
+    },
+  };
+
+  useEffect(() => {
+    const ids = rows.map((r) => r.id);
+    const duplicates = ids.filter((id, i) => ids.indexOf(id) !== i);
+    if (duplicates.length > 0) {
+      console.warn("❌ Duplicate row IDs found:", duplicates);
+    } else {
+      console.log("✅ All row IDs are unique:", ids);
+    }
+  }, [rows]);
+
+  const handleProcessRowUpdateError = (error, row) => {
+    console.error("Update error:", error.message);
+    setSnackbar({ children: error.message, severity: "error" }); // optional snackbar
+    setRowModesModel((prevModel) => ({
+      ...prevModel,
+      [row.id]: { mode: "edit", ignoreModifications: true },
+    }));
+  };
 
   const columns = [
     {
@@ -413,8 +571,8 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
             },
           }}
         >
-          {params.colDef.valueOptions.map((option) => (
-            <MenuItem key={option} value={option}>
+          {params.colDef.valueOptions.map((option, index) => (
+            <MenuItem key={`${String(option)}-${index}`} value={option}>
               {option}
             </MenuItem>
           ))}
@@ -493,25 +651,157 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
   ];
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box
-        sx={{
-          height: 900,
-          width: "100%",
-          border: "2px solid lightGray",
-          borderRadius: 2,
-          p: 1
-        }}
-      >
+    <Box
+      sx={{
+        height: "100%",
+        width: "100%",
+        border: "2px solid lightGray",
+        borderRadius: 2,
+        p: 1,
+      }}
+    >
+      <Box>
+        <StatCardinfo
+          title={`Total: € ${formattedFilteredTotalValue}`}
+          title1={`Paid: € ${formattedFilteredPaidValue}`}
+          title2={`Unpaid: € ${formattedFilteredUnpaidValue}`}
+          title3={`${entryCount} Entries`}
+          progress={"none"}
+        />
+      </Box>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Box
+          display="grid"
+          gap="5px"
+          gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+          sx={{
+            "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+            mb: "5px",
+          }}
+        >
+          <GlobalStyles
+            styles={{
+              ".MuiPickersPopper-root .MuiPaper-root": {
+                backgroundColor: "#f5f5f5 !important",
+                color: "#4a5759 !important",
+                fontSize: "1rem",
+                lineHeight: 1.8,
+                borderRadius: "8px",
+              },
+
+              // Day numbers (default state)
+              ".MuiDayCalendar-weekContainer .MuiPickersDay-root": {
+                color: "#4a5759 !important",
+              },
+
+              // Selected day (override white-on-white)
+              ".MuiDayCalendar-weekContainer .MuiPickersDay-root.Mui-selected":
+                {
+                  backgroundColor: "#2a9d8f !important",
+                  color: "#fff !important",
+                },
+
+              // Today’s date
+              ".MuiDayCalendar-weekContainer .MuiPickersDay-root.MuiDayCalendar-dayWithMargin.MuiPickersDay-today":
+                {
+                  border: "1px solid #2a9d8f",
+                },
+
+              // ✅ Day-of-week headers (top row: S, M, T, etc.)
+              ".MuiDayCalendar-header .MuiTypography-root": {
+                color: "#4a5759 !important",
+                fontWeight: 800,
+              },
+              ".MuiPickersCalendarHeader-root .MuiIconButton-root": {
+                color: "#2a9d8f !important", // or any color you prefer
+              },
+            }}
+          />
+
+          <DesktopDatePicker
+            label="From Date"
+            value={fromDate}
+            onChange={(newValue) => {
+              const selectedDate = dayjs(newValue);
+              setFromDate(selectedDate);
+              // If toDate is empty or equal to old fromDate, update it too
+              if (!toDate || toDate.isSame(fromDate, "day")) {
+                setToDate(selectedDate);
+              }
+            }}
+            format="DD-MM-YYYY"
+            slotProps={{
+              textField: {
+                variant: "outlined",
+                sx: {
+                  ...sharedStyles,
+                  "& .MuiSvgIcon-root": {
+                    color: "#2a9d8f",
+                  },
+                  "& .MuiInputBase-input": {
+                    color: "#2a9d8f",
+                    fontSize: "1rem",
+                    fontWeight: 500,
+                  },
+                },
+              },
+            }}
+          />
+
+          <DesktopDatePicker
+            label="To Date"
+            value={toDate}
+            onChange={(newValue) => setToDate(dayjs(newValue))}
+            format="DD-MM-YYYY"
+            slotProps={{
+              textField: {
+                variant: "outlined",
+                sx: {
+                  ...sharedStyles,
+                  "& .MuiSvgIcon-root": {
+                    color: "#2a9d8f",
+                  },
+                  "& .MuiInputBase-input": {
+                    color: "#2a9d8f",
+                    fontSize: "1rem",
+                    fontWeight: 500,
+                  },
+                },
+              },
+            }}
+          />
+          <IconButton
+            onClick={() => {
+              setFromDate(null);
+              setToDate(null);
+            }}
+            sx={{
+              width: "50px",
+              "&:hover": {
+                backgroundColor: "transparent", // remove hover background
+              },
+              "& .MuiSvgIcon-root": {
+                fontSize: "2rem", // adjust icon size as needed
+                color: "#577590", // customize icon color
+              },
+            }}
+          >
+            <CachedIcon />
+          </IconButton>
+        </Box>
+
         <ThemeProvider theme={theme}>
           <DataGrid
-            rows={rows}
+            rows={filteredRows} // Apply the filtered rows here
             columns={columns}
             editMode="row"
             rowModesModel={rowModesModel}
             onRowModesModelChange={handleRowModesModelChange}
             onRowEditStop={handleRowEditStop}
             processRowUpdate={processRowUpdate}
+            onProcessRowUpdateError={(error, row) =>
+              handleProcessRowUpdateError(error, row)
+            }
             getRowId={(row) => row.id}
             slots={{
               toolbar: () => (
@@ -574,8 +864,7 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
             }}
           />
         </ThemeProvider>
-      </Box>
-    </LocalizationProvider>
-    // </motion.div>
+      </LocalizationProvider>
+    </Box>
   );
 }

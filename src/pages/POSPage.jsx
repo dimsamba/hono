@@ -519,7 +519,7 @@ const POSPage = () => {
   const getCategoryColor = (category) => {
     switch (category.toLowerCase()) {
       case "beverage":
-        return "#47126b"; // warm orange tone
+        return "#415a77"; // warm orange tone
       case "produces":
         return "#156064 "; // rich green tone
       default:
@@ -543,10 +543,11 @@ const POSPage = () => {
               icon={
                 <PointOfSaleIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
               }
-              title={`${sales.length} Sales`}
-              value={`Today's sales: $${formatCurrency(totalSalesToday)}`}
-              subtitle={`Items sold today: ${totalItemsToday}`}
+              title={`Todays Sales Summary`}
+              value={`€ ${formatCurrency(totalSalesToday)}`}
+              subtitle={`${todaysSales.length} Sales | ${totalItemsToday} Items`}
               subtitle2={""}
+              progress={"none"}
             />
           </Box>
 
@@ -763,20 +764,21 @@ const POSPage = () => {
               justifyContent="space-between"
               width="100%"
               container
+              display="column"
               alignContent={"top"}
-              //  display="grid"
               sx={{
                 gridColumn: "span 2",
                 borderRadius: 2,
                 p: 0.5,
               }}
             >
+              {/* Tabs Menu */}
               <Tabs
                 value={selectedTab}
                 onChange={(_e, newValue) => setSelectedTab(newValue)}
                 indicatorColor="primary"
                 variant="fullWidth"
-                sx={{ mb: 1 }}
+                sx={{ mb: 0.5 }}
               >
                 {categories.map((cat, index) => (
                   <Tab
@@ -784,12 +786,20 @@ const POSPage = () => {
                     key={index}
                     sx={{
                       fontSize: 14,
-                      fontWeight: 400,
-                      color: "#6f725a",
+                      fontWeight: 500,
+                      color: "#3FA89B",
                       "&.Mui-selected": {
-                        color: "#007f5f",
+                        color: "white",
                         fontWeight: 700,
                         fontSize: 18,
+                        backgroundColor: "#00b4d8",
+                        borderTopLeftRadius: 10,
+                        borderTopRightRadius: 10,
+                      },
+                      "&:hover": {
+                        backgroundColor: "#90e0ef",
+                        borderTopLeftRadius: 10,
+                        borderTopRightRadius: 10,
                       },
                     }}
                   />
@@ -805,6 +815,7 @@ const POSPage = () => {
                     sm={2} // 2 columns on small screens
                     md={4} // 3 columns on medium screens
                     lg={6} // 4 columns on large screens
+                    m={1} // Margin for spacing
                   >
                     <Paper
                       sx={{
@@ -813,10 +824,7 @@ const POSPage = () => {
                         pb: 1,
                         backgroundColor: getCategoryColor(item.category),
                         color: "white",
-                        border: "1px solid #6fffe9",
                         borderRadius: 2,
-                        boxShadow: "2px 2px 4px rgba(0, 0.5, 0, 0.5)",
-                        transition: "transform 0.2s",
                       }}
                     >
                       <Box

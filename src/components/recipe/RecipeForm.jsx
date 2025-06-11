@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import {
   Box,
   Button,
@@ -12,10 +11,8 @@ import {
   FormControl,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import supabase from "../supabaseClient"; // Import Supabase client
-import { tokens } from "../theme";
-import { Position } from "@syncfusion/ej2-base";
 
 const RecipeForm = ({
   onRecipeSaved,
@@ -35,7 +32,6 @@ const RecipeForm = ({
   const [actualSalePrice, setActualSalePrice] = useState("");
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [inventoryItems, setInventoryItems] = useState([]);
   const [recipes, setRecipes] = useState([]);
@@ -515,8 +511,8 @@ const RecipeForm = ({
       }}
     >
       <form onSubmit={handleSubmit}>
-        <h3 className="text-base mb-5 ml-3 mt-2 text-LightGray">
-          Recipe Calculator
+        <h3 className="text-base mb-5 ml-3 mt-2 text-[#3FA89B] font-bold">
+          RECIPE CALCULATOR
         </h3>
         <Box
           display="grid"

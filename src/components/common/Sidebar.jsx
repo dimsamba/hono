@@ -1,38 +1,96 @@
-import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
-import LocalAtmOutlinedIcon from '@mui/icons-material/LocalAtmOutlined';
-import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
-import PostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
-import ContactPhoneOutlinedIcon from '@mui/icons-material/ContactPhoneOutlined';
-import OutdoorGrillOutlinedIcon from '@mui/icons-material/OutdoorGrillOutlined';
-import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
-import EuroOutlinedIcon from '@mui/icons-material/EuroOutlined';
-import DateRangeOutlinedIcon from '@mui/icons-material/DateRangeOutlined';
-import SyncProblemOutlinedIcon from '@mui/icons-material/SyncProblemOutlined';
+import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
+import LocalAtmOutlinedIcon from "@mui/icons-material/LocalAtmOutlined";
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
+import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
+import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import ContactPhoneOutlinedIcon from "@mui/icons-material/ContactPhoneOutlined";
+import OutdoorGrillOutlinedIcon from "@mui/icons-material/OutdoorGrillOutlined";
+import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
+import EuroOutlinedIcon from "@mui/icons-material/EuroOutlined";
+import DateRangeOutlinedIcon from "@mui/icons-material/DateRangeOutlined";
+import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
+import { Tooltip } from "@mui/material";
 
-import {
-  LogOutIcon,
-  Menu
-} from "lucide-react";
+import { LogOutIcon, Menu } from "lucide-react";
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../supabaseClient";
 
 const SIDEBAR_ITEMS = [
-  { name: "Overview", icon: InsertChartOutlinedIcon, color: "#3FA89B", href: "/overview" },
-  { name: "Vendor", icon: StorefrontOutlinedIcon, color: "#3FA89B", href: "/vendor" },
-  { name: "Item's List", icon: PostAddOutlinedIcon, color: "#3FA89B", href: "/items" },
-  { name: "Inventory", icon: Inventory2OutlinedIcon, color: "#3FA89B", href: "/inventory" },
-  { name: "Expenses", icon: ReceiptLongOutlinedIcon, color: "#3FA89B", href: "/invoice" },
-  { name: "Suppliers", icon: ContactPhoneOutlinedIcon, color: "#3FA89B", href: "/supplier" },
-  { name: "Recipe", icon: OutdoorGrillOutlinedIcon, color: "#3FA89B", href: "/recipe" },
-  { name: "Stock Take", icon: InventoryOutlinedIcon, color: "#3FA89B", href: "/stockTake" },
-  { name: "Sales", icon: LocalAtmOutlinedIcon, color: "#3FA89B", href: "/sales" },
-  { name: "Cost Calculator", icon: EuroOutlinedIcon, color: "#3FA89B", href: "/cost" },
-  { name: "Agenda", icon: DateRangeOutlinedIcon, color: "#3FA89B", href: "/calendar" },
-  { name: "Converter", icon: SyncProblemOutlinedIcon, color: "#3FA89B", href: "/converter" }, 
+  {
+    name: "Overview",
+    icon: InsertChartOutlinedIcon,
+    color: "#3FA89B",
+    href: "/overview",
+  },
+  {
+    name: "Vendor",
+    icon: StorefrontOutlinedIcon,
+    color: "#3FA89B",
+    href: "/vendor",
+  },
+  {
+    name: "Item's List",
+    icon: PostAddOutlinedIcon,
+    color: "#3FA89B",
+    href: "/items",
+  },
+  {
+    name: "Inventory",
+    icon: Inventory2OutlinedIcon,
+    color: "#3FA89B",
+    href: "/inventory",
+  },
+  {
+    name: "Expenses",
+    icon: ReceiptLongOutlinedIcon,
+    color: "#3FA89B",
+    href: "/invoice",
+  },
+  {
+    name: "Suppliers",
+    icon: ContactPhoneOutlinedIcon,
+    color: "#3FA89B",
+    href: "/supplier",
+  },
+  {
+    name: "Recipe",
+    icon: OutdoorGrillOutlinedIcon,
+    color: "#3FA89B",
+    href: "/recipe",
+  },
+  {
+    name: "Stock Take",
+    icon: InventoryOutlinedIcon,
+    color: "#3FA89B",
+    href: "/stockTake",
+  },
+  {
+    name: "Sales",
+    icon: LocalAtmOutlinedIcon,
+    color: "#3FA89B",
+    href: "/sales",
+  },
+  {
+    name: "Cost Calculator",
+    icon: EuroOutlinedIcon,
+    color: "#3FA89B",
+    href: "/cost",
+  },
+  {
+    name: "Agenda",
+    icon: DateRangeOutlinedIcon,
+    color: "#3FA89B",
+    href: "/calendar",
+  },
+  {
+    name: "Converter",
+    icon: SyncProblemOutlinedIcon,
+    color: "#3FA89B",
+    href: "/converter",
+  },
 ];
 
 const Sidebar = () => {
@@ -74,8 +132,7 @@ const Sidebar = () => {
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="p-2 rounded-full hover:bg-gray-200 transition-colors max-w-fit"
         >
-         <Menu className="text-[16px] sm:text-[24px] text-gray-800" />
-
+          <Menu className="text-[16px] sm:text-[24px] text-gray-800" />
         </motion.button>
 
         {/* Navigation */}
@@ -83,10 +140,36 @@ const Sidebar = () => {
           {SIDEBAR_ITEMS.map((item) => (
             <Link key={item.href} to={item.href}>
               <motion.div className="flex items-center p-2 pl-2 text-sm font-medium rounded-lg hover:bg-gray-300 transition-colors mb-2">
-                <item.icon
-                  className="text-[16px] sm:text-[20px]"
-                  style={{ color: item.color ?? "#333", minWidth: "16px" }}
-                />
+                <Tooltip
+                  title={!isSidebarOpen ? item.name : ""}
+                  placement="right"
+                  arrow
+                  slotProps={{
+                    tooltip: {
+                      sx: {
+                        fontSize: 14, // Tooltip text size
+                        fontWeight: 400, // Bold text
+                        backgroundColor: "#3FA89B", // Dark background
+                        color: "white", // White text
+                        borderRadius: 1,
+                        Opacity: "0.6 !important",
+                      },
+                    },
+                    arrow: {
+                      sx: {
+                        color: "#3FA89B", // Match tooltip background
+                      },
+                    },
+                  }}
+                >
+                  <div>
+                    <item.icon
+                      className="text-[16px] sm:text-[20px]"
+                      style={{ color: item.color ?? "#333", minWidth: "16px" }}
+                    />
+                  </div>
+                </Tooltip>
+
                 <AnimatePresence>
                   {isSidebarOpen && (
                     <motion.span
@@ -114,7 +197,9 @@ const Sidebar = () => {
               style={{ color: "#CC4444", minWidth: "16px" }}
             />
             {isSidebarOpen && (
-              <span className="ml-4 whitespace-nowrap text-gray-700">Log out</span>
+              <span className="ml-4 whitespace-nowrap text-gray-700">
+                Log out
+              </span>
             )}
           </button>
         </nav>
