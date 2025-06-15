@@ -1,28 +1,27 @@
-import { useState, useEffect } from "react";
+import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
+import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
+import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import {
-  Box,
-  IconButton,
-  Typography,
-  useTheme,
   Badge,
-  Menu,
-  MenuItem,
+  Box,
+  Button,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
-  Button,
+  DialogTitle,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+  useTheme,
 } from "@mui/material";
-import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
-import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
-import Notification from "../common/Notification";
-import AgendaNotification from "../common/AgendaNotification";
-import { tokens } from "../theme";
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { blue } from "@mui/material/colors";
+import AgendaNotification from "../common/AgendaNotification";
+import Notification from "../common/Notification";
+import { tokens } from "../theme";
 
 const Topbar = ({ title }) => {
   const theme = useTheme();
@@ -75,7 +74,7 @@ const Topbar = ({ title }) => {
         borderBottom: "1px solid #e5e7eb", // Tailwind's border-gray-200
       }}
     >
-      <Typography variant="h4" color={colors.grey[700]}>
+      <Typography variant="h4" color="#3FA89B">
         {title}
       </Typography>
 

@@ -1,6 +1,6 @@
 import supabase from "../components/supabaseClient";
 import { Link } from "react-router-dom";
-import { React, useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { tokens } from "../components/theme";
 import { useTheme } from "@mui/material";

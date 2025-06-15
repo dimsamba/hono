@@ -1,24 +1,23 @@
-import { motion } from "framer-motion";
-import * as React from "react";
+import AddIcon from "@mui/icons-material/Add";
+import CancelIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import { Stack, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
-import { Stack, Typography } from "@mui/material";
-import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import {
-  GridRowModes,
   DataGrid,
-  GridToolbar,
-  GridToolbarContainer,
   GridActionsCellItem,
   GridRowEditStopReasons,
+  GridRowModes,
+  GridToolbar,
+  GridToolbarContainer,
 } from "@mui/x-data-grid";
+import * as React from "react";
 import supabase from "../supabaseClient";
 
 // 🔧 Toolbar for adding new rows
@@ -85,7 +84,7 @@ function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
   );
 }
 
-export default function FullFeaturedCrudGrid({ InventoryData }) {
+export default function FullFeaturedCrudGrid({ InventoryData, onInventoryChanges }) {
   const [rows, setRows] = React.useState(InventoryData); // Use the passed inventoryData
 
   React.useEffect(() => {
@@ -124,6 +123,8 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
       ...prev,
       [id]: { mode: GridRowModes.Edit },
     }));
+    // Notify parent
+    onInventoryChanges();
   };
 
   const handleSaveClick = (id) => () => {
@@ -131,6 +132,8 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
       ...prev,
       [id]: { mode: GridRowModes.View },
     }));
+    // Notify parent
+    onInventoryChanges();
   };
 
   const handleDeleteClick = (id) => async () => {
@@ -147,6 +150,8 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
     }
 
     setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+    // Notify parent
+    onInventoryChanges();
   };
 
   const handleCancelClick = (id) => () => {
@@ -204,6 +209,8 @@ export default function FullFeaturedCrudGrid({ InventoryData }) {
 
   const handleRowModesModelChange = (newModel) => {
     setRowModesModel(newModel);
+    // Notify parent
+    onInventoryChanges();
   };
   
  // Customize Toolbar 

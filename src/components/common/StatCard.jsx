@@ -1,6 +1,6 @@
-import ProgressCircle from "./ProgressCircle";
 import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
+import ProgressCircle from "./ProgressCircle";
 
 const StatCard = ({
   value,
@@ -15,10 +15,6 @@ const StatCard = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
-    // <motion.div
-    //   className="bg-gray-100 bg-opacity-80 backdrop-blur-md overflow-hidden shadow-lg rounded-xl border border-gray-300"
-    //   whileHover={{ y: 1, boxShadow: "0 10px 25px -15px rgba(0, 2, 0, 1.5)" }}
-    // >
     <div className="flex justify-between px-1 py-2 sm:p-6 border-2 border-gray-300 rounded-lg">
       <Box
         width="100%"
@@ -87,7 +83,6 @@ const StatCard = ({
         </Box>
       </Box>
     </div>
-    // </motion.div>
   );
 };
 

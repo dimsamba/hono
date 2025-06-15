@@ -1,21 +1,18 @@
-import { motion } from "framer-motion";
-import { useTheme, useMediaQuery, Box } from "@mui/material";
-import { format } from "date-fns";
 import ContactPhoneOutlinedIcon from "@mui/icons-material/ContactPhoneOutlined";
-import { tokens } from "../components/theme";
+import { Box, useMediaQuery } from "@mui/material";
+import { format } from "date-fns";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import StatCard from "../components/common/StatCard";
 import supabase from "../components/supabaseClient";
-import React, { useState, useEffect } from "react";
-import SupplierData from "../components/supplier/SupplierData"; // ✅ Import SupplierData component
-
+import FullFeaturedCrudGrid from "../components/supplier/SupplierData"; // ✅ Import SupplierData component
 
 // ✅ Import Supabase
 const SupplierPage = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [supplierData, setSupplierData] = useState([]); // ✅ Define state
   const [supplierlatestEntryDate, setLatestEntryDateSupplier] = useState(null); // Declare the state
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const [refreshKey, setRefreshKey] = useState(); // used to force re-render
 
   // Function to fetch suppliers data from Supabase
   const fetchData = async () => {
@@ -30,6 +27,11 @@ const SupplierPage = () => {
   useEffect(() => {
     fetchData(); // ✅ Fetch suppliers data when the page loads
   }, []);
+
+  const handSupplierChange = () => {
+    fetchData(); // ✅ Correct function name
+    setRefreshKey(Date.now()); // update with new timestamp to force StatCard re-render
+  };
 
   // Fetch data from supplier table
   const fetchDataSupplierLE = async () => {
@@ -75,6 +77,7 @@ const SupplierPage = () => {
                   sx={{ color: "#38a3a5", fontSize: "26px" }}
                 />
               }
+              key={refreshKey} // 👈 triggers re-render when key changes
               title={"N. of Suppliers"}
               value={supplierData.length}
               subtitle={
@@ -100,17 +103,10 @@ const SupplierPage = () => {
           transition={{ duration: 1 }}
         >
           {/* ✅ Pass inventory data to the table */}
-          <SupplierData />
-        </motion.div>
-
-        {/* ✅ Pass fetchData to the form so it refreshes after insert */}
-        <motion.div
-          className="grid grid-cols-1 gap-0 sm:grid-cols-1 lg:grid-cols-1 mb-0"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
-          {/* <InventoryForm fetchData={fetchData} /> */}
+           <FullFeaturedCrudGrid
+          SupplierData={supplierData}
+          onSupplierChange={handSupplierChange}
+          />
         </motion.div>
       </main>
     </div>

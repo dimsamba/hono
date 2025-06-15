@@ -1,21 +1,21 @@
-import supabase from "../components/supabaseClient";
-import { useTheme } from "@mui/material";
-import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
-import { tokens } from "../components/theme";
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import StatCard from "../components/common/StatCard";
-import { format } from "date-fns";
-import RamenDiningIcon from "@mui/icons-material/RamenDining";
-import SalesOverviewChart from "../components/sales/SalesOverviewChart";
-import SalesCategory from "../components/overview/SalesCategory";
-import RevenueSumary from "../components/overview/RevenueSumary";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import EuroSymbolOutlinedIcon from "@mui/icons-material/EuroSymbolOutlined";
+import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import RamenDiningIcon from "@mui/icons-material/RamenDining";
+import { useTheme } from "@mui/material";
+import { format } from "date-fns";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import StatCard from "../components/common/StatCard";
+import RevenueSumary from "../components/overview/RevenueSumary";
+import SalesCategory from "../components/overview/SalesCategory";
+import SalesOverviewChart from "../components/sales/SalesOverviewChart";
+import supabase from "../components/supabaseClient";
+import { tokens } from "../components/theme";
 
 const OverviewPage = () => {
   const [inventoryData, setInventoryData] = useState([]);
-  const [invoiceData, setInvoiceData] = useState([]);
+  const [, setInvoiceData] = useState([]);
   const [financialsData, setFinancialsData] = useState([]);
   const [sales, setSales] = useState([]);
   const [recipes, setRecipes] = useState([]);

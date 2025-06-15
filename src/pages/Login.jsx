@@ -1,10 +1,9 @@
-import { React, useState } from "react";
-import supabase  from "../components/supabaseClient";
-import { useNavigate } from "react-router-dom";
+import { TextField, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import supabase from "../components/supabaseClient";
 import { tokens } from "../components/theme";
-import { useTheme } from "@mui/material";
-import { TextField } from "@mui/material";
 
 function Login() {
   const navigate = useNavigate();

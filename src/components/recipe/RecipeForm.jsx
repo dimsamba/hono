@@ -1,18 +1,21 @@
 import {
+  Alert,
   Box,
   Button,
-  TextField,
-  useMediaQuery,
-  Snackbar,
-  Alert,
+  FormControl,
+  InputLabel,
   MenuItem,
   Select,
-  InputLabel,
-  FormControl,
+  Snackbar,
+  TextField,
+  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import supabase from "../supabaseClient"; // Import Supabase client
+import StatCard from "../common/StatCard";
+import RamenDiningIcon from "@mui/icons-material/RamenDining";
+import { format } from "date-fns";
 
 const RecipeForm = ({
   onRecipeSaved,
@@ -37,6 +40,7 @@ const RecipeForm = ({
   const [recipes, setRecipes] = useState([]);
   const [recipeId, setRecipeId] = useState(""); // Initialize as an empty string
   const [numItems, setNumItems] = useState();
+  const [latestEntryDate, setLatestEntryDate] = useState(null);
 
   // Automatically set recipeId when recipe prop is available
   useEffect(() => {
@@ -64,6 +68,13 @@ const RecipeForm = ({
       console.error("Error fetching recipes:", error.message);
     } else {
       setRecipes(data);
+      if (data.length > 0) {
+        // fallback: get latest by checking max date manually
+        const latest = data.reduce((a, b) =>
+          new Date(a.created_at) > new Date(b.created_at) ? a : b
+        );
+        setLatestEntryDate(latest.created_at);
+      }
     }
     setLoading(false);
   }; // Ensure this is part of a valid block or remove if unnecessary
@@ -510,6 +521,30 @@ const RecipeForm = ({
         padding: 1,
       }}
     >
+      <Box
+        display="grid"
+        gap="15px"
+        gridTemplateColumns="repeat(1, minmax(0, 1fr))"
+        sx={{
+          "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+        }}
+      >
+        <StatCard
+          icon={<RamenDiningIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />}
+          title={"Recipes in Database"}
+          value={`${recipes.length} Recipes`}
+          subtitle={
+            latestEntryDate
+              ? `Last Entry: ${format(new Date(latestEntryDate), "dd-MM-yyyy")}`
+              : "No data available"
+          }
+          progress={"none"}
+          sx={{
+            gridColumn: "span 1",
+          }}
+        />
+      </Box>
+
       <form onSubmit={handleSubmit}>
         <h3 className="text-base mb-5 ml-3 mt-2 text-[#3FA89B] font-bold">
           RECIPE CALCULATOR
@@ -655,7 +690,6 @@ const RecipeForm = ({
               label="Note"
               value={recipeNote}
               onChange={(e) => setRecipeNote(e.target.value)}
-              required
               multiline
               minRows={2} // or rows={4} if you want a fixed height
               sx={{
@@ -737,7 +771,7 @@ const RecipeForm = ({
             </thead>
             <tbody>
               {ingredients.map((ingredient, index) => (
-                <tr key={index} className="border-b border-gray-500">
+                <tr key={index}>
                   <td className="p-2">
                     <select
                       className="bg-gray-100 p-1 rounded w-full"

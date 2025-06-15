@@ -1,21 +1,22 @@
 import {
+  Alert,
   Box,
   Button,
+  FormControl,
+  GlobalStyles,
+  Snackbar,
   TextField,
   useMediaQuery,
-  Snackbar,
-  Alert,
   useTheme,
-  FormControl,
 } from "@mui/material";
+import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import supabase from "../supabaseClient"; // Import Supabase client
-import { tokens } from "../theme";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DesktopDatePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
-import { GlobalStyles } from "@mui/material";
+import StatCard from "../common/StatCard";
+import { format } from "date-fns";
+import RamenDiningIcon from "@mui/icons-material/RamenDining";
 
 const StockTakeForm = ({
   onStockTakeSaved,
@@ -32,7 +33,6 @@ const StockTakeForm = ({
   const [stockTakeNote, setStockTakeNote] = useState("");
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [inventoryItems, setInventoryItems] = useState([]);
   const [stockTake, setStockTake] = useState([]);
@@ -41,6 +41,7 @@ const StockTakeForm = ({
   const Today = new Date(); // Get today's date
   Today.setHours(0, 0, 0, 0); // Set time to midnight to avoid timezone issues
   const [stockTakeSelected, setStockTakeSelected] = useState(false);
+  const [latestEntryDate, setLatestEntryDate] = useState(null);
 
   // Automatically set stockTakeId when stockTake prop is available
   useEffect(() => {
@@ -70,6 +71,13 @@ const StockTakeForm = ({
       console.error("Error fetching stockTake:", error.message);
     } else {
       setStockTake(data);
+      if (data.length > 0) {
+        // fallback: get latest by checking max date manually
+        const latest = data.reduce((a, b) =>
+          new Date(a.created_at) > new Date(b.created_at) ? a : b
+        );
+        setLatestEntryDate(latest.created_at);
+      }
     }
     setLoading(false);
   }; // Ensure this is part of a valid block or remove if unnecessary
@@ -442,6 +450,29 @@ const StockTakeForm = ({
         padding: 1,
       }}
     >
+      <Box
+        display="grid"
+        gap="15px"
+        gridTemplateColumns="repeat(1, minmax(0, 1fr))"
+        sx={{
+          "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+        }}
+      >
+        <StatCard
+          icon={<RamenDiningIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />}
+          title={"Stock Take in Database"}
+          value={`${stockTake.length} Stock Take`}
+          subtitle={
+            latestEntryDate
+              ? `Last Entry: ${format(new Date(latestEntryDate), "dd-MM-yyyy")}`
+              : "No data available"
+          }
+          progress={"none"}
+          sx={{
+            gridColumn: "span 1",
+          }}
+        />
+      </Box>
       <form onSubmit={handleSubmit}>
         <h3 className="text-base mb-2 ml-1 mt-1 text-[#3FA89B] font-bold">
           STOCK TAKE CALCULATOR
@@ -533,7 +564,6 @@ const StockTakeForm = ({
               label="Note"
               value={stockTakeNote}
               onChange={(e) => setStockTakeNote(e.target.value)}
-              required
               multiline
               minRows={2} // or rows={4} if you want a fixed height
               sx={{
@@ -614,10 +644,10 @@ const StockTakeForm = ({
             </thead>
             <tbody>
               {invItems.map((item, index) => (
-                <tr key={index} className="border-b border-gray-600">
+                <tr key={index}>
                   <td className="p-2">
                     <select
-                      className="bg-gray-500 p-1 rounded w-full"
+                      className="bg-gray-100 p-1 rounded w-full"
                       value={item.item_id}
                       onChange={(e) =>
                         handleItemsChange(index, "item_id", e.target.value)
@@ -635,7 +665,7 @@ const StockTakeForm = ({
                     <input
                       type="number"
                       min="0"
-                      className="bg-gray-500 p-1 rounded w-20"
+                       className="bg-gray-100 p-1 rounded w-20"
                       value={item.counted_qty}
                       onChange={(e) =>
                         handleItemsChange(index, "counted_qty", e.target.value)

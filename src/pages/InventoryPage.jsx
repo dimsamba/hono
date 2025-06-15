@@ -1,22 +1,19 @@
-import { motion } from "framer-motion";
-import StatCard from "../components/common/StatCard";
-import supabase from "../components/supabaseClient";
-import { ShoppingBasket } from "lucide-react";
-import { useState, useEffect } from "react";
-import InventoryData from "../components/inventory/InventoryData"; // Note the capital "I"
-import { tokens } from "../components/theme";
-import { useTheme } from "@mui/material";
 import { format } from "date-fns";
+import { motion } from "framer-motion";
+import { ShoppingBasket } from "lucide-react";
+import { useEffect, useState } from "react";
+import StatCard from "../components/common/StatCard";
+import FullFeaturedCrudGrid from "../components/inventory/InventoryData"; // Note the capital "I"
+import supabase from "../components/supabaseClient";
 
 // ✅ Import Supabase
 const InventoryPage = () => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const [inventory, setInventory] = useState([]);
   const [latestEntryDate, setLatestEntryDate] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(); // used to force re-render
 
   // Function to fetch inventory data from Supabase
-  const fetchRecipes = async () => {
+  const fetchData = async () => {
     const { data, error } = await supabase.from("inventory").select("*");
 
     console.log("Inventory raw fetch:", data);
@@ -36,8 +33,13 @@ const InventoryPage = () => {
   };
 
   useEffect(() => {
-    fetchRecipes();
+    fetchData();
   }, []);
+
+  const handleinventoryChanges = () => {
+    fetchData();
+    setRefreshKey(Date.now()); // update with new timestamp to force StatCard re-render
+  };
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
@@ -51,10 +53,9 @@ const InventoryPage = () => {
         >
           <StatCard
             icon={
-              <ShoppingBasket
-              sx={{ color: "#38a3a5", fontSize: "26px" }}
-              />
+              <ShoppingBasket sx={{ color: "#38a3a5", fontSize: "26px" }} />
             }
+            key={refreshKey} // 👈 triggers re-render when key changes
             title={"Inventory in Database"}
             value={`${inventory.length} Items`}
             subtitle={
@@ -80,7 +81,10 @@ const InventoryPage = () => {
           transition={{ duration: 1 }}
         >
           {/* Pass InventoryData to FullFeaturedCrudGrid */}
-          <InventoryData />
+          <FullFeaturedCrudGrid
+            inventory={inventory}
+            onInventoryChanges={handleinventoryChanges}
+          />
         </motion.div>
       </main>
     </div>

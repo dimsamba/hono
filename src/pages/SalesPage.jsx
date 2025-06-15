@@ -1,17 +1,13 @@
 import { motion } from "framer-motion";
 import StatCard from "../components/common/StatCard";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import SalesTable from "../components/sales/SalesTable";
+import FullFeaturedCrudGrid from "../components/sales/SalesTable";
 import { useState, useEffect } from "react";
 import supabase from "../components/supabaseClient";
-import { tokens } from "../components/theme";
-import { useTheme, useMediaQuery } from "@mui/material";
 
 const SalesPage = () => {
-  const isNonMobile = useMediaQuery("(min-width:600px)");
   const [sales, setSales] = useState([]);
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const [refreshKey, setRefreshKey] = useState(); // used to force re-render
 
   // Filter sales from last 30 days
   const now = new Date();
@@ -39,25 +35,32 @@ const SalesPage = () => {
   );
 
   // Fetch data from Supabase
+  // Place this function **outside** of useEffect
+  const fetchData = async () => {
+    const { data, error } = await supabase.from("sales").select("*");
+
+    if (error) {
+      console.error("Supabase SELECT error:", error.message);
+      return;
+    }
+
+    const formattedData = data.map((row) => ({
+      ...row,
+      date: row.date ? new Date(row.date) : new Date(),
+    }));
+
+    setSales(formattedData);
+  };
+
+  // Inside the component
   useEffect(() => {
-    const fetchData = async () => {
-      const { data, error } = await supabase.from("sales").select("*");
+    fetchData(); // ✅ call it here
+  }, []);
 
-      if (error) {
-        console.error("Supabase SELECT error:", error.message);
-        return;
-      }
-
-      const formattedData = data.map((row) => ({
-        ...row,
-        date: row.date ? new Date(row.date) : new Date(),
-      }));
-
-      setSales(formattedData); // Update rows state with the fetched data
-    };
-
-    fetchData(); // Call the fetch function when the component mounts
-  }, []); // Empty dependency array to only run once when the component mounts
+  const handleSalesChange = () => {
+    fetchData();
+    setRefreshKey(Date.now()); // update with new timestamp to force StatCard re-render
+  };
 
   // Customization for decimals and thousands separators
   const formatCurrency = (value) => {
@@ -69,7 +72,7 @@ const SalesPage = () => {
   };
 
   return (
-     <div className="flex-1 overflow-auto relative z-10">
+    <div className="flex-1 overflow-auto relative z-10">
       <main className="max-w-10xl py-6 px-4 lg:px-8">
         {/* STATS */}
         <motion.div
@@ -78,24 +81,25 @@ const SalesPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-            <StatCard
-              icon={
-                <PointOfSaleIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
-              }
-              title={`${sales.length} Sales`}
-              value={`€ ${formatCurrency(totalSalesValue)}`}
-              subtitle={`${
-                salesLastMonth.filter((sale) => {
-                  const today = new Date();
-                  const thirtyDaysAgo = new Date();
-                  thirtyDaysAgo.setDate(today.getDate() - 30);
+          <StatCard
+            icon={
+              <PointOfSaleIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
+            }
+            key={refreshKey} // 👈 triggers re-render when key changes
+            title={`${sales.length} Sales`}
+            value={`€ ${formatCurrency(totalSalesValue)}`}
+            subtitle={`${
+              salesLastMonth.filter((sale) => {
+                const today = new Date();
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(today.getDate() - 30);
 
-                  const saleDate = new Date(sale.date); // or sale.date
-                  return saleDate >= thirtyDaysAgo && saleDate <= today;
-                }).length
-              } Sales in last 30 Days`}
-              subtitle2={`€ ${formatCurrency(totalSalesValue30Days)}`}
-            />
+                const saleDate = new Date(sale.date); // or sale.date
+                return saleDate >= thirtyDaysAgo && saleDate <= today;
+              }).length
+            } Sales in last 30 Days`}
+            subtitle2={`€ ${formatCurrency(totalSalesValue30Days)}`}
+          />
           {/* </Box> */}
         </motion.div>
         <motion.div
@@ -105,7 +109,10 @@ const SalesPage = () => {
           transition={{ duration: 1 }}
         >
           {/* <SalesTable/> */}
-          <SalesTable sales={sales} />
+          <FullFeaturedCrudGrid
+            sales={sales}
+            onSalesChange={handleSalesChange}
+          />
         </motion.div>
       </main>
     </div>

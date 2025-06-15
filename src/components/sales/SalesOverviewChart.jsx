@@ -1,15 +1,15 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import {
-  AreaChart,
   Area,
+  AreaChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
 } from "recharts";
-import { useState, useEffect } from "react";
 import supabase from "../supabaseClient";
 
 const SalesOverviewChart = () => {

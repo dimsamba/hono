@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import {
+  Bar,
   BarChart,
-  Bar, XAxis,
-  YAxis,
   CartesianGrid,
-  Tooltip,
+  Legend,
   ResponsiveContainer,
-  Legend
+  Tooltip,
+  XAxis,
+  YAxis
 } from "recharts";
 import supabase from "../supabaseClient";
 

@@ -1,36 +1,42 @@
 // ... (imports unchanged)
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import LoyaltyOutlinedIcon from "@mui/icons-material/LoyaltyOutlined";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import { v4 as uuidv4 } from "uuid"; // NEW: for unique order item keys
 import StatCard from "../components/common/StatCard";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import StatCardVend from "../components/common/StatCardVend";
 // Add to the top of the file:
-import { motion } from "framer-motion";
-import React, { useEffect, useState, useMemo } from "react";
-import supabase from "../components/supabaseClient";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
-import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import LocalActivityOutlinedIcon from "@mui/icons-material/LocalActivityOutlined";
+import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import Tooltip from "@mui/material/Tooltip";
-
-import {
-  Box,
-  Typography,
-  IconButton,
-  TextField,
-  Button,
-  Paper,
-  Grid2,
-  Grid,
-  FormControl,
-  useMediaQuery,
-  Tabs,
-  Tab,
-} from "@mui/material";
+import { motion } from "framer-motion";
+import React, { useEffect, useMemo, useState } from "react";
+import supabase from "../components/supabaseClient";
+import { tokens } from "../components/theme";
 import { Add, Print, Save } from "@mui/icons-material";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
+import {
+  Box,
+  Button,
+  FormControl,
+  Grid,
+  Grid2,
+  IconButton,
+  Paper,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 
 const POSPage = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [order, setOrder] = useState([]);
   const [receivedAmount, setReceivedAmount] = useState("");
@@ -123,9 +129,7 @@ const POSPage = () => {
         return {
           ...item,
           price: newPrice, // Keep as string
-          name: isDiscounted
-            ? `${item.originalName} (réduc)`
-            : item.originalName,
+          name: isDiscounted ? `${item.originalName} (Réd)` : item.originalName,
         };
       }
       return item;
@@ -434,20 +438,20 @@ const POSPage = () => {
   const sharedStyles = {
     backgroundColor: "#ebf1fa",
     "& .MuiInputLabel-root": {
-      color: "#007f5f",
+      color: "#287271",
       fontSize: 16,
       backgroundColor: "#ebf1fa",
       px: 1,
     },
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
-        border: "1px solid #60d394",
+        border: "1px solid #45a29e",
       },
       "&:hover fieldset": {
-        borderColor: "#60d394",
+        borderColor: "#45a29e",
       },
       "&.Mui-focused fieldset": {
-        borderColor: "#25a18e",
+        borderColor: "#1e7f74",
       },
     },
   };
@@ -519,230 +523,17 @@ const POSPage = () => {
   const getCategoryColor = (category) => {
     switch (category.toLowerCase()) {
       case "beverage":
-        return "#415a77"; // warm orange tone
+        return "#545e75"; // warm orange tone
       case "produces":
-        return "#156064 "; // rich green tone
+        return "#545e75 "; // rich green tone
       default:
-        return "#1d4e89"; // default purple tone
+        return "#545e75"; // default purple tone
     }
   };
 
   return (
-    <div className="flex-1 overflow-hidden relative z-10 bg-primary-700">
-      <main className="max-w-8xl mx-auto py-1 px-1 lg:px-8 scrollbar-hide">
-        {/* STATS */}
-        <motion.div
-          className="grid gap-2 sm:grid-cols-1 lg:grid-cols-3 mb-1"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
-          {/* Box 1 */}
-          <Box sx={{ borderRadius: 2, p: 1 }}>
-            <StatCard
-              icon={
-                <PointOfSaleIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
-              }
-              title={`Todays Sales Summary`}
-              value={`€ ${formatCurrency(totalSalesToday)}`}
-              subtitle={`${todaysSales.length} Sales | ${totalItemsToday} Items`}
-              subtitle2={""}
-              progress={"none"}
-            />
-          </Box>
-
-          {/* Box 2 */}
-          <Box gridColumn="span 1" sx={{ borderRadius: 2, px: 1, py: 0 }}>
-            <Box className="flex-1 mb-2 mt-2.5 mx-1">
-              <FormControl fullWidth>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Cash Amount"
-                  value={receivedAmount}
-                  onChange={(e) => setReceivedAmount(e.target.value)}
-                  type="number"
-                  sx={{
-                    ...sharedStyles,
-                    "& .MuiInputBase-input": {
-                      color: "#222",
-                      fontSize: 16,
-                      height: "30px",
-                    },
-                  }}
-                />
-              </FormControl>
-            </Box>
-            <Box className="flex-1 mb-2 mt-1 mx-1">
-              <FormControl fullWidth>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Comment"
-                  multiline
-                  minRows={2}
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  sx={{
-                    ...sharedStyles,
-                    "& .MuiInputBase-inputMultiline": {
-                      color: "#333",
-                      fontSize: 16,
-                      height: "200px",
-                    },
-                  }}
-                />
-              </FormControl>
-            </Box>
-          </Box>
-
-          {/* Box 3 */}
-          <Box
-            className="w-full"
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            px={1}
-            py={1}
-            borderRadius={2}
-            gap={0}
-          >
-            {/* Icon buttons in one row */}
-            <Grid
-              container
-              spacing={1}
-              justifyContent="center"
-              alignItems="center"
-              sx={{ maxWidth: 400 }} // Optional: constrain width
-            >
-              {[
-                {
-                  value: "Cash",
-                  icon: <AttachMoneyIcon />,
-                  bgColor: "white",
-                  color: "#287271",
-                  borderColor: "#287271",
-                },
-                {
-                  value: "CB",
-                  icon: <CreditCardIcon />,
-                  bgColor: "white",
-                  color: "#72369d",
-                },
-                {
-                  value: "Voucher",
-                  icon: <LocalActivityOutlinedIcon />,
-                  bgColor: "white",
-                  color: "#f50062",
-                },
-                {
-                  value: "Other",
-                  icon: <PaymentsOutlinedIcon />,
-                  bgColor: "white",
-                  color: "#0e1428",
-                },
-              ].map(({ value, icon, bgColor, color }) => (
-                <Grid
-                  item
-                  xs={3}
-                  key={value}
-                  display="flex"
-                  justifyContent="center"
-                  mt="5px"
-                >
-                  <Tooltip
-                    title={value}
-                    arrow
-                    placement="top"
-                    slotProps={{
-                      tooltip: {
-                        sx: {
-                          fontSize: 14,
-                          fontWeight: 600,
-                          backgroundColor: "#233d4d",
-                          color: "white",
-                        },
-                      },
-                    }}
-                  >
-                    <IconButton
-                      value={value}
-                      onClick={() => handlePaymentTypeChange(value)}
-                      sx={{
-                        color: paymentType === value ? "#3FA89B" : "#777",
-                        transition: "0.2s",
-                        "&:hover": {
-                          color: "#3FA89B",
-                          backgroundColor: "#aaf683",
-                        },
-                        backgroundColor:
-                          paymentType === value ? "#b2ff9e" : bgColor,
-                        border: 2,
-                        borderColor:
-                          paymentType === value ? "#005ae0" : "#008083",
-                        borderRadius: 1,
-                        height: "100%",
-                        minHeight: 60,
-                        width: "100%",
-                        minWidth: 60,
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      {React.cloneElement(icon, {
-                        sx: { fontSize: 32, color: color },
-                      })}
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-              ))}
-            </Grid>
-
-            {/* Save buttons below */}
-            <Box display="flex" gap={1} mt={1} width="100%" flexDirection="row">
-              <Button
-                variant="outlined"
-                startIcon={<Save />}
-                onClick={() => saveSale(false)}
-                sx={{
-                  backgroundColor: "#26A889",
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "#62CDB4",
-                  },
-                  border: 1,
-                  borderRadius: 2,
-                  height: "80px",
-                  width: "100%",
-                }}
-              >
-                Save
-              </Button>
-
-              <Button
-                variant="outlined"
-                startIcon={<Print />}
-                onClick={() => saveSale(true)}
-                sx={{
-                  backgroundColor: "#00b4d8",
-                  color: "white",
-                  fontSize: 14,
-                  "&:hover": {
-                    backgroundColor: "#90e0ef",
-                  },
-                  border: 1,
-                  borderRadius: 2,
-                  height: "80px",
-                  width: "100%",
-                }}
-              >
-                Save & Print
-              </Button>
-            </Box>
-          </Box>
-        </motion.div>
-
+    <div className="flex-1 overflow-hidden relative z-10 bg-[#18435a] ">
+      <main className="max-w-8xl mx-auto scrollbar-hide h-[1500px]">
         {/* Items buttons and Sale Summary */}
         <motion.div
           className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-3"
@@ -752,91 +543,54 @@ const POSPage = () => {
         >
           <Box
             display="grid"
-            gap={1}
-            gridTemplateColumns="repeat(3, minmax(0, 1fr))"
+            gap={0}
+            gridTemplateColumns="repeat(12, minmax(0, 1fr))"
             sx={{
-              "& > div": { gridColumn: isNonMobile ? undefined : "span 3" },
-              mt: 2,
+              "& > div": {
+                gridColumn: isNonMobile ? undefined : "span 3",
+              },
             }}
           >
-            {/* Left: Items Grid */}
+            {/* 1st Column Items grid */}
             <Box
-              justifyContent="space-between"
-              width="100%"
-              container
-              display="column"
-              alignContent={"top"}
               sx={{
-                gridColumn: "span 2",
-                borderRadius: 2,
-                p: 0.5,
+                gridColumn: "span 6", // Half of the 8 columns
+                borderRight: "1px solid #3a6c77",
+                px: 0.5,
+                pt: 1,
               }}
             >
-              {/* Tabs Menu */}
-              <Tabs
-                value={selectedTab}
-                onChange={(_e, newValue) => setSelectedTab(newValue)}
-                indicatorColor="primary"
-                variant="fullWidth"
-                sx={{ mb: 0.5 }}
-              >
-                {categories.map((cat, index) => (
-                  <Tab
-                    label={cat}
-                    key={index}
-                    sx={{
-                      fontSize: 14,
-                      fontWeight: 500,
-                      color: "#3FA89B",
-                      "&.Mui-selected": {
-                        color: "white",
-                        fontWeight: 700,
-                        fontSize: 18,
-                        backgroundColor: "#00b4d8",
-                        borderTopLeftRadius: 10,
-                        borderTopRightRadius: 10,
-                      },
-                      "&:hover": {
-                        backgroundColor: "#90e0ef",
-                        borderTopLeftRadius: 10,
-                        borderTopRightRadius: 10,
-                      },
-                    }}
-                  />
-                ))}
-              </Tabs>
-
-              <Grid2 container spacing={0.5}>
+              <Grid2 container spacing={0} sx={{ width: "100%" }}>
                 {sampleMenu.map((item) => (
                   <Grid2
                     item
+                    xs={12}
+                    sm={6}
+                    md={4}
+                    lg={3}
                     key={item.id}
-                    xs={8.5}
-                    sm={2} // 2 columns on small screens
-                    md={4} // 3 columns on medium screens
-                    lg={6} // 4 columns on large screens
-                    m={1} // Margin for spacing
+                    sx={{ flexGrow: 1 }}
                   >
                     <Paper
                       sx={{
-                        pl: 1,
+                        // flexGrow: 1, // This makes Paper fill its parent Grid2
+                        borderRadius: 0,
+                        px: 1,
                         pt: 1,
-                        pb: 1,
                         backgroundColor: getCategoryColor(item.category),
-                        color: "white",
-                        borderRadius: 2,
+                        mb: 0.5,
+                        mr: 0.5,
                       }}
                     >
                       <Box
                         display="flex"
                         flexDirection="column"
-                        justifyContent="space-between"
-                        width={150}
                         alignContent={"center"}
-                        gap={1}
+                        gap={0}
                         sx={{
                           height: "100%",
-                          padding: "5px",
+                          width: "100%",
+                          flexGrow: 1,
                         }}
                       >
                         {/* First Row: Full width Typography */}
@@ -847,9 +601,10 @@ const POSPage = () => {
                         >
                           <Typography
                             sx={{
-                              fontSize: 16,
-                              fontWeight: 600,
-                              color: "white",
+                              fontSize: 18,
+                              fontWeight: 500,
+                              color: "ehite",
+                              flexGrow: 1,
                             }}
                           >
                             {item.name}
@@ -857,25 +612,18 @@ const POSPage = () => {
                         </Box>
 
                         {/* Second Row: IconButtons side by side */}
-                        <Box
-                          display="flex"
-                          justifyContent="space-between"
-                          width="100%"
-                          container
-                          alignItems="center"
-                          //    backgroundColor="#003019"
-                        >
+                        <Box display="flex" width="100%" alignItems="center">
                           <IconButton
                             onClick={() => addToOrder(item)}
                             sx={{
                               color: "white",
                               mb: "8px",
-                              backgroundColor: "#00b4d8",
+                              backgroundColor: "#1a9cb3",
                               width: "100%", // Square size
-                              height: 40,
-                              borderRadius: 2, // Rounded corners (theme spacing unit, or use '8px')
+                              height: 50,
+                              borderRadius: 0, // Rounded corners (theme spacing unit, or use '8px')
                               "&:hover": {
-                                backgroundColor: "#0096c7", // Optional hover color
+                                backgroundColor: "#007090", // Optional hover color
                               },
                             }}
                           >
@@ -906,13 +654,14 @@ const POSPage = () => {
                           }}
                           sx={{
                             ...sharedStyles,
+                            flexGrow: 1,
                             "& .MuiInputBase-inputMultiline": {},
                             width: "100px",
                             height: "40px",
                             ml: "5px",
                             mb: "10px",
-                            borderRadius: 2,
-                            backgroundColor: "#ebf9fa",
+                            backgroundColor: "#e6f4f1",
+                            border: "1px solid #1a7e96",
                             "& .MuiInputBase-input": {
                               color: "#111", // Replace "red" with any color you want
                               fontSize: 18,
@@ -924,10 +673,10 @@ const POSPage = () => {
                           sx={{
                             color: "white",
                             mr: "8px",
-                            backgroundColor: "#e36414",
+                            backgroundColor: "#d97706",
                             mb: "10px",
                             "&:hover": {
-                              backgroundColor: "#ff5400", // Optional hover color
+                              backgroundColor: "#b45309", // Optional hover color
                             },
                           }} // Smaller button padding
                         >
@@ -940,23 +689,267 @@ const POSPage = () => {
               </Grid2>
             </Box>
 
-            {/* Right: Sales Summary */}
+            {/* 2 nd Column Tab menu */}
             <Box
-              display="flex"
-              flexDirection={{ xs: "column", md: "row" }} // Switch layout by screen size
-              gap={2}
               sx={{
-                gridColumn: "span 1",
+                gridColumn: "span 2", // Narrow middle column
+                borderRight: "1px solid #3a6c77",
+              }}
+            >
+              {/* StadCards */}
+              <Box>
+                <StatCardVend
+                  title2={`Today Sales`}
+                  icon={
+                    <PointOfSaleIcon
+                      sx={{ color: colors.greenAccent[400], fontSize: "26px" }}
+                    />
+                  }
+                  title={`€ ${formatCurrency(totalSalesToday)}`}
+                  icon1={
+                    <LoyaltyOutlinedIcon
+                      sx={{ color: colors.orange[500], fontSize: "26px" }}
+                    />
+                  }
+                  subtitle={`${todaysSales.length} Sales`}
+                  icon2={
+                    <CategoryOutlinedIcon
+                      sx={{ color: colors.primary[100], fontSize: "26px" }}
+                    />
+                  }
+                  subtitle2={`${totalItemsToday} Items`}
+                />
+              </Box>
+
+              {/* Tab Menu */}
+              <Box
+                sx={{
+                  display: "flex",
+                  width: "100%",
+                  justifyContent: "center", // Center horizontally
+                }}
+              >
+                <Tabs
+                  orientation="vertical"
+                  value={selectedTab}
+                  onChange={(_e, newValue) => setSelectedTab(newValue)}
+                  variant="standard"
+                  sx={{
+                    width: "100%", // Fixed width (optional)
+                    mt: 1,
+                    p: 0,
+                  }}
+                >
+                  {categories.map((cat, index) => (
+                    <Tab
+                      label={cat}
+                      key={index}
+                      sx={{
+                        backgroundColor: "#545e75",
+                        width: "100%",
+                        fontSize: 16,
+                        fontWeight: 100,
+                        color: "#cae9ff",
+                        height: "70px",
+                        justifyContent: "center",
+                        "&.Mui-selected": {
+                          color: "#a7d7c5",
+                          fontWeight: 700,
+                          fontSize: 18,
+                          backgroundColor: "#1a9cb3",
+                        },
+                        "&:hover": {
+                          backgroundColor: "#007090",
+                          fontWeight: 600,
+                        },
+                      }}
+                    />
+                  ))}
+                </Tabs>
+              </Box>
+
+              {/* TextField Received Amount and Comments */}
+              <Box className="flex-1 mt-1">
+                <FormControl fullWidth>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    label="Cash Amount"
+                    value={receivedAmount}
+                    onChange={(e) => setReceivedAmount(e.target.value)}
+                    type="number"
+                    sx={{
+                      ...sharedStyles,
+                      "& .MuiInputBase-input": {
+                        color: "#222",
+                        fontSize: 28,
+                        height: "60px",
+                      },
+                    }}
+                  />
+                </FormControl>
+              </Box>
+              <Box className="flex-1 mb-2 mt-1">
+                <FormControl fullWidth>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    label="Comment"
+                    multiline
+                    minRows={2}
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    sx={{
+                      ...sharedStyles,
+                      "& .MuiInputBase-inputMultiline": {
+                        color: "#333",
+                        fontSize: 14,
+                        minHeight: "60px",
+                      },
+                    }}
+                  />
+                </FormControl>
+              </Box>
+            </Box>
+
+            {/* 3rd Column: Sales Summary */}
+            <Box
+              sx={{
+                gridColumn: "span 4", // Remaining 3 columns
+                p: 1,
               }}
             >
               <Box
-                flex={1}
+                className="w-full"
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+              >
+                {/* Icon buttons in one row */}
+                <Grid
+                  container
+                  sx={{ width: "100%", flexGrow: 1 }} // Optional: constrain width
+                >
+                  {[
+                    {
+                      value: "Cash",
+                      icon: <AttachMoneyIcon />,
+                      bgColor: "#eafaf7",
+                      color: "#287271",
+                    },
+                    {
+                      value: "CB",
+                      icon: <CreditCardIcon />,
+                      bgColor: "#eafaf7",
+                      color: "#72369d",
+                    },
+                    {
+                      value: "Voucher",
+                      icon: <LocalActivityOutlinedIcon />,
+                      bgColor: "#eafaf7",
+                      color: "#f50062",
+                    },
+                    {
+                      value: "Other",
+                      icon: <PaymentsOutlinedIcon />,
+                      bgColor: "#eafaf7",
+                      color: "#0e1428",
+                    },
+                  ].map(({ value, icon, bgColor, color }) => (
+                    <Grid item xs={3} key={value}>
+                      <Tooltip
+                        title={value}
+                        arrow
+                        placement="top"
+                        slotProps={{
+                          tooltip: {
+                            sx: {
+                              fontSize: 14,
+                              fontWeight: 600,
+                              backgroundColor: "#233d4d",
+                              color: "white",
+                            },
+                          },
+                        }}
+                      >
+                        <IconButton
+                          value={value}
+                          onClick={() => handlePaymentTypeChange(value)}
+                          sx={{
+                            color: paymentType === value ? "#ccdbdc" : "#777",
+                            transition: "0.2s",
+                            "&:hover": {
+                              color: "#3FA89B",
+                              backgroundColor: "#aaf683",
+                            },
+                            backgroundColor:
+                              paymentType === value ? "#b2ff9e" : bgColor,
+                            borderColor:
+                              paymentType === value ? "#005ae0" : "#008083",
+                            borderRadius: 0,
+                            height: "60px",
+                            width: "100%",
+                            border: 2,
+                          }}
+                        >
+                          {React.cloneElement(icon, {
+                            sx: { fontSize: 32, color: color },
+                          })}
+                        </IconButton>
+                      </Tooltip>
+                    </Grid>
+                  ))}
+                </Grid>
+
+                {/* Save buttons below */}
+                <Box display="flex" gap={0.4} my={0.5} width="100%" px={0.1}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Save />}
+                    onClick={() => saveSale(false)}
+                    sx={{
+                      backgroundColor: "#26A889",
+                      color: "white",
+                      "&:hover": {
+                        backgroundColor: "#62CDB4",
+                      },
+                      border: 0,
+                      borderRadius: 0,
+                      height: "80px",
+                      width: "100%",
+                    }}
+                  >
+                    Save
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    startIcon={<Print />}
+                    onClick={() => saveSale(true)}
+                    sx={{
+                      backgroundColor: "#00b4d8",
+                      color: "white",
+                      fontSize: 14,
+                      "&:hover": {
+                        backgroundColor: "#90e0ef",
+                      },
+                      border: 0,
+                      borderRadius: 0,
+                      height: "80px",
+                      width: "100%",
+                    }}
+                  >
+                    Print
+                  </Button>
+                </Box>
+              </Box>
+
+              {/* Sales Sumary */}
+              <Box
+                flex={2}
                 width="100%"
-                border="1px solid #111"
-                borderRadius={2}
-                p={1.5}
-                backgroundColor="#f0f4f1"
-                boxShadow="0 2px 4px rgba(0, 0, 0.1, 0.1)"
+                p={2}
+                sx={{ flexGrow: 1, backgroundColor: "#e1eff6" }}
               >
                 <Box
                   display="flex"
@@ -1007,13 +1000,13 @@ const POSPage = () => {
                 ))}
 
                 <Box mt={2} mb={3}>
-                  <Typography sx={{ color: "#777" }}>
+                  <Typography sx={{ color: "#777", fontSize: 20 }}>
                     Received: €{parseFloat(receivedAmount || 0).toFixed(2)}
                   </Typography>
                   <Typography sx={{ fontSize: 22 }}>
                     Total: €{calculateTotal().toFixed(2)}
                   </Typography>
-                  <Typography sx={{ color: "#af3800" }}>
+                  <Typography sx={{ color: "#af3800", fontSize: 25 }}>
                     Change: €{calculateChange()}
                   </Typography>
                 </Box>

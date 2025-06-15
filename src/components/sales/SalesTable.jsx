@@ -1,26 +1,29 @@
-import React, { useState } from "react";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { LocalizationProvider } from "@mui/x-date-pickers";
+import CachedIcon from "@mui/icons-material/Cached";
+import {
+  GlobalStyles,
+  Stack,
+  IconButton,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import Box from "@mui/material/Box";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Tooltip from "@mui/material/Tooltip";
+import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DesktopDatePicker } from "@mui/x-date-pickers";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Typography, useMediaQuery } from "@mui/material";
-import { Stack, useTheme } from "@mui/material";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { GlobalStyles } from "@mui/material";
-import Tooltip from "@mui/material/Tooltip";
-import { tokens } from "../theme";
+import React, { useState } from "react";
+import StatCardinfo from "../common/StatCardinfo";
 
 import {
-  GridRowModes,
   DataGrid,
   GridActionsCellItem,
   GridRowEditStopReasons,
+  GridRowModes,
   GridToolbar,
 } from "@mui/x-data-grid";
 import supabase from "../supabaseClient";
@@ -51,11 +54,9 @@ function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
 
-export default function FullFeaturedCrudGrid({ SalesTable }) {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const isNonMobile = useMediaQuery("(min-width:600px)");
+export default function FullFeaturedCrudGrid({ SalesTable, onSalesChange }) {
   const [rows, setRows] = React.useState(SalesTable); // Use the passed SalesTable
+  const isNonMobile = useMediaQuery("(min-width:600px)");
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [, setNewRowId] = React.useState(null);
@@ -170,6 +171,8 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
     }
 
     setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+    // Notify parent
+    onSalesChange();
   };
 
   const processRowUpdate = async (newRow) => {
@@ -208,6 +211,8 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
 
   const handleRowModesModelChange = (newModel) => {
     setRowModesModel(newModel);
+    // Notify parent
+    onSalesChange();
   };
 
   // Filter between dates
@@ -273,8 +278,8 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
     {
       field: "actions",
       type: "actions",
-      headerName: "Delete",
-      width: 100,
+      headerName: "Del",
+      width: 60,
       cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
@@ -292,7 +297,7 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
     {
       field: "date",
       headerName: "Date",
-      width: 260,
+      width: 150,
       editable: true,
       align: "center",
       headerAlign: "center",
@@ -312,6 +317,22 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
       },
 
       renderEditCell: (params) => <MyDateField {...params} />,
+    },
+    {
+      field: "sale_total_disc",
+      headerName: "Sales w/ Disc",
+      type: "numeric",
+      align: "right",
+      headerAlign: "right",
+      width: 120,
+      editable: true,
+      renderCell: (params) =>
+        params.value && !isNaN(params.value)
+          ? `€ ${new Intl.NumberFormat("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(params.value)}`
+          : "",
     },
     {
       field: "items_display",
@@ -376,22 +397,6 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
       align: "right",
       headerAlign: "right",
       type: "numeric",
-      width: 150,
-      editable: true,
-      renderCell: (params) =>
-        params.value && !isNaN(params.value)
-          ? `€ ${new Intl.NumberFormat("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(params.value)}`
-          : "",
-    },
-    {
-      field: "sale_total_disc",
-      headerName: "Sales w/ Disc",
-      type: "numeric",
-      align: "right",
-      headerAlign: "right",
       width: 150,
       editable: true,
       renderCell: (params) =>
@@ -470,6 +475,15 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
         p: 1,
       }}
     >
+      <Box>
+        <StatCardinfo
+          title={`Total: € ${formattedFilteredTotalValue}`}
+          title1={`Total Sales: ${entryCount}`}
+          title2={`Total Items sold: ${totalItemsCount}`}
+          //  title3={}
+          progress={"none"}
+        />
+      </Box>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Box
           display="grid"
@@ -593,86 +607,24 @@ export default function FullFeaturedCrudGrid({ SalesTable }) {
               },
             }}
           />
-        </Box>
-        <Box
-          display="flex"
-          flexDirection={{ xs: "column", sm: "row" }} // column on mobile, row on larger screens
-          justifyContent="center"
-          alignItems="center"
-          sx={{
-            gridColumn: "span 2",
-            border: "1px solid #38a3a5",
-            borderRadius: "5px",
-            height: { xs: "auto", sm: "56px" }, // auto height for stacking
-            p: 1, // add some padding for breathing room
-            gap: 1, // space between items
-            textAlign: "center",
-          }}
-        >
-          <Button
-            variant="outlined"
-            width="100%"
-            sx={{
-              //  width: "100%",
-              color: colors.orange[500],
-              backgroundColor: "white",
-              fontSize: "14px",
-              fontWeight: 500,
-              border: "2px solid",
-              borderColor: colors.orange[500],
-              "&:hover": {
-                fontWeight: 600,
-                border: "3px solid",
-                borderColor: colors.orange[500],
-              },
-            }}
+          <IconButton
             onClick={() => {
               setFromDate(null);
               setToDate(null);
             }}
+            sx={{
+              width: "50px",
+              "&:hover": {
+                backgroundColor: "transparent", // remove hover background
+              },
+              "& .MuiSvgIcon-root": {
+                fontSize: "2rem", // adjust icon size as needed
+                color: "#577590", // customize icon color
+              },
+            }}
           >
-            Reset
-          </Button>
-         
-          <Box gridColumn={"span 2"} display="flex" alignItems="center">
-            <Typography
-              sx={{
-                color: "#38a3a5",
-                fontSize: "24px",
-                fontWeight: 600,
-              }}
-            >
-              € {formattedFilteredTotalValue}
-            </Typography>
-          </Box>
-
-          <Box
-            gridColumn={"span 2"}
-            //  width="50%"
-            display="flex"
-            alignItems="center"
-          >
-            <Typography
-              sx={{
-                color: "#555",
-                fontSize: "18px",
-                fontWeight: 500,
-                mr: 1,
-              }}
-            >
-              | {`${entryCount}`} Sales
-            </Typography>
-
-            <Typography
-              sx={{
-                color: "#555",
-                fontSize: "18px",
-                fontWeight: 500,
-              }}
-            >
-              | {` ${totalItemsCount}`} Items
-            </Typography>
-          </Box>
+            <CachedIcon />
+          </IconButton>
         </Box>
 
         {/* </Box> */}

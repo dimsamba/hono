@@ -1,30 +1,27 @@
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import FullCalendar from "@fullcalendar/react";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useRef } from "react";
 
 import {
   Box,
-  TextField,
-  Typography,
   FormControl,
   FormLabel,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
+  TextField,
+  Typography,
+  useTheme,
 } from "@mui/material";
-import { useTheme } from "@mui/material";
-import { tokens } from "../components/theme";
 import supabase from "../components/supabaseClient";
 
 const CalendarPage = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const [events, setEvents] = useState([]);
   const [selectedTask, setSelectedTask] = useState("");
   const [userId, setUserId] = useState(null);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import supabase from "../components/supabaseClient"; // ✅ Correct: Named import
 import { Navigate } from "react-router-dom";
+import supabase from "../components/supabaseClient"; // ✅ Correct: Named import
 
 function Wrapper({ children }) {
   const [authenticated, setAuthenticated] = useState(false);

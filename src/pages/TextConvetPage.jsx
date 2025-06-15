@@ -1,8 +1,8 @@
-import { motion } from "framer-motion";
-import { IconButton, TextField } from "@mui/material";
-import { useState } from "react";
-import ClearIcon from "@mui/icons-material/HighlightOff";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import ClearIcon from "@mui/icons-material/HighlightOff";
+import { IconButton, TextField } from "@mui/material";
+import { motion } from "framer-motion";
+import { useState } from "react";
 
 const translationMap = {
   a: "g",

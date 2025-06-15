@@ -1,7 +1,7 @@
-import supabase from "../components/supabaseClient";
-import { useState, useEffect } from "react";
-import CostForm from "../components/costCalculator/CostForm";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import CostForm from "../components/costCalculator/CostForm";
+import supabase from "../components/supabaseClient";
 
 // ✅ Import Supabase
 const CostCalculatorPage = () => {

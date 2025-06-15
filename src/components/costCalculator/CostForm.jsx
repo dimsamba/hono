@@ -1,13 +1,11 @@
-import { Box, Button, TextField, useTheme, useMediaQuery } from "@mui/material";
 import EuroSymbolOutlinedIcon from "@mui/icons-material/EuroSymbolOutlined";
-import StatCard from "../common/StatCard";
-import { useState, useEffect } from "react";
-import { LocalizationProvider } from "@mui/x-date-pickers";
+import { Box, Button, FormControl, GlobalStyles, TextField, useMediaQuery, useTheme } from "@mui/material";
+import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DesktopDatePicker } from "@mui/x-date-pickers";
-import supabase from "../supabaseClient"; // update the path as needed
 import dayjs from "dayjs"; // if not already imported
-import { GlobalStyles, FormControl } from "@mui/material";
+import { useEffect, useState } from "react";
+import StatCard from "../common/StatCard";
+import supabase from "../supabaseClient"; // update the path as needed
 
 const CostForm = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");

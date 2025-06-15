@@ -1,11 +1,11 @@
-import { motion } from "framer-motion";
-import { useMediaQuery, Box } from "@mui/material";
-import StatCard from "../components/common/StatCard";
-import MoneyOffCsredIcon from "@mui/icons-material/MoneyOffCsred";
 import MoneyOffIcon from "@mui/icons-material/MoneyOff";
-import supabase from "../components/supabaseClient";
-import { useState, useEffect } from "react";
+import MoneyOffCsredIcon from "@mui/icons-material/MoneyOffCsred";
+import { Box, useMediaQuery } from "@mui/material";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import StatCard from "../components/common/StatCard";
 import FullFeaturedCrudGrid from "../components/invoices/InvoiceData";
+import supabase from "../components/supabaseClient";
 
 // ✅ Import Supabase
 const invoicePaga = () => {

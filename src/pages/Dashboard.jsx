@@ -1,24 +1,23 @@
 // Version: 1.2.3
 
-import React from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
-import { useMode } from "../components/theme";
-import { useState } from "react";
-import Sidebar from "../components/common/Sidebar";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import OverviewPage from "../pages/OverviewPage";
-import SalesPage from "../pages/SalesPage";
-import TextConvetPage from "../pages/TextConvetPage";
-import InventoryPage from "../pages/InventoryPage";
-import SupplierPage from "../pages/SupplierPage";
+import { useState } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
+import Sidebar from "../components/common/Sidebar";
 import Topbar from "../components/common/Topbar";
-import InvoicePage from "../pages/InvoicePage";
-import RecipePage from "../pages/RecipePage";
+import { useMode } from "../components/theme";
 import CalendarPage from "../pages/CalendarPage";
-import StockTackPage from "./StockTakePage";
+import InventoryPage from "../pages/InventoryPage";
+import InvoicePage from "../pages/InvoicePage";
+import OverviewPage from "../pages/OverviewPage";
+import RecipePage from "../pages/RecipePage";
+import SalesPage from "../pages/SalesPage";
+import SupplierPage from "../pages/SupplierPage";
+import TextConvetPage from "../pages/TextConvetPage";
 import CostCalculatorPage from "./CostCalculatorPage";
 import ItemsListPage from "./ItemsListPage";
 import POSPage from "./POSPage";
+import StockTackPage from "./StockTakePage";
 
 function Dashboard() {
   const [theme] = useMode();
@@ -27,18 +26,18 @@ function Dashboard() {
 
   // Define titles based on routes
   const pageTitles = {
-    "/overview": "Overview",
-    "/sales": "Sales",
-    "/converter": "Text Converter",
-    "/inventory": "Inventory",
-    "/supplier": "Suppliers",
-    "/invoice": "Expenses",
-    "/recipe": "Recipe",
-    "/calendar": "Agenda",
-    "/stockTake": "Stock Take",
-    "/cost": "Cost Calculator",
-    "/posPage": "Vendor",
-    "/items": "Items List",
+    "/overview": "OVERVIEW",
+    "/sales": "SALES",
+    "/converter": "CONVERTER",
+    "/inventory": "INVENTORY",
+    "/supplier": "SUPPLIERS",
+    "/invoice": "EXPENSES",
+    "/recipe": "RECIPE",
+    "/calendar": "AGENDA",
+    "/stockTake": "STOCK TAKE",
+    "/cost": "COST CALCULATOR",
+    "/vendor": "HONO VENDOR",
+    "/items": "ITEMS LIST",
   };
 
   return (
@@ -56,7 +55,7 @@ function Dashboard() {
             title={pageTitles[location.pathname] || "Dashboard"}
           />
           {/* Page content */}
-          <div className="flex-1 overflow-y-scroll p-4 scrollbar-hide">
+          <div className="flex-1 overflow-y-scroll p-0 scrollbar-hide">
             <Routes>
               <Route path="overview" element={<OverviewPage />} />
               <Route path="cost" element={<CostCalculatorPage />} />

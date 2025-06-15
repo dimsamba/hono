@@ -1,20 +1,20 @@
-import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
-import LocalAtmOutlinedIcon from "@mui/icons-material/LocalAtmOutlined";
-import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
-import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
-import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
-import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import ContactPhoneOutlinedIcon from "@mui/icons-material/ContactPhoneOutlined";
-import OutdoorGrillOutlinedIcon from "@mui/icons-material/OutdoorGrillOutlined";
-import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
-import EuroOutlinedIcon from "@mui/icons-material/EuroOutlined";
 import DateRangeOutlinedIcon from "@mui/icons-material/DateRangeOutlined";
+import EuroOutlinedIcon from "@mui/icons-material/EuroOutlined";
+import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
+import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
+import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
+import LocalAtmOutlinedIcon from "@mui/icons-material/LocalAtmOutlined";
+import OutdoorGrillOutlinedIcon from "@mui/icons-material/OutdoorGrillOutlined";
+import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
 import { Tooltip } from "@mui/material";
 
-import { LogOutIcon, Menu } from "lucide-react";
-import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { LogOutIcon, Menu } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../supabaseClient";
 
