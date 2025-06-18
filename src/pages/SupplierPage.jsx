@@ -1,4 +1,4 @@
-import ContactPhoneOutlinedIcon from "@mui/icons-material/ContactPhoneOutlined";
+import HailOutlinedIcon from '@mui/icons-material/HailOutlined';
 import { Box, useMediaQuery } from "@mui/material";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -73,13 +73,13 @@ const SupplierPage = () => {
           >
             <StatCard
               icon={
-                <ContactPhoneOutlinedIcon
+                <HailOutlinedIcon
                   sx={{ color: "#38a3a5", fontSize: "26px" }}
                 />
               }
               key={refreshKey} // 👈 triggers re-render when key changes
-              title={"N. of Suppliers"}
-              value={supplierData.length}
+              title={"Suppliers Summary"}
+              value={`${supplierData.length} Entries`}
               subtitle={
                 supplierlatestEntryDate
                   ? `Last Entry: ${format(
@@ -88,10 +88,6 @@ const SupplierPage = () => {
                     )}`
                   : "No data available"
               }
-              progress={"none"}
-              sx={{
-                gridColumn: "span 1",
-              }}
             />
           </Box>
         </motion.div>
@@ -103,9 +99,9 @@ const SupplierPage = () => {
           transition={{ duration: 1 }}
         >
           {/* ✅ Pass inventory data to the table */}
-           <FullFeaturedCrudGrid
-          SupplierData={supplierData}
-          onSupplierChange={handSupplierChange}
+          <FullFeaturedCrudGrid
+            SupplierData={supplierData}
+            onSupplierChange={handSupplierChange}
           />
         </motion.div>
       </main>

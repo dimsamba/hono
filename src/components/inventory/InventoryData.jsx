@@ -84,7 +84,10 @@ function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
   );
 }
 
-export default function FullFeaturedCrudGrid({ InventoryData, onInventoryChanges }) {
+export default function FullFeaturedCrudGrid({
+  InventoryData,
+  onInventoryChanges,
+}) {
   const [rows, setRows] = React.useState(InventoryData); // Use the passed inventoryData
 
   React.useEffect(() => {
@@ -212,23 +215,23 @@ export default function FullFeaturedCrudGrid({ InventoryData, onInventoryChanges
     // Notify parent
     onInventoryChanges();
   };
-  
- // Customize Toolbar 
+
+  // Customize Toolbar
   const theme = createTheme({
-  components: {
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          "&.MuiDataGrid-paper": {
-            backgroundColor: "#F2FAF8",
-            color: "#333",
-            fontWeight: 600,
+    components: {
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            "&.MuiDataGrid-paper": {
+              backgroundColor: "#F2FAF8",
+              color: "#333",
+              fontWeight: 600,
+            },
           },
         },
       },
     },
-  },
-});
+  });
 
   const columns = [
     {
@@ -298,17 +301,24 @@ export default function FullFeaturedCrudGrid({ InventoryData, onInventoryChanges
         "Condiments",
         "Dry",
         "Dairy",
-        "Dry-food",
-        "Frozen-food",
-        "Fruits and-vegetables",
+        "Dry-Goods",
+        "Eggs",
+        "Frozen-Foods",
+        "Fruits-Vegetables",
+        "Grains",
+        "Herbs",
         "Meat",
-        "Oils-and-fats",
+        "Nuts",
+        "Oils-Fats",
         "Pasta",
+        "Pastry-Goods",
+        "Prepared Foods",
         "Produce",
+        "Sauces",
         "Seafood",
         "Snacks",
         "Spices",
-        "Sweets-and-desserts",
+        "Sweets-Desserts",
       ],
       renderEditCell: (params) => (
         <Select
@@ -587,95 +597,95 @@ export default function FullFeaturedCrudGrid({ InventoryData, onInventoryChanges
         width: "100%",
         border: "2px solid lightGray",
         borderRadius: 2,
-        p: 1
+        p: 1,
       }}
     >
       <ThemeProvider theme={theme}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        editMode="row"
-        rowModesModel={rowModesModel}
-        onRowModesModelChange={handleRowModesModelChange}
-        onRowEditStop={handleRowEditStop}
-        processRowUpdate={processRowUpdate}
-        getRowId={(row) => row.id}
-        disableVirtualization
-        slots={{
-          toolbar: () => (
-            <CombinedToolbar
-              setRows={setRows}
-              setNewRowId={setNewRowId}
-              setRowModesModel={setRowModesModel}
-            />
-          ),
-        }}
-        sx={{
-          border: "none",
-          "& .MuiDataGrid-scrollbar": {
-            overflow: "hidden",
-            scrollBar: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            fontSize: "0.9rem",
-            color: "#111", // dark text for light background
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            fontSize: "0.9rem",
-            fontWeight: "bold",
-          },
-          "& .MuiButtonBase-root": {
-            color: "#111",
-          },
-          "& .MuiDataGrid-columnHeader": {
-            backgroundColor: "white !important",
-            color: "#111",
-          },
-          "& .MuiDataGrid-scrollbarFiller": {
-            backgroundColor: "white !important",
-          },
-          "& .MuiButton-text": {
-            color: "#0d1b2a !important",
-          },
-          "& .MuiDataGrid-row--editing .MuiDataGrid-cell": {
-            backgroundColor: "#e7ecef !important",
-            // boxShadow: "none", // remove default shadow if needed
-          },
-          "& .MuiDataGrid-row--editing input": {
-            color: "dimGray !important",
-            fontSize: "15px",
-            fontWeight: 600, // semibold
-          },
-          "& .MuiDataGrid-cell": {
-            borderBlockColor: "lightGray",
-            color: "dimGray !important",
-            fontSize: "15px",
-            fontWeight: 400, // semibold
-          },
-          // other global styles...
-          "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='total_units_per_pack']":
-            {
-              backgroundColor: "red", // light red
-              color: "#b71c1c", // dark red text
-              fontWeight: 600,
-              border: "2px solid #f44336",
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          editMode="row"
+          rowModesModel={rowModesModel}
+          onRowModesModelChange={handleRowModesModelChange}
+          onRowEditStop={handleRowEditStop}
+          processRowUpdate={processRowUpdate}
+          getRowId={(row) => row.id}
+          disableVirtualization
+          slots={{
+            toolbar: () => (
+              <CombinedToolbar
+                setRows={setRows}
+                setNewRowId={setNewRowId}
+                setRowModesModel={setRowModesModel}
+              />
+            ),
+          }}
+          sx={{
+            border: "none",
+            "& .MuiDataGrid-scrollbar": {
+              overflow: "hidden",
+              scrollBar: "none",
             },
-          "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='price_per_unit']":
-            {
-              backgroundColor: "red", // light red
-              color: "#b71c1c", // dark red text
-              fontWeight: 600,
-              border: "2px solid #f44336",
+            "& .MuiDataGrid-cell": {
+              fontSize: "0.9rem",
+              color: "#111", // dark text for light background
             },
-          "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='effective_price_per_unit']":
-            {
-              backgroundColor: "red", // light red
-              color: "#b71c1c", // dark red text
-              fontWeight: 600,
-              border: "2px solid #f44336",
+            "& .MuiDataGrid-columnHeaderTitle": {
+              fontSize: "0.9rem",
+              fontWeight: "bold",
             },
-        }}
-      />
+            "& .MuiButtonBase-root": {
+              color: "#111",
+            },
+            "& .MuiDataGrid-columnHeader": {
+              backgroundColor: "white !important",
+              color: "#111",
+            },
+            "& .MuiDataGrid-scrollbarFiller": {
+              backgroundColor: "white !important",
+            },
+            "& .MuiButton-text": {
+              color: "#0d1b2a !important",
+            },
+            "& .MuiDataGrid-row--editing .MuiDataGrid-cell": {
+              backgroundColor: "#e7ecef !important",
+              // boxShadow: "none", // remove default shadow if needed
+            },
+            "& .MuiDataGrid-row--editing input": {
+              color: "dimGray !important",
+              fontSize: "15px",
+              fontWeight: 600, // semibold
+            },
+            "& .MuiDataGrid-cell": {
+              borderBlockColor: "lightGray",
+              color: "dimGray !important",
+              fontSize: "15px",
+              fontWeight: 400, // semibold
+            },
+            // other global styles...
+            "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='total_units_per_pack']":
+              {
+                backgroundColor: "red", // light red
+                color: "#b71c1c", // dark red text
+                fontWeight: 600,
+                border: "2px solid #f44336",
+              },
+            "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='price_per_unit']":
+              {
+                backgroundColor: "red", // light red
+                color: "#b71c1c", // dark red text
+                fontWeight: 600,
+                border: "2px solid #f44336",
+              },
+            "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='effective_price_per_unit']":
+              {
+                backgroundColor: "red", // light red
+                color: "#b71c1c", // dark red text
+                fontWeight: 600,
+                border: "2px solid #f44336",
+              },
+          }}
+        />
       </ThemeProvider>
     </Box>
     // </motion.div>

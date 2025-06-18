@@ -1,4 +1,4 @@
-import ContactPhoneOutlinedIcon from "@mui/icons-material/ContactPhoneOutlined";
+import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import { Box, useMediaQuery } from "@mui/material";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -13,7 +13,7 @@ const ItemsListPage = () => {
   const [itemsListData, setItemsListDataData] = useState([]); // ✅ Define state
   const [itemslatestEntryDate, setLatestEntryDateItems] = useState(null); // Declare the state
   const [refreshKey, setRefreshKey] = useState(); // used to force re-render
-  
+
   // Function to fetch suppliers data from Supabase
   const fetchData = async () => {
     const { data, error } = await supabase.from("itemsList").select("*");
@@ -73,13 +73,13 @@ const ItemsListPage = () => {
           >
             <StatCard
               icon={
-                <ContactPhoneOutlinedIcon
+                <FactCheckOutlinedIcon
                   sx={{ color: "#38a3a5", fontSize: "26px" }}
                 />
               }
               key={refreshKey} // 👈 triggers re-render when key changes
-              title={"N. of Items in database"}
-              value={itemsListData.length}
+              title={"Items Summary"}
+              value={`${itemsListData.length} Items in database`}
               subtitle={
                 itemslatestEntryDate
                   ? `Last Entry: ${format(
@@ -88,10 +88,6 @@ const ItemsListPage = () => {
                     )}`
                   : "No data available"
               }
-              progress={"none"}
-              sx={{
-                gridColumn: "span 1",
-              }}
             />
           </Box>
         </motion.div>

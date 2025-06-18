@@ -112,7 +112,7 @@ const SalesCategory = () => {
                 borderColor: "#4B5563",
               }}
               itemStyle={{ color: "dimGray" }}
-              formatter={(value, name) => [`${name}: ${value} sales`]} // Shows name and value only
+              formatter={(value) => [` ${"name"}: ${value} sales`]} // Shows name and value only
             />
             {/* <Legend /> */}
             <Bar

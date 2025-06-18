@@ -32,6 +32,12 @@ const SIDEBAR_ITEMS = [
     href: "/vendor",
   },
   {
+    name: "Sales",
+    icon: LocalAtmOutlinedIcon,
+    color: "#3FA89B",
+    href: "/sales",
+  },
+  {
     name: "Item's List",
     icon: PostAddOutlinedIcon,
     color: "#3FA89B",
@@ -42,12 +48,6 @@ const SIDEBAR_ITEMS = [
     icon: Inventory2OutlinedIcon,
     color: "#3FA89B",
     href: "/inventory",
-  },
-  {
-    name: "Expenses",
-    icon: ReceiptLongOutlinedIcon,
-    color: "#3FA89B",
-    href: "/invoice",
   },
   {
     name: "Suppliers",
@@ -62,16 +62,16 @@ const SIDEBAR_ITEMS = [
     href: "/recipe",
   },
   {
+    name: "Expenses",
+    icon: ReceiptLongOutlinedIcon,
+    color: "#3FA89B",
+    href: "/invoice",
+  },
+  {
     name: "Stock Take",
     icon: InventoryOutlinedIcon,
     color: "#3FA89B",
     href: "/stockTake",
-  },
-  {
-    name: "Sales",
-    icon: LocalAtmOutlinedIcon,
-    color: "#3FA89B",
-    href: "/sales",
   },
   {
     name: "Cost Calculator",

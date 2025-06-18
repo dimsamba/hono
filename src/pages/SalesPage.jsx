@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 import StatCard from "../components/common/StatCard";
+import StatCardBg from "../components/common/StatCardBg";
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
+import EventRepeatOutlinedIcon from '@mui/icons-material/EventRepeatOutlined';
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import FullFeaturedCrudGrid from "../components/sales/SalesTable";
 import { useState, useEffect } from "react";
@@ -8,6 +11,14 @@ import supabase from "../components/supabaseClient";
 const SalesPage = () => {
   const [sales, setSales] = useState([]);
   const [refreshKey, setRefreshKey] = useState(); // used to force re-render
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+
+  const [metrics, setMetrics] = useState({
+    totalSalesAmount: 0,
+    totalEntries: 0,
+    totalItems: 0,
+  });
 
   // Filter sales from last 30 days
   const now = new Date();
@@ -76,7 +87,7 @@ const SalesPage = () => {
       <main className="max-w-10xl py-6 px-4 lg:px-8">
         {/* STATS */}
         <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4 mb-3"
+          className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 mb-3"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
@@ -86,8 +97,17 @@ const SalesPage = () => {
               <PointOfSaleIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
             }
             key={refreshKey} // 👈 triggers re-render when key changes
-            title={`${sales.length} Sales`}
+            title={`Sales Sumary`}
             value={`€ ${formatCurrency(totalSalesValue)}`}
+            subtitle={`${sales.length} Sales`}
+          />
+           <StatCard
+            icon={
+              <EventRepeatOutlinedIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
+            }
+            key={refreshKey} // 👈 triggers re-render when key changes
+            title={`Last 30 Days`}
+            value={`€ ${formatCurrency(totalSalesValue30Days)}`}
             subtitle={`${
               salesLastMonth.filter((sale) => {
                 const today = new Date();
@@ -97,8 +117,15 @@ const SalesPage = () => {
                 const saleDate = new Date(sale.date); // or sale.date
                 return saleDate >= thirtyDaysAgo && saleDate <= today;
               }).length
-            } Sales in last 30 Days`}
-            subtitle2={`€ ${formatCurrency(totalSalesValue30Days)}`}
+            } Sales`}
+          />
+          <StatCardBg
+            icon={
+              <CalendarMonthOutlinedIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
+            }
+            title={`Total Between dates`}
+            value={`€ ${formatCurrency(metrics.totalSalesAmount)}`}
+            subtitle={`${metrics.totalEntries} Sales / ${metrics.totalItems} Items`}
           />
           {/* </Box> */}
         </motion.div>
@@ -112,6 +139,11 @@ const SalesPage = () => {
           <FullFeaturedCrudGrid
             sales={sales}
             onSalesChange={handleSalesChange}
+            fromDate={fromDate}
+            toDate={toDate}
+            setFromDate={setFromDate}
+            setToDate={setToDate}
+            onMetricsChange={setMetrics}
           />
         </motion.div>
       </main>

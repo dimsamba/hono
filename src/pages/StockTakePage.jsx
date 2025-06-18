@@ -60,14 +60,6 @@ const StockTakePage = () => {
             onTotalValueChange={handleTotalValueChange}
           />
         </motion.div>
-
-        {/* ✅ Pass fetchData to the form so it refreshes after insert */}
-        <motion.div
-          className="grid grid-cols-1 gap-0 sm:grid-cols-1 lg:grid-cols-1 mb-0"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        ></motion.div>
       </main>
     </div>
   );

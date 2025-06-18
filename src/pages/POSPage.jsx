@@ -3,7 +3,6 @@ import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import LoyaltyOutlinedIcon from "@mui/icons-material/LoyaltyOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import { v4 as uuidv4 } from "uuid"; // NEW: for unique order item keys
-import StatCard from "../components/common/StatCard";
 import StatCardVend from "../components/common/StatCardVend";
 // Add to the top of the file:
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
@@ -237,7 +236,7 @@ const POSPage = () => {
       alert("Error saving sale.");
       console.error(error);
     } else {
-      alert("Sale saved successfully.");
+      // alert("Sale saved successfully.");
 
       setSales((prev) => [
         ...prev,
@@ -274,9 +273,27 @@ const POSPage = () => {
     setSampleMenu(reset);
   };
 
+  // Get the latest sales ID to print as Sales Number
+  const getLatestSaleId = async () => {
+    const { data, error } = await supabase
+      .from("sales")
+      .select("id")
+      .order("id", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.error("Error fetching latest sale ID:", error.message);
+      return null;
+    }
+
+    return data.id;
+  };
+
   // Print Layout
-  const triggerPrint = (saleData) => {
-    // Format date to European format (dd-mm-yyyy HH:MM:SS)
+  const triggerPrint = async (saleData) => {
+    const latestId = await getLatestSaleId(); // fetch the ID
+
     const formatDateEU = (isoString) => {
       const date = new Date(isoString);
       const day = String(date.getDate()).padStart(2, "0");
@@ -288,7 +305,6 @@ const POSPage = () => {
       return `${day}-${month}-${year}, ${hours}:${minutes}:${seconds}`;
     };
 
-    // Parse items if they're stored as a string (in case it wasn't parsed earlier)
     if (typeof saleData.items === "string") {
       saleData.items = JSON.parse(saleData.items);
     }
@@ -297,20 +313,15 @@ const POSPage = () => {
       .map((item) => {
         const hasDiscount =
           item.originalPrice != null && item.price !== item.originalPrice;
-
         const original =
           item.originalPrice != null
-            ? item.originalPrice.toFixed(2) // If originalPrice is available, format it
-            : item.price.toFixed(2); // Otherwise, use the current price
-        const discounted = item.price.toFixed(2); // The discounted price
-        const total = (item.quantity * item.price).toFixed(2); // The total for the item
-
-        // Display the price with discount if applicable
+            ? item.originalPrice.toFixed(2)
+            : item.price.toFixed(2);
+        const discounted = item.price.toFixed(2);
+        const total = (item.quantity * item.price).toFixed(2);
         const priceDisplay = hasDiscount
-          ? `(€${original}) → €${discounted}` // If there's a discount, show both
-          : `€${original}`; // If no discount, show the original price only
-
-        // Return the HTML structure for this item
+          ? `(€${original}) → €${discounted}`
+          : `€${original}`;
         return `
       <tr>
         <td>${item.name}</td>
@@ -319,9 +330,8 @@ const POSPage = () => {
         <td class="right">€${total}</td>
       </tr>`;
       })
-      .join(""); // Join all the rows together to make a full HTML table body
+      .join("");
 
-    // Now the HTML content
     const htmlContent = `
   <html>
   <head>
@@ -374,8 +384,16 @@ const POSPage = () => {
     </style>
   </head>
   <body>
-    <h2>Honō</h2>
+
+ <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+  <h1 style="margin: 0;">Honō</h1>
+  <h4 style="margin: 0; font-style: italic;">La flamme du savoir-faire</h4>
+  <p> * * * * * </p>
+   <p></p>
+ </div>
+    
     <p><strong>Date:</strong> ${formatDateEU(saleData.date)}</p>
+    <p>Sales N.: 000${latestId ?? "N/A"}</p>
     <p><strong>Paiement:</strong> ${saleData.payment_type}</p>
 
     <hr class="divider" />
@@ -413,15 +431,12 @@ const POSPage = () => {
     </div>
   </body>
   </html>
-`;
+  `;
 
-    // Open the print window and add the HTML content
     const printWindow = window.open("", "_blank", "width=800,height=600");
     printWindow.document.open();
     printWindow.document.write(htmlContent);
     printWindow.document.close();
-
-    // Trigger print
     printWindow.focus();
     printWindow.print();
     printWindow.onafterprint = () => printWindow.close();
@@ -438,10 +453,9 @@ const POSPage = () => {
   const sharedStyles = {
     backgroundColor: "#ebf1fa",
     "& .MuiInputLabel-root": {
-      color: "#287271",
-      fontSize: 16,
+      color: "#364958",
+      fontSize: 18,
       backgroundColor: "#ebf1fa",
-      px: 1,
     },
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
@@ -451,7 +465,7 @@ const POSPage = () => {
         borderColor: "#45a29e",
       },
       "&.Mui-focused fieldset": {
-        borderColor: "#1e7f74",
+        border: "3px solid #08bdbd",
       },
     },
   };
@@ -532,7 +546,7 @@ const POSPage = () => {
   };
 
   return (
-    <div className="flex-1 overflow-hidden relative z-10 bg-[#18435a] ">
+    <div className="flex-1 overflow-hidden relative z-10 bg-[#fcfeff] border-t-2">
       <main className="max-w-8xl mx-auto scrollbar-hide h-[1500px]">
         {/* Items buttons and Sale Summary */}
         <motion.div
@@ -555,8 +569,7 @@ const POSPage = () => {
             <Box
               sx={{
                 gridColumn: "span 6", // Half of the 8 columns
-                borderRight: "1px solid #3a6c77",
-                px: 0.5,
+                px: 0,
                 pt: 1,
               }}
             >
@@ -693,16 +706,21 @@ const POSPage = () => {
             <Box
               sx={{
                 gridColumn: "span 2", // Narrow middle column
-                borderRight: "1px solid #3a6c77",
               }}
             >
               {/* StadCards */}
-              <Box>
+              <Box
+                sx={{
+                  backgroundColor: "#022b3a",
+                  border: "1px solid #45a29e",
+                  mt: 1,
+                }}
+              >
                 <StatCardVend
                   title2={`Today Sales`}
                   icon={
                     <PointOfSaleIcon
-                      sx={{ color: colors.greenAccent[400], fontSize: "26px" }}
+                      sx={{ color: colors.blueAccent[200], fontSize: "26px" }}
                     />
                   }
                   title={`€ ${formatCurrency(totalSalesToday)}`}
@@ -736,8 +754,7 @@ const POSPage = () => {
                   variant="standard"
                   sx={{
                     width: "100%", // Fixed width (optional)
-                    mt: 1,
-                    p: 0,
+                    mt: 0.5,
                   }}
                 >
                   {categories.map((cat, index) => (
@@ -752,6 +769,7 @@ const POSPage = () => {
                         color: "#cae9ff",
                         height: "70px",
                         justifyContent: "center",
+                        borderBottom: "1px solid lightGray",
                         "&.Mui-selected": {
                           color: "#a7d7c5",
                           fontWeight: 700,
@@ -816,7 +834,8 @@ const POSPage = () => {
             <Box
               sx={{
                 gridColumn: "span 4", // Remaining 3 columns
-                p: 1,
+                p: 0.5,
+                mt: 0.5,
               }}
             >
               <Box
@@ -834,25 +853,25 @@ const POSPage = () => {
                     {
                       value: "Cash",
                       icon: <AttachMoneyIcon />,
-                      bgColor: "#eafaf7",
+                      bgColor: "#ebf1fa",
                       color: "#287271",
                     },
                     {
                       value: "CB",
                       icon: <CreditCardIcon />,
-                      bgColor: "#eafaf7",
+                      bgColor: "#ebf1fa",
                       color: "#72369d",
                     },
                     {
                       value: "Voucher",
                       icon: <LocalActivityOutlinedIcon />,
-                      bgColor: "#eafaf7",
+                      bgColor: "#ebf1fa",
                       color: "#f50062",
                     },
                     {
                       value: "Other",
                       icon: <PaymentsOutlinedIcon />,
-                      bgColor: "#eafaf7",
+                      bgColor: "#ebf1fa",
                       color: "#0e1428",
                     },
                   ].map(({ value, icon, bgColor, color }) => (
@@ -889,7 +908,7 @@ const POSPage = () => {
                             borderRadius: 0,
                             height: "60px",
                             width: "100%",
-                            border: 2,
+                            border: "1px solid #45a29e",
                           }}
                         >
                           {React.cloneElement(icon, {
@@ -902,7 +921,7 @@ const POSPage = () => {
                 </Grid>
 
                 {/* Save buttons below */}
-                <Box display="flex" gap={0.4} my={0.5} width="100%" px={0.1}>
+                <Box display="flex" gap={0.4} my={0.5} width="100%">
                   <Button
                     variant="outlined"
                     startIcon={<Save />}
@@ -915,7 +934,7 @@ const POSPage = () => {
                       },
                       border: 0,
                       borderRadius: 0,
-                      height: "80px",
+                      height: "100px",
                       width: "100%",
                     }}
                   >
@@ -935,7 +954,7 @@ const POSPage = () => {
                       },
                       border: 0,
                       borderRadius: 0,
-                      height: "80px",
+                      height: "100px",
                       width: "100%",
                     }}
                   >
@@ -949,7 +968,11 @@ const POSPage = () => {
                 flex={2}
                 width="100%"
                 p={2}
-                sx={{ flexGrow: 1, backgroundColor: "#e1eff6" }}
+                sx={{
+                  flexGrow: 1,
+                  backgroundColor: "#ebf1fa",
+                  border: "1px solid #45a29e",
+                }}
               >
                 <Box
                   display="flex"

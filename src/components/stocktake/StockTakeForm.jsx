@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import supabase from "../supabaseClient"; // Import Supabase client
 import StatCard from "../common/StatCard";
 import { format } from "date-fns";
-import RamenDiningIcon from "@mui/icons-material/RamenDining";
+import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 
 const StockTakeForm = ({
   onStockTakeSaved,
@@ -459,9 +459,9 @@ const StockTakeForm = ({
         }}
       >
         <StatCard
-          icon={<RamenDiningIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />}
-          title={"Stock Take in Database"}
-          value={`${stockTake.length} Stock Take`}
+          icon={<InventoryOutlinedIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />}
+          title={"Stock Take Summary"}
+          value={`${stockTake.length} Entries`}
           subtitle={
             latestEntryDate
               ? `Last Entry: ${format(new Date(latestEntryDate), "dd-MM-yyyy")}`

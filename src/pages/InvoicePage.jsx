@@ -1,5 +1,4 @@
-import MoneyOffIcon from "@mui/icons-material/MoneyOff";
-import MoneyOffCsredIcon from "@mui/icons-material/MoneyOffCsred";
+import StatCardBg from "../components/common/StatCardBg";
 import { Box, useMediaQuery } from "@mui/material";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -12,8 +11,12 @@ const invoicePaga = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [invoicesData, setInvoiceData] = useState([]); // ✅ Define state
   const [refreshKey, setRefreshKey] = useState(); // used to force re-render
+  const [filteredRows, setFilteredRows] = useState([]);
+  const [filteredTotalValue, setFilteredTotalValue] = useState(0);
+  const [filteredPaidValue, setFilteredPaidValue] = useState(0);
+  const [filteredUnpaidValue, setFilteredUnpaidValue] = useState(0);
 
-  // Function to fetch inventory data from Supabase
+  // Function to fetch invoices data from Supabase
   const fetchData = async () => {
     const { data, error } = await supabase.from("invoices").select("*");
     if (error) {
@@ -32,28 +35,10 @@ const invoicePaga = () => {
     setRefreshKey((prev) => prev); // ✅ Also force StatCard re-render
   };
 
-  // Function for Progressive Circle
-  const totalInvoices = invoicesData.length;
-  const unpaidInvoices = invoicesData.filter((inv) => !inv.paid);
-  const unpaid =
-    totalInvoices > 0
-      ? (unpaidInvoices.length / totalInvoices).toFixed(2)
-      : "0";
-
   // Function for Progressive Circle (due in 7 days only)
   const now = new Date();
   const in7Days = new Date();
   in7Days.setDate(now.getDate() + 7); // not +8 here
-
-  const dueSoonInvoices = invoicesData.filter((inv) => {
-    const invDate = new Date(inv.invoice_date);
-    return !inv.paid && invDate >= now && invDate <= in7Days;
-  });
-
-  const unpaidDueSoon =
-    totalInvoices > 0
-      ? (dueSoonInvoices.length / totalInvoices).toFixed(2)
-      : "0";
 
   console.log(
     invoicesData.filter((inv) => {
@@ -63,6 +48,11 @@ const invoicePaga = () => {
       invDate.setHours(0, 0, 0, 0);
       return !inv.paid && invDate < today;
     })
+  );
+
+  const totalAmountTTC = invoicesData.reduce(
+    (sum, row) => sum + (row.amount_ttc || 0),
+    0
   );
 
   // Customization for decimals and thousands separators
@@ -87,20 +77,15 @@ const invoicePaga = () => {
           <Box
             display="grid"
             gap="15px"
-            gridTemplateColumns="repeat(2, minmax(0, 1fr))"
+            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
             sx={{
               "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
             }}
           >
             <StatCard
-              icon={
-                <MoneyOffCsredIcon
-                  sx={{ color: "#38a3a5", fontSize: "26px" }}
-                />
-              }
               key={refreshKey} // 👈 triggers re-render when key changes
-              title={"Due in 7 days"}
-              value={(() => {
+              title={`Total € ${formatCurrency(totalAmountTTC)}`}
+              valueRed={(() => {
                 const now = new Date();
                 const in7Days = new Date();
                 in7Days.setDate(now.getDate() + 8);
@@ -117,7 +102,7 @@ const invoicePaga = () => {
 
                 return `€ ${formatCurrency(totalAmount)}`;
               })()}
-              subtitle={`${
+              subtitleRed={`${
                 invoicesData.filter((inv) => {
                   const today = new Date();
                   const in7Days = new Date();
@@ -133,23 +118,8 @@ const invoicePaga = () => {
 
                   return !inv.paid && invDate >= start && invDate <= end;
                 }).length
-              }/${invoicesData.length} Due in 7 days`}
-              increase={` ${formatCurrency(unpaidDueSoon * 100)}%`}
-              progress={unpaidDueSoon}
-              sx={{
-                gridColumn: "span 1",
-              }}
-            />
-
-            <StatCard
-              icon={
-                <MoneyOffIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
-              }
-              key={refreshKey} // 👈 triggers re-render when key changes
-              title={`${invoicesData.filter((inv) => !inv.paid).length}/${
-                invoicesData.length
-              } Unpaid Invoices`}
-              subtitleRed={`${
+              } Due in 7 days`}
+              subtitleRed2={`${
                 invoicesData.filter((inv) => {
                   const today = new Date();
                   today.setHours(0, 0, 0, 0);
@@ -157,7 +127,7 @@ const invoicePaga = () => {
                   invDate.setHours(0, 0, 0, 0);
                   return !inv.paid && invDate < today;
                 }).length
-              }/${invoicesData.length} Overdue – Total: € ${formatCurrency(
+              } Overdue (€ ${formatCurrency(
                 invoicesData
                   .filter((inv) => {
                     const today = new Date();
@@ -168,8 +138,13 @@ const invoicePaga = () => {
                   })
                   .reduce((acc, curr) => acc + (curr.amount_ttc || 0), 0)
                   .toFixed(2)
-              )}`}
-              value={`Total ${(() => {
+              )})`}
+            />
+
+              <StatCard
+              key={refreshKey} // 👈 triggers re-render when key changes
+              title={`Total ${invoicesData.length} Entries`}
+              valueRed={`${(() => {
                 const unpaidInvoices = invoicesData.filter((inv) => !inv.paid);
 
                 const totalAmount = unpaidInvoices.reduce((sum, inv) => {
@@ -179,11 +154,21 @@ const invoicePaga = () => {
 
                 return `€ ${formatCurrency(totalAmount)}`;
               })()}`}
-              increase={` ${formatCurrency(unpaid * 100)}%`}
-              progress={unpaid}
-              sx={{
-                gridColumn: "span 1",
-              }}
+              subtitleRed={`${invoicesData.filter((inv) => !inv.paid).length}
+               Unpaid Invoices`}
+            />
+
+            <StatCardBg
+              key={refreshKey} // 👈 triggers re-render when key changes
+              title={`Between Dates € ${formatCurrency(filteredTotalValue)}`}
+              value={`€ ${formatCurrency(filteredPaidValue)}`}
+              subtitle={`Paid`}
+            />
+             <StatCardBg
+              key={refreshKey} // 👈 triggers re-render when key changes
+              title={`Between Dates ${filteredRows.length} Entries`}
+              valueRed={`€ ${formatCurrency(filteredUnpaidValue)}`}
+              subtitleRed={`Unpaid`}
             />
           </Box>
         </motion.div>
@@ -198,17 +183,11 @@ const invoicePaga = () => {
           <FullFeaturedCrudGrid
             InvoiceData={invoicesData}
             onInvoiceChange={handleInvoiceChange}
+            onFilteredRowsChange={setFilteredRows}
+            onTotalValueChange={setFilteredTotalValue}
+            onPaidValueChange={setFilteredPaidValue}
+            onUnpaidValueChange={setFilteredUnpaidValue}
           />
-        </motion.div>
-
-        {/* ✅ Pass fetchData to the form so it refreshes after insert */}
-        <motion.div
-          className="grid grid-cols-1 gap-0 sm:grid-cols-1 lg:grid-cols-1 mb-0"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
-          {/* <InventoryForm fetchData={fetchData} /> */}
         </motion.div>
       </main>
     </div>

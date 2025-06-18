@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { motion } from "framer-motion";
-import { ShoppingBasket } from "lucide-react";
+import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import { useEffect, useState } from "react";
 import StatCard from "../components/common/StatCard";
 import FullFeaturedCrudGrid from "../components/inventory/InventoryData"; // Note the capital "I"
@@ -46,17 +46,19 @@ const InventoryPage = () => {
       <main className="max-w-10xl py-6 px-4 lg:px-8">
         {/* STATS */}
         <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4 mb-3"
+          className="mb-3"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
           <StatCard
             icon={
-              <ShoppingBasket sx={{ color: "#38a3a5", fontSize: "26px" }} />
+              <InventoryOutlinedIcon
+                sx={{ color: "#38a3a5", fontSize: "26px" }}
+              />
             }
             key={refreshKey} // 👈 triggers re-render when key changes
-            title={"Inventory in Database"}
+            title={"Inventory Sumary"}
             value={`${inventory.length} Items`}
             subtitle={
               latestEntryDate
@@ -66,10 +68,6 @@ const InventoryPage = () => {
                   )}`
                 : "No data available"
             }
-            progress={"none"}
-            sx={{
-              gridColumn: "span 1",
-            }}
           />
         </motion.div>
 

@@ -1,15 +1,13 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
-const StatCard = ({
+const StatCardRecipe = ({
   value,
   valueRed,
+  value2,
+  valueRed2,
   title,
   icon,
-  subtitle,
-  subtitle2,
-  subtitleRed,
-  subtitleRed2,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -34,6 +32,7 @@ const StatCard = ({
             gridColumn: "span 1",
             width: "100%",
             height: "60px",
+            ml: 0.8
           }}
         >
           <Box>{icon}</Box>
@@ -55,69 +54,39 @@ const StatCard = ({
             height: "5px",
             ml: 1,
             mt: 1,
-            mb: 1
           }}
         >
-          <Typography variant="h4" sx={{ color: "#004e64", lineHeight: 1 }}>
+          <Typography variant="h5" sx={{ color: "#004e64", lineHeight: 1 }}>
             {value}
           </Typography>
           <Typography
-            variant="h4"
+            variant="h5"
             sx={{ color: colors.orange[500], lineHeight: 1 }}
           >
             {valueRed}
           </Typography>
         </Box>
 
-        {/* Box 3 third row */}
+        {/* Box 2 second row */}
         <Box
           display="flex"
           alignItems="center"
           sx={{
             gridColumn: { xs: "span 2", sm: "span 1" },
             width: "100%",
+            height: "5px",
             ml: 1,
             mt: 1,
-            height: "15px",
           }}
         >
-          <Typography
-            variant="h6"
-            sx={{ color: colors.grey[400], lineHeight: 1 }}
-          >
-            {subtitle}
+          <Typography variant="h5" sx={{ color: "#004e64", lineHeight: 1 }}>
+            {value2}
           </Typography>
           <Typography
-            variant="h6"
-            sx={{ color: colors.orange[500], lineHeight: 1, fontWeight: [500] }}
+            variant="h5"
+            sx={{ color: colors.orange[500], lineHeight: 1 }}
           >
-            {subtitleRed}
-          </Typography>
-        </Box>
-
-        {/* Box 4 fourth row  */}
-        <Box
-          display="flex"
-          alignItems="center"
-          sx={{
-            gridColumn: { xs: "span 2", sm: "span 1" },
-            width: "100%",
-            ml: 1,
-            mt: 0,
-            height: "15px",
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{ color: colors.grey[400], lineHeight: 1 }}
-          >
-            {subtitle2}
-          </Typography>
-          <Typography
-            variant="h6"
-            sx={{ color: colors.orange[500], lineHeight: 1, fontWeight: [500] }}
-          >
-            {subtitleRed2}
+            {valueRed2}
           </Typography>
         </Box>
       </Box>
@@ -125,4 +94,4 @@ const StatCard = ({
   );
 };
 
-export default StatCard;
+export default StatCardRecipe;

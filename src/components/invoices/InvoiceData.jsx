@@ -4,7 +4,14 @@ import CancelIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import { Chip, GlobalStyles, IconButton, Stack, Typography, useMediaQuery } from "@mui/material";
+import {
+  Chip,
+  GlobalStyles,
+  IconButton,
+  Stack,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
@@ -22,10 +29,10 @@ import { DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
+import dayjs from "dayjs";
 import StatCardinfo from "../common/StatCardinfo";
 import supabase from "../supabaseClient";
 
@@ -92,7 +99,14 @@ function CombinedToolbar({ setRows, setRowModesModel }) {
   );
 }
 
-export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
+export default function FullFeaturedCrudGrid({
+  InvoiceData,
+  onInvoiceChange,
+  onFilteredRowsChange = () => {},
+  onTotalValueChange = () => {},
+  onPaidValueChange = () => {},
+  onUnpaidValueChange = () => {},
+}) {
   const [rows, setRows] = React.useState(InvoiceData); // Use the passed inventoryData
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
@@ -365,42 +379,49 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
 
   // Filter between dates
   // Get value between dates
-  const filteredRows = (rows || []).filter((row) => {
-    const rowDate = dayjs(row.invoice_date);
+  const {
+    filteredRows,
+    filteredTotalValue,
+    filteredPaidValue,
+    filteredUnpaidValue,
+  } = useMemo(() => {
+    const filtered = (rows || []).filter((row) => {
+      const rowDate = dayjs(row.invoice_date);
 
-    if (fromDate && toDate) {
-      return (
-        rowDate.isSameOrAfter(fromDate, "day") &&
-        rowDate.isSameOrBefore(toDate, "day")
-      );
-    }
-    if (fromDate) {
-      return rowDate.isSameOrAfter(fromDate, "day");
-    }
-    if (toDate) {
-      return rowDate.isSameOrBefore(toDate, "day");
-    }
-    return true;
-  });
+      if (fromDate && toDate) {
+        return (
+          rowDate.isSameOrAfter(fromDate, "day") &&
+          rowDate.isSameOrBefore(toDate, "day")
+        );
+      }
+      if (fromDate) {
+        return rowDate.isSameOrAfter(fromDate, "day");
+      }
+      if (toDate) {
+        return rowDate.isSameOrBefore(toDate, "day");
+      }
+      return true;
+    });
 
-  // Count entries between dates
+    const total = filtered.reduce((sum, row) => sum + (row.amount_ttc || 0), 0);
+
+    const paid = filtered
+      .filter((row) => row.paid === true)
+      .reduce((sum, row) => sum + (row.amount_ttc || 0), 0);
+
+    const unpaid = filtered
+      .filter((row) => row.paid === false)
+      .reduce((sum, row) => sum + (row.amount_ttc || 0), 0);
+
+    return {
+      filteredRows: filtered,
+      filteredTotalValue: total,
+      filteredPaidValue: paid,
+      filteredUnpaidValue: unpaid,
+    };
+  }, [rows, fromDate, toDate]); // Only recompute when these change
+
   const entryCount = filteredRows.length;
-
-  // Sum amount_ttc
-  const filteredTotalValue = filteredRows.reduce(
-    (sum, row) => sum + (row.amount_ttc || 0),
-    0
-  );
-
-  // Sum only paid invoices (paid === true)
-  const filteredPaidValue = filteredRows
-    .filter((row) => row.paid === true)
-    .reduce((sum, row) => sum + (row.amount_ttc || 0), 0);
-
-  // Sum only unpaid invoices (paid === false)
-  const filteredUnpaidValue = filteredRows
-    .filter((row) => row.paid === false)
-    .reduce((sum, row) => sum + (row.amount_ttc || 0), 0);
 
   // Format values
   const formattedFilteredPaidValue = new Intl.NumberFormat("en-US", {
@@ -421,6 +442,23 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(filteredTotalValue);
+
+  // ⬇️ Send filtered results to parent
+  useEffect(() => {
+    onFilteredRowsChange(filteredRows);
+    onTotalValueChange(filteredTotalValue);
+    onPaidValueChange(filteredPaidValue);
+    onUnpaidValueChange(filteredUnpaidValue);
+  }, [
+    filteredRows,
+    filteredTotalValue,
+    filteredPaidValue,
+    filteredUnpaidValue,
+    onFilteredRowsChange,
+    onTotalValueChange,
+    onPaidValueChange,
+    onUnpaidValueChange,
+  ]);
 
   // Customize Toolbar
   const theme = createTheme({
@@ -659,15 +697,6 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
         p: 1,
       }}
     >
-      <Box>
-        <StatCardinfo
-          title={`Total: € ${formattedFilteredTotalValue}`}
-          title1={`Paid: € ${formattedFilteredPaidValue}`}
-          title2={`Unpaid: € ${formattedFilteredUnpaidValue}`}
-          title3={`${entryCount} Entries`}
-          progress={"none"}
-        />
-      </Box>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Box
           display="grid"
@@ -675,7 +704,7 @@ export default function FullFeaturedCrudGrid({ InvoiceData, onInvoiceChange }) {
           gridTemplateColumns="repeat(4, minmax(0, 1fr))"
           sx={{
             "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-            mb: "5px",
+            my: 1,
           }}
         >
           <GlobalStyles

@@ -1,12 +1,6 @@
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import CachedIcon from "@mui/icons-material/Cached";
-import {
-  GlobalStyles,
-  Stack,
-  IconButton,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { GlobalStyles, Stack, IconButton, useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
@@ -16,8 +10,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import React, { useState } from "react";
-import StatCardinfo from "../common/StatCardinfo";
+import React, { useState, useEffect } from "react";
 
 import {
   DataGrid,
@@ -54,7 +47,11 @@ function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
 
-export default function FullFeaturedCrudGrid({ SalesTable, onSalesChange }) {
+export default function FullFeaturedCrudGrid({
+  SalesTable,
+  onSalesChange,
+  onMetricsChange,
+}) {
   const [rows, setRows] = React.useState(SalesTable); // Use the passed SalesTable
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [fromDate, setFromDate] = useState(null);
@@ -219,36 +216,37 @@ export default function FullFeaturedCrudGrid({ SalesTable, onSalesChange }) {
   // Get value between dates
   const filteredRows = (rows || []).filter((row) => {
     const rowDate = dayjs(row.date);
-
     if (fromDate && toDate) {
       return (
         rowDate.isSameOrAfter(fromDate, "day") &&
         rowDate.isSameOrBefore(toDate, "day")
       );
     }
-    if (fromDate) {
-      return rowDate.isSameOrAfter(fromDate, "day");
-    }
-    if (toDate) {
-      return rowDate.isSameOrBefore(toDate, "day");
-    }
+    if (fromDate) return rowDate.isSameOrAfter(fromDate, "day");
+    if (toDate) return rowDate.isSameOrBefore(toDate, "day");
     return true;
   });
 
-  // Count number of Items
   const totalItemsCount = filteredRows.reduce((sum, row) => {
     const value = Number(row.total_items);
     return sum + (isNaN(value) ? 0 : value);
   }, 0);
 
-  // Count entries between dates
   const entryCount = filteredRows.length;
 
-  // Sum sale_total_disc
   const filteredTotalValue = filteredRows.reduce(
     (sum, row) => sum + (row.sale_total_disc || 0),
     0
   );
+
+  // Notify parent with updated metrics
+  useEffect(() => {
+    onMetricsChange({
+      totalSalesAmount: filteredTotalValue,
+      totalEntries: entryCount,
+      totalItems: totalItemsCount,
+    });
+  }, [fromDate, toDate, rows]); // Trigger when relevant data changes
 
   // Format value to 2 decimal places
   const formattedFilteredTotalValue = new Intl.NumberFormat("en-US", {
@@ -475,15 +473,6 @@ export default function FullFeaturedCrudGrid({ SalesTable, onSalesChange }) {
         p: 1,
       }}
     >
-      <Box>
-        <StatCardinfo
-          title={`Total: € ${formattedFilteredTotalValue}`}
-          title1={`Total Sales: ${entryCount}`}
-          title2={`Total Items sold: ${totalItemsCount}`}
-          //  title3={}
-          progress={"none"}
-        />
-      </Box>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Box
           display="grid"

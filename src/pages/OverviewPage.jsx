@@ -1,7 +1,6 @@
-import EuroSymbolOutlinedIcon from "@mui/icons-material/EuroSymbolOutlined";
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import RamenDiningIcon from "@mui/icons-material/RamenDining";
+import PriceCheckOutlinedIcon from "@mui/icons-material/PriceCheckOutlined";
 import { useTheme } from "@mui/material";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -20,6 +19,8 @@ const OverviewPage = () => {
   const [sales, setSales] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [latestEntryDate, setLatestEntryDate] = useState(null);
+  const [latestRecipeDate, setLatestRecipeDate] = useState(null);
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -166,14 +167,23 @@ const OverviewPage = () => {
     }
   }, [sales, recipes, inventoryData, financialsData]);
 
+  useEffect(() => {
+    if (recipes.length > 0) {
+      const latest = recipes
+        .map((r) => new Date(r.created_at))
+        .reduce((a, b) => (a > b ? a : b));
+      setLatestRecipeDate(latest.toISOString());
+    }
+  }, [recipes]);
+
   return (
     <div
       className="flex-1 overflow-auto relative z-10"
       style={{ backgroundColor: colors.background }}
     >
-      <main className="max-w-9xl mx-auto py-6 px-4 lg:px-8">
+      <main className="max-w-9xl mx-auto py-6 px-1 lg:px-8">
         <motion.div
-          className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mb-5"
+          className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mb-3"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
@@ -181,24 +191,19 @@ const OverviewPage = () => {
           {/* Financials */}
           <StatCard
             icon={
-              <EuroSymbolOutlinedIcon
+              <PriceCheckOutlinedIcon
                 sx={{ color: "#38a3a5", fontSize: "26px" }}
               />
             }
-            title={"30 days Financial Summary"}
-            value={
+            title={`30 days Financial Summary`}
+            value={ 
+            <>
               <span className={netProfit < 0 ? "text-red-400" : ""}>
-                Net Profit: € {formatCurrency(netProfit)}
-              </span>
-            }
-            subtitle={`Revenue: € ${formatCurrency(revenue)}`}
-            subtitle2={`Expenses: € ${formatCurrency(expenses)}`}
-            progress={profitMargin}
-            increase={
-              <span className={profitMargin < 0 ? "text-red-400" : ""}>
-                {(profitMargin * 100).toFixed(2)} %
-              </span>
-            }
+                  Net profit: € {formatCurrency(netProfit)}
+                </span>
+            </>}
+            subtitle={`Revenue € ${formatCurrency(revenue)}`}
+            subtitleRed2={`Expenses € ${formatCurrency(expenses)}`}
           />
 
           {/* Sales */}
@@ -206,9 +211,10 @@ const OverviewPage = () => {
             icon={
               <PointOfSaleIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
             }
-            title={`${sales.length} Sales`}
-            value={`€ ${formatCurrency(totalSalesValue)}`}
-            subtitle={`${
+            title={`Sales Summary`}
+            value={`Total: € ${formatCurrency(totalSalesValue)}`}
+            subtitle={`Last 30 Days: € ${formatCurrency(totalSalesValue30Days)}`}
+            subtitle2={`N. Sales: ${sales.length} / ${
               salesLastMonth.filter((sale) => {
                 const today = new Date();
                 const thirtyDaysAgo = new Date();
@@ -217,10 +223,8 @@ const OverviewPage = () => {
                 const saleDate = new Date(sale.date); // or sale.date
                 return saleDate >= thirtyDaysAgo && saleDate <= today;
               }).length
-            } Sales in last 30 Days`}
-            subtitle2={`€ ${formatCurrency(totalSalesValue30Days)}`}
+            } in 30 Days`}
           />
-
           {/* Inventory */}
           <StatCard
             icon={
@@ -228,35 +232,33 @@ const OverviewPage = () => {
                 sx={{ color: "#38a3a5", fontSize: "26px" }}
               />
             }
-            title={"Inventory in Database"}
-            value={`${inventoryData.length} Items`}
+            title={"Inventory Summary"}
+            value={`${inventoryData.length} Items in Database`}
             subtitle={
               latestEntryDate
-                ? `Last Entry: ${format(
+                ? `Last Entry:  ${format(
                     new Date(latestEntryDate),
                     "dd-MM-yyyy"
                   )}`
                 : "No data available"
             }
-            progress={"none"}
           />
-
-          {/* Recipes */}
-          <StatCard
+           <StatCard
             icon={
-              <RamenDiningIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
+              <InventoryOutlinedIcon
+                sx={{ color: "#38a3a5", fontSize: "26px" }}
+              />
             }
-            title={"Recipe in Database"}
-            value={`${recipes.length} Recipes`}
+            title={"Recipes Sumary"}
+            value={`${recipes.length} Saved Recipes`}
             subtitle={
-              latestEntryDate
-                ? `Last Entry: ${format(
-                    new Date(latestEntryDate),
+              latestRecipeDate
+                ? `Last Recipe: ${format(
+                    new Date(latestRecipeDate),
                     "dd-MM-yyyy"
                   )}`
-                : "No data available"
+                : "No recipes available"
             }
-            progress={"none"}
           />
         </motion.div>
 

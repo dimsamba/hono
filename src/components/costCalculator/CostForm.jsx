@@ -1,4 +1,5 @@
-import EuroSymbolOutlinedIcon from "@mui/icons-material/EuroSymbolOutlined";
+import CreditScoreOutlinedIcon from '@mui/icons-material/CreditScoreOutlined';
+import EventRepeatOutlinedIcon from '@mui/icons-material/EventRepeatOutlined';
 import { Box, Button, FormControl, GlobalStyles, TextField, useMediaQuery, useTheme } from "@mui/material";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -366,7 +367,7 @@ const CostForm = () => {
           {/* Grand Expenses & Grand Revenue */}
           <StatCard
             icon={
-              <EuroSymbolOutlinedIcon
+              <EventRepeatOutlinedIcon
                 sx={{ color: "#38a3a5", fontSize: "26px" }}
               />
             }
@@ -378,23 +379,12 @@ const CostForm = () => {
             }
             subtitle={`Revenue: € ${formatCurrency(totalRevenue)}`}
             subtitle2={`Expenses: € ${formatCurrency(totalExpenses)}`}
-            progress={profitMarginBetwnDates} // Ensures it's a valid number for the progress bar
-            increase={
-              <span
-                className={profitMarginBetwnDates < 0 ? "text-red-400" : ""}
-              >
-                {`${(profitMarginBetwnDates * 100).toFixed(2)} %`}
-              </span>
-            }
-            sx={{
-              gridColumn: "span 1",
-            }}
           />
 
           {/* Grand Net Revenue */}
           <StatCard
             icon={
-              <EuroSymbolOutlinedIcon
+              <CreditScoreOutlinedIcon
                 sx={{ color: "#38a3a5", fontSize: "26px" }}
               />
             }
@@ -406,15 +396,6 @@ const CostForm = () => {
             }
             subtitle={`Revenue: € ${formatCurrency(revenue)}`}
             subtitle2={`Expenses: € ${formatCurrency(expenses)}`}
-            progress={profitMargin} // Ensures it's a valid number for the progress bar
-            increase={
-              <span className={profitMargin < 0 ? "text-red-400" : ""}>
-                {`${(profitMargin * 100).toFixed(2)} %`}
-              </span>
-            }
-            sx={{
-              gridColumn: "span 1",
-            }}
           />
         </Box>
         <Box
