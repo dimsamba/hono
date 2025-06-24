@@ -247,14 +247,7 @@ export default function FullFeaturedCrudGrid({
       totalItems: totalItemsCount,
     });
   }, [fromDate, toDate, rows]); // Trigger when relevant data changes
-
-  // Format value to 2 decimal places
-  const formattedFilteredTotalValue = new Intl.NumberFormat("en-US", {
-    style: "decimal",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(filteredTotalValue);
-
+  
   // Customize Toolbar
   const themeGrid = createTheme({
     components: {

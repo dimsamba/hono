@@ -16,9 +16,9 @@ import { useEffect, useState } from "react";
 import supabase from "../supabaseClient"; // Import Supabase client
 import StatCard from "../common/StatCard";
 import StatCardRecipe from "../common/StatCardRecipe";
-import RamenDiningIcon from "@mui/icons-material/RamenDining";
-import LoyaltyOutlinedIcon from '@mui/icons-material/LoyaltyOutlined';
-import PriceChangeOutlinedIcon from '@mui/icons-material/PriceChangeOutlined';
+import RamenDiningOutlinedIcon from "@mui/icons-material/RamenDiningOutlined";
+import LoyaltyOutlinedIcon from "@mui/icons-material/LoyaltyOutlined";
+import PriceChangeOutlinedIcon from "@mui/icons-material/PriceChangeOutlined";
 import { format } from "date-fns";
 
 const RecipeForm = ({
@@ -45,6 +45,7 @@ const RecipeForm = ({
   const [recipeId, setRecipeId] = useState(""); // Initialize as an empty string
   const [numItems, setNumItems] = useState();
   const [latestEntryDate, setLatestEntryDate] = useState(null);
+  const [recipeSelected, setRecipeSelected] = useState(false);
 
   // Automatically set recipeId when recipe prop is available
   useEffect(() => {
@@ -100,6 +101,7 @@ const RecipeForm = ({
     fetchInventory();
   }, []);
 
+  // Calculatios
   useEffect(() => {
     const total = ingredients.reduce((sum, i) => sum + (i.cost || 0), 0);
     setTotalCost(total);
@@ -116,7 +118,7 @@ const RecipeForm = ({
     if (onTotalCostChange) onTotalCostChange(total);
   }, [ingredients, numberOfPortions, actualSalePrice]);
 
-  // Handle ingredient changes
+  // Handle item changes
   const handleIngredientChange = (index, field, value) => {
     const updated = [...ingredients];
 
@@ -126,7 +128,7 @@ const RecipeForm = ({
         updated[index] = {
           ...updated[index],
           item_id: item.item_name,
-          item_name: item.item_name,
+          item_name: item.item_name, // Ensure item_name is updated
           price_per_unit: item.price_per_unit,
           unit_type: item.unit_type,
           quantity_used: "",
@@ -134,10 +136,15 @@ const RecipeForm = ({
         };
       }
     } else if (field === "quantity_used") {
-      const quantity = parseFloat(value) || 0;
-      const price = updated[index].price_per_unit || 0;
-      updated[index].quantity_used = quantity;
-      updated[index].cost = quantity * price;
+      if (value === "") {
+        updated[index].quantity_used = ""; // allow empty string for typing
+        updated[index].cost = 0; // or leave unchanged if you prefer
+      } else {
+        const quantity = parseFloat(value);
+        const price = updated[index].price_per_unit || 0;
+        updated[index].quantity_used = quantity;
+        updated[index].cost = quantity * price;
+      }
     }
 
     setIngredients(updated);
@@ -223,8 +230,8 @@ const RecipeForm = ({
       setLoading(false);
       return;
     } else {
-      alert("Recipe and Ingredients saved successfully!");
-      // ✅ Continue with ingredient saving
+      //  alert("Recipe and Ingredients saved successfully!");
+      // ✅ Continue with item saving
     }
 
     const recipeId = data.id;
@@ -242,18 +249,17 @@ const RecipeForm = ({
     const userId = userData.user.id;
 
     // ✅ Now build the ingredients array with user_id and recipe_id
-    const ingredientsToInsert = ingredients.map((ingredient) => ({
+    const ingredientsToInsert = ingredients.map((item) => ({
       user_id: userId,
-      recipe_id: recipeId,
-      ingredient_id: ingredient.id, // this is the inventory item's ID
-      ingredient_name: ingredient.item_name,
-      quantity_used: ingredient.quantity_used,
-      unit_type: ingredient.unit_type,
-      price_per_unit: ingredient.price_per_unit,
-      ingredient_cost: ingredient.cost,
-      created_at: new Date().toISOString(), // optional
+      recipe_id: parseInt(recipeId),
+      ingredient_id: item.id,
+      item_name: item.item_name, // Use item_name if that's your field
+      quantity_used: item.quantity_used,
+      unit_type: item.unit_type,
+      price_per_unit: item.price_per_unit,
+      ingredient_cost: item.cost,
+      created_at: new Date().toISOString(),
     }));
-
     // Insert ingredients
     const { error: insertError } = await supabase
       .from("recipe_ingredients")
@@ -273,6 +279,7 @@ const RecipeForm = ({
     setActualSalePrice("");
     setRecipeNote("");
     setIngredients([]);
+    setRecipeSelected(false);
 
     // ✅ Refresh the table
     fetchRecipes();
@@ -354,16 +361,16 @@ const RecipeForm = ({
       return;
     }
 
-    // ✅ Step 3: Insert updated ingredient list
-    const ingredientsToInsert = ingredients.map((ingredient) => ({
+    // ✅ Step 3: Insert updated item list
+    const ingredientsToInsert = ingredients.map((item) => ({
       user_id: userId,
       recipe_id: parseInt(recipeId),
-      ingredient_id: ingredient.id,
-      ingredient_name: ingredient.ingredient_name || "Unnamed Ingredient",
-      quantity_used: ingredient.quantity_used,
-      unit_type: ingredient.unit_type,
-      price_per_unit: ingredient.price_per_unit,
-      ingredient_cost: ingredient.cost,
+      ingredient_id: item.id,
+      item_name: item.item_name || "Unnamed item",
+      quantity_used: item.quantity_used,
+      unit_type: item.unit_type,
+      price_per_unit: item.price_per_unit,
+      ingredient_cost: item.cost,
       created_at: new Date().toISOString(),
     }));
 
@@ -378,7 +385,7 @@ const RecipeForm = ({
       return;
     }
 
-    alert("Recipe and ingredients updated successfully!");
+    console.log("ingredientsToInsert:", ingredientsToInsert);
     // Reset state
     setRecipeName("");
     setRecipeType("");
@@ -386,6 +393,7 @@ const RecipeForm = ({
     setActualSalePrice("");
     setRecipeNote("");
     setIngredients([]);
+    setRecipeSelected(false);
 
     // ✅ Refresh the table
     fetchRecipes();
@@ -407,12 +415,13 @@ const RecipeForm = ({
     { value: "gougères", label: "Gougères" },
     { value: "main", label: "Main" },
     { value: "mise-en-place", label: "Mise-en-place" },
+    { value: "prep", label: "Prep" },
     { value: "sauce", label: "Sauce" },
     { value: "side", label: "Side" },
     { value: "starter", label: "Starter" },
   ];
 
-  // make sure the form is filled before add new ingredient
+  // make sure the form is filled before add new item
   const formFilled =
     recipeName !== "" &&
     recipeType !== "" &&
@@ -421,6 +430,7 @@ const RecipeForm = ({
 
   // Fetch Recipe and Ingredients from both tables "recipes" and "recipe_ingredients"
   const handleRecipeSelect = async (recipeId) => {
+    setRecipeSelected(true); // Set recipeSelect to true
     try {
       // Fetch recipe from "recipes" table
       const { data: recipe, error: recipeError } = await supabase
@@ -451,7 +461,7 @@ const RecipeForm = ({
 
       const enrichedIngredients = ingredients.map((ing) => ({
         ...ing,
-        item_id: ing.ingredient_name,
+        item_id: ing.item_name,
         price_per_unit: ing.price_per_unit,
         unit_type: ing.unit_type,
         cost: ing.ingredient_cost,
@@ -487,6 +497,7 @@ const RecipeForm = ({
       setActualSalePrice("");
       setRecipeNote("");
       setIngredients([]);
+      setRecipeSelected(false);
 
       // ✅ Refresh the table
       fetchRecipes();
@@ -528,7 +539,11 @@ const RecipeForm = ({
     <main>
       <motion.div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 mb-3">
         <StatCard
-          icon={<RamenDiningIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />}
+          icon={
+            <RamenDiningOutlinedIcon
+              sx={{ color: "#38a3a5", fontSize: "26px" }}
+            />
+          }
           title={"Recipes Sumary"}
           value={`${recipes.length} Saved Recipes`}
           subtitle={
@@ -540,9 +555,7 @@ const RecipeForm = ({
 
         <StatCardRecipe
           icon={
-            <LoyaltyOutlinedIcon
-              sx={{ color: "#38a3a5", fontSize: "26px" }}
-            />
+            <LoyaltyOutlinedIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
           }
           title={`Selling Info`}
           value={`Price per portion: € ${formatCurrency(costPerPortion)}`}
@@ -570,7 +583,7 @@ const RecipeForm = ({
       >
         <form onSubmit={handleSubmit}>
           <h3 className="text-base mb-5 ml-3 mt-2 text-[#3FA89B] font-bold">
-            RECIPE CALCULATOR
+            ADD / UPDATE RECIPE
           </h3>
           <Box
             display="grid"
@@ -669,7 +682,15 @@ const RecipeForm = ({
                 label="Number of Portions"
                 type="number"
                 value={numberOfPortions}
-                onChange={(e) => setNumberOfPortions(Number(e.target.value))}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  // Allow empty string to let the user delete and type freely
+                  if (val === "") {
+                    setNumberOfPortions("");
+                  } else {
+                    setNumberOfPortions(Number(val));
+                  }
+                }}
                 slotProps={{ min: 1 }}
                 required
                 sx={{
@@ -691,7 +712,15 @@ const RecipeForm = ({
                 label="Actual Sale Price (€)"
                 type="number"
                 value={actualSalePrice}
-                onChange={(e) => setActualSalePrice(Number(e.target.value))}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  // Allow empty string to let the user delete and type freely
+                  if (val === "") {
+                    setActualSalePrice("");
+                  } else {
+                    setActualSalePrice(Number(val));
+                  }
+                }}
                 slotProps={{ min: 0, step: "0.01" }}
                 required
                 sx={{
@@ -765,12 +794,12 @@ const RecipeForm = ({
                 </tr>
               </thead>
               <tbody>
-                {ingredients.map((ingredient, index) => (
+                {ingredients.map((item, index) => (
                   <tr key={index}>
                     <td className="p-2">
                       <select
                         className="bg-gray-100 p-1 rounded w-full"
-                        value={ingredient.item_id}
+                        value={item.item_id || ""}
                         onChange={(e) =>
                           handleIngredientChange(
                             index,
@@ -779,20 +808,23 @@ const RecipeForm = ({
                           )
                         }
                       >
-                        <option value="">Select</option>
-                        {inventoryItems.map((item) => (
-                          <option key={item.item_name} value={item.item_name}>
-                            {item.item_name}
-                          </option>
-                        ))}
+                        <option value="">Select Ingredeient</option>
+                        {[...inventoryItems]
+                          .sort((a, b) =>
+                            a.item_name.localeCompare(b.item_name)
+                          )
+                          .map((item) => (
+                            <option key={item.item_name} value={item.item_name}>
+                              {item.item_name}
+                            </option>
+                          ))}
                       </select>
                     </td>
                     <td className="p-2">
                       <input
                         type="number"
-                        min="0"
                         className="bg-gray-100 p-1 rounded w-20"
-                        value={ingredient.quantity_used}
+                        value={item.quantity_used}
                         onChange={(e) =>
                           handleIngredientChange(
                             index,
@@ -802,11 +834,9 @@ const RecipeForm = ({
                         }
                       />
                     </td>
-                    <td className="p-2">{ingredient.unit_type}</td>
-                    <td className="p-2">
-                      €{ingredient.price_per_unit?.toFixed(5)}
-                    </td>
-                    <td className="p-2">€{ingredient.cost?.toFixed(4)}</td>
+                    <td className="p-2">{item.unit_type}</td>
+                    <td className="p-2">€{item.price_per_unit?.toFixed(5)}</td>
+                    <td className="p-2">€{item.cost?.toFixed(4)}</td>
                     <td className="p-2 text-right">
                       <button
                         type="button" // <<<<< THIS is critical
@@ -820,7 +850,7 @@ const RecipeForm = ({
                 ))}
               </tbody>
             </table>
-            {/* Finish Ingredient Table */}
+            {/* Finish item Table */}
           </Box>
 
           <Box
@@ -864,7 +894,7 @@ const RecipeForm = ({
             <Button
               type="submit"
               variant="contained"
-              disabled={loading}
+              disabled={loading || recipeSelected}
               sx={{
                 gridColumn: isMobile ? "span 1" : "span 2",
                 backgroundColor: "#26A889",
@@ -932,6 +962,7 @@ const RecipeForm = ({
                 setActualSalePrice("");
                 setRecipeNote("");
                 setIngredients([]);
+                setRecipeSelected(false);
               }}
               sx={{
                 gridColumn: isMobile ? "span 1" : "span 1",

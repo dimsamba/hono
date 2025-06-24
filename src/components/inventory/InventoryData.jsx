@@ -58,7 +58,7 @@ function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
         startIcon={<AddIcon sx={{ color: "#3FA89B" }} />}
       >
         <Typography sx={{ color: "#3FA89B", fontWeight: 600 }}>
-          Add record
+          Add new Item
         </Typography>
       </Button>
     </GridToolbarContainer>
@@ -284,13 +284,13 @@ export default function FullFeaturedCrudGrid({
     {
       field: "item_name",
       headerName: "Item",
-      width: 180,
+      width: 220,
       editable: true,
     },
     {
       field: "category",
       headerName: "Category",
-      width: 200,
+      width: 180,
       editable: true,
       type: "singleSelect",
       valueOptions: [
@@ -298,6 +298,7 @@ export default function FullFeaturedCrudGrid({
         "Beverages",
         "Canned-goods",
         "Charcuterie",
+        "complement",
         "Condiments",
         "Dry",
         "Dairy",
@@ -361,6 +362,7 @@ export default function FullFeaturedCrudGrid({
       type: "singleSelect",
       valueOptions: [
         "bag",
+        "barquette",
         "bottle",
         "box",
         "bucket",
@@ -370,6 +372,7 @@ export default function FullFeaturedCrudGrid({
         "container",
         "crate",
         "drum",
+        "filet",
         "jar",
         "jug",
         "keg",
@@ -378,10 +381,12 @@ export default function FullFeaturedCrudGrid({
         "roll",
         "sack",
         "shrink pack",
+        "tablettes",
         "tin",
         "tray",
         "tube",
         "tub",
+        "unit",
         "wrap",
       ],
       renderEditCell: (params) => (
@@ -429,7 +434,7 @@ export default function FullFeaturedCrudGrid({
     {
       field: "unit_type",
       headerName: "Unit",
-      width: 120,
+      width: 100,
       editable: true,
       align: "center",
       headerAlign: "center",
@@ -529,7 +534,7 @@ export default function FullFeaturedCrudGrid({
       headerName: "€ Item",
       type: "numeric",
       width: 100,
-      editable: true,
+      editable: false,
       align: "right",
       headerAlign: "right",
       renderCell: (params) =>
@@ -573,7 +578,7 @@ export default function FullFeaturedCrudGrid({
       headerAlign: "right",
       renderCell: (params) =>
         params.value && !isNaN(params.value)
-          ? `€ ${parseFloat(params.value).toFixed(3)}`
+          ? `€ ${parseFloat(params.value).toFixed(4)}`
           : "",
     },
     {
@@ -593,7 +598,7 @@ export default function FullFeaturedCrudGrid({
   return (
     <Box
       sx={{
-        height: 900,
+        height: 700,
         width: "100%",
         border: "2px solid lightGray",
         borderRadius: 2,
@@ -649,12 +654,16 @@ export default function FullFeaturedCrudGrid({
             },
             "& .MuiDataGrid-row--editing .MuiDataGrid-cell": {
               backgroundColor: "#e7ecef !important",
-              // boxShadow: "none", // remove default shadow if needed
+           //   boxShadow: "2", // remove default shadow if needed
             },
             "& .MuiDataGrid-row--editing input": {
               color: "dimGray !important",
               fontSize: "15px",
-              fontWeight: 600, // semibold
+              fontWeight: 600,
+              "&:focus": {
+                border: "3px solid #00a6a6",
+                outline: "none", // Optional: remove default outline
+              },
             },
             "& .MuiDataGrid-cell": {
               borderBlockColor: "lightGray",
@@ -665,29 +674,36 @@ export default function FullFeaturedCrudGrid({
             // other global styles...
             "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='total_units_per_pack']":
               {
-                backgroundColor: "red", // light red
+                backgroundColor: "#bfbdc1 !important", // light red
                 color: "#b71c1c", // dark red text
                 fontWeight: 600,
-                border: "2px solid #f44336",
+                border: "2px solid #6d6a75",
+              },
+            "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='price_per_item']":
+              {
+                backgroundColor: "#bfbdc1 !important", // light red
+                color: "#b71c1c", // dark red text
+                fontWeight: 600,
+                border: "2px solid #6d6a75",
               },
             "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='price_per_unit']":
               {
-                backgroundColor: "red", // light red
+                backgroundColor: "#bfbdc1 !important", // light red
                 color: "#b71c1c", // dark red text
                 fontWeight: 600,
-                border: "2px solid #f44336",
+                border: "2px solid #6d6a75",
+                borderLeft: "none",
               },
             "& .MuiDataGrid-row--editing .MuiDataGrid-cell[data-field='effective_price_per_unit']":
               {
-                backgroundColor: "red", // light red
+                backgroundColor: "#bfbdc1 !important", // light red
                 color: "#b71c1c", // dark red text
                 fontWeight: 600,
-                border: "2px solid #f44336",
+                border: "2px solid #6d6a75",
               },
           }}
         />
       </ThemeProvider>
     </Box>
-    // </motion.div>
   );
 }

@@ -9,7 +9,6 @@ import { useLocation } from "react-router-dom";
 import {
   Box,
   FormControl,
-  FormLabel,
   List,
   ListItem,
   ListItemButton,
@@ -27,24 +26,24 @@ const CalendarPage = () => {
   const [userId, setUserId] = useState(null);
 
   const location = useLocation();
-  const { taskDate, taskId } = location.state || {};
+  // const { taskDate, taskId } = location.state || {};
   const calendarRef = useRef(null);
+  const taskDate = location.state?.taskDate;
+  const taskId = location.state?.taskId;
 
   // Use Fetch to locate a specific task so it can be reach from the notification Icon
   // on the top bar
   useEffect(() => {
-    if (taskDate && calendarRef.current) {
+    if (calendarRef.current && taskDate) {
       const calendarApi = calendarRef.current.getApi();
-      calendarApi.gotoDate(taskDate); // Scroll to the correct date
-    }
 
-    if (taskId) {
-      // Optionally do something more to highlight the task
-      // You could set a highlightedTaskId state and style the event
-      console.log("Target event ID:", taskId);
+      // Use timeout to ensure the calendar has fully mounted
+      setTimeout(() => {
+        calendarApi.gotoDate(taskDate); // Scroll to taskDate
+        calendarApi.changeView("timeGridDay"); // Switch to timeGridDay
+      }, 300);
     }
-  }, [taskDate, taskId, events]); // Include events to make sure they're loaded
-
+  }, [taskDate]);
   // Add appointment
   const handleDateClick = async (info) => {
     const title = prompt("Enter appointment title:");
@@ -135,126 +134,140 @@ const CalendarPage = () => {
 
   return (
     <div className="flex-1 overflow-auto relative z-10 bg-gray-100">
-      <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
+      <main className="max-w-7xl mx-auto">
         <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-8"
+          className="grid grid-cols-1 gap-0 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 mb-3 content-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          <div className="flex flex-col gap-5 lg:flex-row">
-            <div className="w-full lg:w-1/2 max-h-[250px] bg-gray-100 pt-4 pr-4 pl-4 pb-2 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-xl border border-gray-300">
-              <Box
+          <Box sx={{ px: 1 }}>
+            {/* Box  */}
+            <Box
+              sx={{
+                display: "flex",
+                width: "100%",
+              }}
+            >
+              {/* Title */}
+              <Typography
+                variant="h6"
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
+                  height: "40px",
                   width: "100%",
+                  color: "#3FA89B",
+                  textAlign: "left",
+                  fontSize: 20,
+                  lineHeight: "40px", // vertically center text
+                  paddingLeft: "3px", // optional, for some right padding
                 }}
               >
-                {/* Title */}
-                <Typography
-                  variant="h6"
-                  color="white"
-                  gutterBottom
+                APPOINTMENTS
+              </Typography>
+
+              <Typography
+                sx={{
+                  height: "40px",
+                  width: "100%",
+                  color: "#3FA89B",
+                  textAlign: "right",
+                  fontSize: 20,
+                  lineHeight: "40px", // vertically center text
+                  paddingRight: "3px", // optional, for some right padding
+                }}
+              >
+                {events.length}
+              </Typography>
+            </Box>
+
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <List
+                dense
+                sx={{
+                  height: 155,
+                  border: "1px solid #3FA89B",
+                  borderRadius: 1,
+                  overflowY: "auto",
+                  backgroundColor: "#ebf2fa",
+                  "&::-webkit-scrollbar": { display: "none" },
+                }}
+              >
+                {events.map((event) => (
+                  <ListItem key={event.id} disablePadding>
+                    <ListItemButton
+                      onClick={() => {
+                        setSelectedTask(event.task);
+
+                        // Assuming event.date is a valid date string like "2025-06-22"
+                        if (calendarRef.current) {
+                          const calendarApi = calendarRef.current.getApi();
+                          calendarApi.gotoDate(event.date); // ✅ Scrolls to the event's date
+                        }
+                      }}
+                      selected={selectedTask === event.task} // ✅ check if this item is selected
+                      sx={{
+                        backgroundColor:
+                          selectedTask === event.task
+                            ? "#b7efc5"
+                            : "transparent", // keep background after click
+                        "&:hover": {
+                          backgroundColor: "#b7efc5", // same as selected color
+                        },
+                        py: 0.01,
+                      }}
+                    >
+                      <ListItemText
+                        primary={event.title}
+                        primaryTypographyProps={{
+                          fontSize: 14,
+                          color: "#777",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      />
+
+                      <Box sx={{ width: "30%", textAlign: "right" }}>
+                        <ListItemText
+                          primary={new Date(event.date).toLocaleDateString(
+                            "fr-FR"
+                          )}
+                          primaryTypographyProps={{
+                            fontSize: 14,
+                            color: "#777",
+                          }}
+                        />
+                      </Box>
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            </FormControl>
+
+            {/* Text Box with task descriptions */}
+            <Box>
+              <FormControl fullWidth>
+                <Box
                   sx={{
                     display: "flex",
-                    color: "#111",
-                    fontSize: "14px",
-                    mt: 2,
+                    width: "100%",
                   }}
                 >
-                  Appointments
-                </Typography>
-
-                <TextField
-                  value={events.length}
-                  slotProps={{ readOnly: true }}
-                  sx={{
-                    ml: 2,
-                    width: 200,
-                    input: {
-                      color: "#111",
-                      textAlign: "right", // ✅ Apply text alignment here
-                    },
-                    "& .MuiOutlinedInput-root": {},
-                    "& .MuiInputLabel-root": {
-                      color: "#333",
-                      fontSize: 16,
-                    },
-                  }}
-                />
-              </Box>
-              <FormControl fullWidth sx={{ mb: 2 }}>
-                <List
-                  dense
-                  sx={{
-                    height: 150,
-                    border: "1px solid lightGray",
-                    borderRadius: 1,
-                    overflowY: "auto",
-                    backgroundColor: "#F9F9F9",
-                    "&::-webkit-scrollbar": { display: "none" },
-                  }}
-                >
-                  {events.map((event) => (
-                    <ListItem key={event.id} disablePadding>
-                      <ListItemButton
-                        onClick={() => setSelectedTask(event.task)}
-                        sx={{
-                          "&:hover": {
-                            backgroundColor: "#f0f0f9", // or any light color for hover
-                          },
-                          py: 0.1, // optional: reduce vertical padding on the button itself
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            width: "100%",
-                            color: "#333",
-                          }}
-                        >
-                          <Box sx={{ width: "70%" }}>
-                            <ListItemText
-                              primary={event.title}
-                              primaryTypographyProps={{
-                                fontSize: 14,
-                                color: "#444",
-                                lineHeight: 1.4,
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            />
-                          </Box>
-
-                          <Box sx={{ width: "30%", textAlign: "right" }}>
-                            <ListItemText
-                              primary={new Date(event.date).toLocaleDateString(
-                                "fr-FR"
-                              )}
-                              primaryTypographyProps={{
-                                fontSize: 14,
-                                color: "#444",
-                                lineHeight: 1.4,
-                              }}
-                            />
-                          </Box>
-                        </Box>
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                </List>
-              </FormControl>
-            </div>
-
-            <div className="w-full lg:w-1/2 max-h-[250px] bg-gray-100 pt-4 pr-4 pl-4 pb-2 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-xl border border-gray-300">
-              {/* Text Box with task descriptions */}
-              <FormControl fullWidth sx={{ mb: 0 }}>
-                <FormLabel sx={{ color: "#555", fontSize: 14, mt: 2, mb: 2 }}>
-                  Description
-                </FormLabel>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      height: "40px",
+                      width: "100%",
+                      color: "#3FA89B",
+                      textAlign: "left",
+                      fontSize: 20,
+                      lineHeight: "40px", // vertically center text
+                      paddingLeft: "3px", // optional, for some right padding
+                    }}
+                  >
+                    DESCRIPTION
+                  </Typography>
+                </Box>
                 <TextField
                   fullWidth
                   multiline
@@ -263,40 +276,51 @@ const CalendarPage = () => {
                   value={selectedTask}
                   onChange={(e) => setSelectedTask(e.target.value)}
                   sx={{
-                    backgroundColor: "#FAFAFA",
+                    backgroundColor: "#ebf2fa",
+                    height: 150,
                     "& .MuiOutlinedInput-root": {
-                      alignItems: "flex-start",
                       "& textarea": {
-                        color: "#444",
+                        color: "#777",
                         fontSize: 16,
-                        padding: "2px", // optional, improves layout
                       },
                       "& fieldset": {
-                        borderColor: "lightGray",
+                        border: "1px solid #3FA89B", // default border
                       },
                       "&:hover fieldset": {
-                        borderColor: "lightGray",
+                        border: "1px solid #3FA89B", // keep border on hover
+                      },
+                      "&.Mui-focused fieldset": {
+                        border: "1px solid #3FA89B", // keep border on focus
                       },
                     },
                   }}
                 />
               </FormControl>
-            </div>
-          </div>
+            </Box>
+          </Box>
           {/* Calendar */}
-          <div className="w-full lg:w-122 bg-gray-100 pt-4 pr-4 mt-3 pl-4 pb-2 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-xl border border-gray-300">
+          <Box
+            sx={{
+              m: 1,
+              mt: 3,
+              p: 1,
+              border: "1px solid #3FA89B",
+              backgroundColor: "#ebf2fa",
+            }}
+          >
             <Box
               sx={{
                 flex: 1,
+                backgroundColor: "#ebf2fa",
                 "& .fc-theme-standard td": {
-                  color: "#333",
+                  color: "#777",
                 },
                 "& .fc table": {
                   background: "#FAFAFA",
-                  borderColor: "#CCC",
+                  borderColor: "#3FA89B",
                 },
                 "& .fc": {
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#ebf2fa",
                   color: "#111111",
                   fontFamily: `'Inter', sans-serif`,
                 },
@@ -312,7 +336,7 @@ const CalendarPage = () => {
                   fontSize: "14px",
                 },
                 "& .fc .fc-button:hover": {
-                  backgroundColor: "#e5e7eb !important",
+                  backgroundColor: "#c7f9cc !important",
                 },
                 "& .fc .fc-daygrid-day-number": {
                   color: "#111111",
@@ -367,7 +391,7 @@ const CalendarPage = () => {
                 ]}
               />
             </Box>
-          </div>
+          </Box>
         </motion.div>
       </main>
     </div>

@@ -45,7 +45,7 @@ function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
         startIcon={<AddIcon sx={{ color: "#3FA89B" }} />}
       >
         <Typography sx={{ color: "#3FA89B", fontWeight: 600 }}>
-          Add supplier
+          Add new supplier
         </Typography>
       </Button>
     </GridToolbarContainer>

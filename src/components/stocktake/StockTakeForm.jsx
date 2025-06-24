@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import supabase from "../supabaseClient"; // Import Supabase client
 import StatCard from "../common/StatCard";
 import { format } from "date-fns";
-import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
+import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 
 const StockTakeForm = ({
   onStockTakeSaved,
@@ -117,7 +117,7 @@ const StockTakeForm = ({
         updated[index] = {
           ...updated[index],
           item_id: item.item_name,
-          item_name: item.item_name,
+          item_name: item.item_name, // Ensure item_name is updated
           price_per_unit: item.price_per_unit,
           unit_type: item.unit_type,
           unit_per_itm: item.unit_per_itm,
@@ -126,14 +126,18 @@ const StockTakeForm = ({
         };
       }
     } else if (field === "counted_qty") {
-      const quantity = parseFloat(value) || 0;
-      const price = updated[index].price_per_unit || 0;
-      updated[index].counted_qty = quantity;
-      updated[index].value = quantity * price;
+      if (value === "") {
+        updated[index].counted_qty = ""; // allow empty string for typing
+        updated[index].value = 0; // or leave unchanged if you prefer
+      } else {
+        const quantity = parseFloat(value);
+        const price = updated[index].price_per_unit || 0;
+        updated[index].counted_qty = quantity;
+        updated[index].value = quantity * price;
+      }
     }
 
     setInvItems(updated);
-    // Removed setShouldSave as it is not defined
   };
 
   const addItemsRow = () => {
@@ -459,7 +463,11 @@ const StockTakeForm = ({
         }}
       >
         <StatCard
-          icon={<InventoryOutlinedIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />}
+          icon={
+            <InventoryOutlinedIcon
+              sx={{ color: "#38a3a5", fontSize: "26px" }}
+            />
+          }
           title={"Stock Take Summary"}
           value={`${stockTake.length} Entries`}
           subtitle={
@@ -594,10 +602,10 @@ const StockTakeForm = ({
           }}
         >
           <Box gridColumn="span 2">
-            <strong>Number of Items:</strong> {totalItems}
+            <>Number of Items:</> {totalItems}
           </Box>
           <Box gridColumn="span 2">
-            <strong>Stock Take Value:</strong> €{totalValue.toFixed(2)}
+            <>Stock Take Value:</> €{totalValue.toFixed(2)}
           </Box>
         </Box>
 
@@ -653,19 +661,20 @@ const StockTakeForm = ({
                         handleItemsChange(index, "item_id", e.target.value)
                       }
                     >
-                      <option value="">Select</option>
-                      {inventoryItems.map((item) => (
-                        <option key={item.item_name} value={item.item_name}>
-                          {item.item_name}
-                        </option>
-                      ))}
+                      <option value="">Select item</option>
+                      {[...inventoryItems]
+                        .sort((a, b) => a.item_name.localeCompare(b.item_name))
+                        .map((item) => (
+                          <option key={item.item_name} value={item.item_name}>
+                            {item.item_name}
+                          </option>
+                        ))}
                     </select>
                   </td>
                   <td className="p-2">
                     <input
                       type="number"
-                      min="0"
-                       className="bg-gray-100 p-1 rounded w-20"
+                      className="bg-gray-100 p-1 rounded w-20"
                       value={item.counted_qty}
                       onChange={(e) =>
                         handleItemsChange(index, "counted_qty", e.target.value)

@@ -11,12 +11,15 @@ import LocalActivityOutlinedIcon from "@mui/icons-material/LocalActivityOutlined
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import { motion } from "framer-motion";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import supabase from "../components/supabaseClient";
 import { tokens } from "../components/theme";
 import { Add, Print, Save } from "@mui/icons-material";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import BackspaceIcon from "@mui/icons-material/Backspace";
+
 import {
   Box,
   Button,
@@ -31,6 +34,7 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Popover,
 } from "@mui/material";
 
 const POSPage = () => {
@@ -42,6 +46,8 @@ const POSPage = () => {
   const [sales, setSales] = useState([]);
   const today = new Date();
   const [comment, setComment] = useState("");
+  const [anchorEl, setAnchorEl] = useState(null);
+  const inputRef = useRef(null);
   const [resetFlag, setResetFlag] = useState(false);
   const [paymentType, setPaymentType] = useState("cash");
   const [sampleMenu, setSampleMenu] = useState([]);
@@ -545,6 +551,37 @@ const POSPage = () => {
     }
   };
 
+  // Comment Function
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "comment-popover" : undefined;
+
+  // Focus the TextField when Popover opens
+  useEffect(() => {
+    if (open && inputRef.current) {
+      // Wait for the popover to fully open
+      setTimeout(() => {
+        inputRef.current.focus();
+      }, 100); // Delay to ensure input is mounted
+    }
+  }, [open]);
+
+  // Handle the KeyPad
+  const handleKeypadInput = (key) => {
+    setReceivedAmount((prev) => {
+      // Prevent multiple decimals
+      if (key === "." && prev.includes(".")) return prev;
+      return prev + key;
+    });
+  };
+
   return (
     <div className="flex-1 overflow-hidden relative z-10 bg-[#fcfeff] border-t-2">
       <main className="max-w-8xl mx-auto scrollbar-hide h-[1500px]">
@@ -558,7 +595,7 @@ const POSPage = () => {
           <Box
             display="grid"
             gap={0}
-            gridTemplateColumns="repeat(12, minmax(0, 1fr))"
+            gridTemplateColumns="repeat(13, minmax(0, 1fr))"
             sx={{
               "& > div": {
                 gridColumn: isNonMobile ? undefined : "span 3",
@@ -705,7 +742,7 @@ const POSPage = () => {
             {/* 2 nd Column Tab menu */}
             <Box
               sx={{
-                gridColumn: "span 2", // Narrow middle column
+                gridColumn: "span 3", // Narrow middle column
               }}
             >
               {/* StadCards */}
@@ -786,47 +823,160 @@ const POSPage = () => {
                 </Tabs>
               </Box>
 
-              {/* TextField Received Amount and Comments */}
+              {/* KeyPad Received Amount */}
               <Box className="flex-1 mt-1">
-                <FormControl fullWidth>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    label="Cash Amount"
-                    value={receivedAmount}
-                    onChange={(e) => setReceivedAmount(e.target.value)}
-                    type="number"
-                    sx={{
-                      ...sharedStyles,
-                      "& .MuiInputBase-input": {
-                        color: "#222",
-                        fontSize: 28,
-                        height: "60px",
-                      },
-                    }}
-                  />
-                </FormControl>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                    gap: 0.1,
+                    mt: 0,
+                    border: "1px solid #003049",
+                  }}
+                >
+                  {[
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7",
+                    "8",
+                    "9",
+                    ".",
+                    "0",
+                    "backspace",
+                  ].map((key) =>
+                    key === "backspace" ? (
+                      <IconButton
+                        key="backspace"
+                        onClick={() =>
+                          setReceivedAmount((prev) => prev.slice(0, -1))
+                        }
+                        sx={{
+                          height: 60,
+                          fontSize: 24,
+                          border: "1px solid #003049",
+                          borderRadius: 1,
+                          color: "#003049",
+                        }}
+                      >
+                        <BackspaceIcon />
+                      </IconButton>
+                    ) : (
+                      <Button
+                        key={key}
+                        variant="outlined"
+                        onClick={() => handleKeypadInput(key)}
+                        sx={{
+                          height: 60,
+                          fontSize: 34,
+                          border: "1px solid #003049",
+                          color: "#003049",
+                        }}
+                      >
+                        {key}
+                      </Button>
+                    )
+                  )}
+                </Box>
               </Box>
-              <Box className="flex-1 mb-2 mt-1">
-                <FormControl fullWidth>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    label="Comment"
-                    multiline
-                    minRows={2}
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
+
+              {/* Comment box */}
+              <Box
+                className="flex-1 mb-2 mt-1 w-full"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                sx={{
+                  backgroundColor: "#white",
+                  height: 60,
+                }}
+              >
+                <IconButton
+                  onClick={handleClick}
+                  color="primary"
+                  sx={{
+                    borderRadius: 0,
+                    width: "100%",
+                    height: "100%",
+                    border: "2px solid #003049",
+                    "&:hover": {
+                      backgroundColor: "#e5e5e5",
+                    },
+                  }}
+                >
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    gap={1}
                     sx={{
-                      ...sharedStyles,
-                      "& .MuiInputBase-inputMultiline": {
-                        color: "#333",
-                        fontSize: 14,
-                        minHeight: "60px",
-                      },
+                      color: "#003049",
+                      height: "100%",
                     }}
-                  />
-                </FormControl>
+                  >
+                    <ChatBubbleOutlineIcon />
+                    <span>Comment</span>
+                  </Box>
+                </IconButton>
+
+                <Popover
+                  id={id}
+                  open={open}
+                  anchorEl={anchorEl}
+                  onClose={handleClose}
+                  onEntered={() => {
+                    if (inputRef.current) {
+                      inputRef.current.focus();
+                    }
+                  }}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "left",
+                  }}
+                >
+                  <Box sx={{ width: 250, position: "relative", p: 0 }}>
+                    {/* Close Button */}
+                    <IconButton
+                      size="small"
+                      onClick={handleClose}
+                      sx={{
+                        position: "absolute",
+                        top: 4,
+                        right: 4,
+                        zIndex: 1,
+                        color: "#006ba6",
+                      }}
+                    >
+                      <CancelOutlinedIcon fontSize="small" />
+                    </IconButton>
+
+                    {/* Comment Input */}
+                    <FormControl fullWidth>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        multiline
+                        minRows={2}
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        inputRef={inputRef}
+                        sx={{
+                          backgroundColor: "#ebf1fa",
+                          border: "2px solid #006ba6",
+                          borderRadius: 1,
+                          "& .MuiInputBase-inputMultiline": {
+                            color: "#333",
+                            fontSize: 16,
+                            minHeight: "40px",
+                            backgroundColor: "#ebf1fa",
+                          },
+                        }}
+                      />
+                    </FormControl>
+                  </Box>
+                </Popover>
               </Box>
             </Box>
 
@@ -1024,13 +1174,13 @@ const POSPage = () => {
 
                 <Box mt={2} mb={3}>
                   <Typography sx={{ color: "#777", fontSize: 20 }}>
-                    Received: €{parseFloat(receivedAmount || 0).toFixed(2)}
+                    Received: €{formatCurrency(receivedAmount)}
                   </Typography>
                   <Typography sx={{ fontSize: 22 }}>
-                    Total: €{calculateTotal().toFixed(2)}
+                    Total: €{formatCurrency(calculateTotal())}
                   </Typography>
                   <Typography sx={{ color: "#af3800", fontSize: 25 }}>
-                    Change: €{calculateChange()}
+                    Change: €{formatCurrency(calculateChange())}
                   </Typography>
                 </Box>
 

@@ -410,7 +410,7 @@ const CostForm = () => {
         >
           <form onSubmit={(e) => e.preventDefault()}>
             <h3 className="text-base mb-2 ml-1 mt-1 text-[#3FA89B] font-bold">
-              COST CALCULATOR
+              GRAND TOTAL COST CALCULATOR
             </h3>
             <Box
               display="grid"

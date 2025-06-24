@@ -1,12 +1,12 @@
 import ContactPhoneOutlinedIcon from "@mui/icons-material/ContactPhoneOutlined";
 import DateRangeOutlinedIcon from "@mui/icons-material/DateRangeOutlined";
-import EuroOutlinedIcon from "@mui/icons-material/EuroOutlined";
+import PriceCheckOutlinedIcon from '@mui/icons-material/PriceCheckOutlined';
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import LocalAtmOutlinedIcon from "@mui/icons-material/LocalAtmOutlined";
-import OutdoorGrillOutlinedIcon from "@mui/icons-material/OutdoorGrillOutlined";
-import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
+import RamenDiningOutlinedIcon from '@mui/icons-material/RamenDiningOutlined';
+import PlaylistAddOutlinedIcon from '@mui/icons-material/PlaylistAddOutlined';
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
@@ -39,7 +39,7 @@ const SIDEBAR_ITEMS = [
   },
   {
     name: "Item's List",
-    icon: PostAddOutlinedIcon,
+    icon: PlaylistAddOutlinedIcon,
     color: "#3FA89B",
     href: "/items",
   },
@@ -57,7 +57,7 @@ const SIDEBAR_ITEMS = [
   },
   {
     name: "Recipe",
-    icon: OutdoorGrillOutlinedIcon,
+    icon: RamenDiningOutlinedIcon,
     color: "#3FA89B",
     href: "/recipe",
   },
@@ -75,7 +75,7 @@ const SIDEBAR_ITEMS = [
   },
   {
     name: "Cost Calculator",
-    icon: EuroOutlinedIcon,
+    icon: PriceCheckOutlinedIcon,
     color: "#3FA89B",
     href: "/cost",
   },
