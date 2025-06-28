@@ -88,9 +88,9 @@ const SalesPage = () => {
         {/* STATS */}
         <motion.div
           className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 mb-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          // initial={{ opacity: 0, y: 20 }}
+          // animate={{ opacity: 1, y: 0 }}
+          // transition={{ duration: 1 }}
         >
           <StatCard
             icon={
@@ -131,9 +131,9 @@ const SalesPage = () => {
         </motion.div>
         <motion.div
           className="grid grid-cols-1 h-[1200px] gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          // initial={{ opacity: 0, y: 20 }}
+          // animate={{ opacity: 1, y: 0 }}
+          // transition={{ duration: 1 }}
         >
           {/* <SalesTable/> */}
           <FullFeaturedCrudGrid

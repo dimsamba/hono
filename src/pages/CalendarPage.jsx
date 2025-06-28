@@ -137,9 +137,9 @@ const CalendarPage = () => {
       <main className="max-w-7xl mx-auto">
         <motion.div
           className="grid grid-cols-1 gap-0 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 mb-3 content-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          // initial={{ opacity: 0, y: 20 }}
+          // animate={{ opacity: 1, y: 0 }}
+          // transition={{ duration: 1 }}
         >
           <Box sx={{ px: 1 }}>
             {/* Box  */}

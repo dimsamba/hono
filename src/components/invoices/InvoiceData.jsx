@@ -33,8 +33,8 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import React, { useEffect, useState, useMemo } from "react";
 import dayjs from "dayjs";
-import StatCardinfo from "../common/StatCardinfo";
 import supabase from "../supabaseClient";
+import InvoiceNumberEditCell from "./InvoiceNumberEditCell";
 
 // Enable plugins once
 dayjs.extend(isSameOrAfter);
@@ -260,17 +260,18 @@ export default function FullFeaturedCrudGrid({
   const processRowUpdate = async (newRow) => {
     const { isNew, id, ...cleanRow } = newRow;
 
+    // Calculate TVA %
     cleanRow.tva_perct =
       (cleanRow.amount_ttc - cleanRow.amount_ht) / cleanRow.amount_ht;
     cleanRow.tva_perct = cleanRow.tva_perct ? cleanRow.tva_perct * 100 : 0;
 
-    // ❗ Manual validation + reject edit
+    // ❗ Manual validation
     if (
       newRow.amount_ttc === null ||
       newRow.amount_ttc === undefined ||
       newRow.amount_ttc === ""
     ) {
-      setSnackbar({ children: "Amount TTC is required", severity: "error" }); // optional
+      setSnackbar({ children: "Amount TTC is required", severity: "error" });
       throw new Error("Amount TTC is required");
     }
 
@@ -278,34 +279,53 @@ export default function FullFeaturedCrudGrid({
       setSnackbar({
         children: "Amount TTC must be a number",
         severity: "error",
-      }); // optional
+      });
       throw new Error("Amount TTC must be a number");
     }
 
     try {
       if (isNew) {
+        const { data: existing, error: fetchError } = await supabase
+          .from("invoices")
+          .select("id")
+          .eq("invoice_numb", cleanRow.invoice_numb)
+          .limit(1)
+          .maybeSingle();
+
+        if (fetchError) throw fetchError;
+
+        if (existing) {
+          alert(`Invoice: "${cleanRow.invoice_numb}" already exists.`);
+          return newRow;
+        }
+
+        // ✅ Insert new row
         const { data, error } = await supabase
           .from("invoices")
           .insert([cleanRow])
           .select();
+
         if (error) throw error;
+
         const [inserted] = data;
         setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
         return inserted;
       } else {
+        // ✏️ Update existing row
         const { error } = await supabase
           .from("invoices")
           .update(cleanRow)
           .eq("id", id);
+
         if (error) throw error;
-        setRows((prev) =>
-          prev.map((row) => (row.id === id ? { ...cleanRow, id } : row))
-        );
-        return { ...cleanRow, id };
+
+        const updated = { ...cleanRow, id };
+        setRows((prev) => prev.map((row) => (row.id === id ? updated : row)));
+        return updated;
       }
     } catch (error) {
-      console.error("❌ Failed in processRowUpdate:", error.message);
-      throw error; // triggers DataGrid to reject the update
+      console.error(`${isNew ? "Insert" : "Update"} error:`, error.message);
+      return newRow;
     }
   };
 
@@ -562,6 +582,9 @@ export default function FullFeaturedCrudGrid({
       align: "right",
       headerAlign: "right",
       editable: true,
+      renderEditCell: (params) => (
+        <InvoiceNumberEditCell {...params} setRows={setRows} />
+      ),
     },
     {
       field: "invoice_date",

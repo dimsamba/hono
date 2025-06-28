@@ -7,6 +7,7 @@ import { Stack, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import NewItemEditCell from "../inventory/NewItemEditCell";
 import {
   DataGrid,
   GridActionsCellItem,
@@ -161,33 +162,52 @@ export default function FullFeaturedCrudGrid({ ItemsData, onItemsChange }) {
   const processRowUpdate = async (newRow) => {
     const { isNew, id, ...cleanRow } = newRow;
 
-    if (isNew) {
-      const { data, error } = await supabase
-        .from("itemsList")
-        .insert([cleanRow])
-        .select();
-      if (error) {
-        console.error("Insert error:", error.message);
-        return newRow;
-      }
+    try {
+      if (isNew) {
+        // 🔍 Check if item with same name exists
+        const { data: existing, error: fetchError } = await supabase
+          .from("itemsList")
+          .select("id")
+          .eq("item_name", cleanRow.item_name)
+          .limit(1)
+          .maybeSingle();
 
-      const [inserted] = data;
-      setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
-      return inserted;
-    } else {
-      const { error } = await supabase
-        .from("itemsList")
-        .update(cleanRow)
-        .eq("id", id);
-      if (error) {
-        console.error("Update error:", error.message);
-        return newRow;
-      }
+        if (fetchError) throw fetchError;
 
-      setRows((prev) =>
-        prev.map((row) => (row.id === id ? { ...cleanRow, id } : row))
-      );
-      return { ...cleanRow, id };
+        if (existing) {
+          alert(`Item "${cleanRow.item_name}" already exists.`);
+          return newRow;
+        }
+
+        // 🆕 Insert new item
+        const { data, error } = await supabase
+          .from("itemsList")
+          .insert([cleanRow])
+          .select();
+
+        if (error) throw error;
+
+        const [inserted] = data;
+        setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
+        return inserted;
+      } else {
+        // ✏️ Update existing item
+        const { error } = await supabase
+          .from("itemsList")
+          .update(cleanRow)
+          .eq("id", id);
+
+        if (error) throw error;
+
+        const updatedRow = { ...cleanRow, id };
+        setRows((prev) =>
+          prev.map((row) => (row.id === id ? updatedRow : row))
+        );
+        return updatedRow;
+      }
+    } catch (err) {
+      console.error(`${isNew ? "Insert" : "Update"} error:`, err.message);
+      return newRow;
     }
   };
 
@@ -250,7 +270,15 @@ export default function FullFeaturedCrudGrid({ ItemsData, onItemsChange }) {
             ];
       },
     },
-    { field: "item_name", headerName: "Item", width: 180, editable: true },
+    {
+      field: "item_name",
+      headerName: "Item",
+      width: 180,
+      editable: true,
+      renderEditCell: (params) => (
+        <NewItemEditCell {...params} setRows={setRows} />
+      ),
+    },
     {
       field: "category",
       headerName: "Category",

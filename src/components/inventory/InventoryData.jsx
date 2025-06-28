@@ -9,6 +9,8 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import ItemNameEditCell from "./ItemNameEditCell"; // Adjust path if needed
+
 import {
   DataGrid,
   GridActionsCellItem,
@@ -19,6 +21,7 @@ import {
 } from "@mui/x-data-grid";
 import * as React from "react";
 import supabase from "../supabaseClient";
+import { useEffect, useState, value, id } from "react";
 
 // 🔧 Toolbar for adding new rows
 function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
@@ -96,6 +99,7 @@ export default function FullFeaturedCrudGrid({
   const [rowModesModel, setRowModesModel] = React.useState({});
   const [, setNewRowId] = React.useState(null);
 
+  // Fetch data from inventory table on mount
   React.useEffect(() => {
     const fetchData = async () => {
       const { data, error } = await supabase.from("inventory").select("*");
@@ -170,43 +174,76 @@ export default function FullFeaturedCrudGrid({
   };
 
   const processRowUpdate = async (newRow) => {
-    const { isNew, id, ...cleanRow } = newRow;
+    const { isNew, id, ...rest } = newRow;
 
-    cleanRow.total_units_per_pack =
-      cleanRow.qnty_item_pack * cleanRow.unit_per_itm;
-    cleanRow.price_per_unit =
-      cleanRow.price_per_pack / cleanRow.total_units_per_pack;
-    cleanRow.effective_price_per_unit =
-      cleanRow.price_per_unit / (cleanRow.yield_pct / 100);
-    cleanRow.price_per_item = cleanRow.price_per_pack / cleanRow.qnty_item_pack;
+    // Safely parse numbers
+    const qnty_item_pack = parseFloat(rest.qnty_item_pack) || 0;
+    const unit_per_itm = parseFloat(rest.unit_per_itm) || 0;
+    const price_per_pack = parseFloat(rest.price_per_pack) || 0;
+    const yield_pct = parseFloat(rest.yield_pct) || 100;
 
-    if (isNew) {
-      const { data, error } = await supabase
-        .from("inventory")
-        .insert([cleanRow])
-        .select();
-      if (error) {
-        console.error("Insert error:", error.message);
-        return newRow;
+    const total_units_per_pack = qnty_item_pack * unit_per_itm || 0;
+    const price_per_unit = total_units_per_pack
+      ? price_per_pack / total_units_per_pack
+      : 0;
+    const effective_price_per_unit =
+      yield_pct !== 0 ? price_per_unit / (yield_pct / 100) : 0;
+    const price_per_item =
+      qnty_item_pack !== 0 ? price_per_pack / qnty_item_pack : 0;
+
+    const cleanRow = {
+      ...rest,
+      total_units_per_pack,
+      price_per_unit,
+      effective_price_per_unit,
+      price_per_item,
+    };
+
+    try {
+      if (isNew) {
+        // 🔍 Check if item with same name exists
+        const { data: existing, error: fetchError } = await supabase
+          .from("inventory")
+          .select("id")
+          .eq("item_name", cleanRow.item_name)
+          .limit(1)
+          .maybeSingle();
+
+        if (fetchError) throw fetchError;
+
+        if (existing) {
+          alert(`Item: "${cleanRow.item_name}" already exists.`);
+          setSnackbar({ children: msg, severity: "error" }); // optional snackbar
+          throw new Error(msg); // ✅ cancels the save
+        }
+
+        // 🆕 Insert new item
+        const { data, error } = await supabase
+          .from("inventory")
+          .insert([cleanRow])
+          .select();
+
+        if (error) throw error;
+
+        const [inserted] = data;
+        setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
+        return inserted;
+      } else {
+        // ✏️ Update existing item
+        const { error } = await supabase
+          .from("inventory")
+          .update(cleanRow)
+          .eq("id", id);
+
+        if (error) throw error;
+
+        const updated = { ...cleanRow, id };
+        setRows((prev) => prev.map((row) => (row.id === id ? updated : row)));
+        return updated;
       }
-
-      const [inserted] = data;
-      setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
-      return inserted;
-    } else {
-      const { error } = await supabase
-        .from("inventory")
-        .update(cleanRow)
-        .eq("id", id);
-      if (error) {
-        console.error("Update error:", error.message);
-        return newRow;
-      }
-
-      setRows((prev) =>
-        prev.map((row) => (row.id === id ? { ...cleanRow, id } : row))
-      );
-      return { ...cleanRow, id };
+    } catch (error) {
+      console.error(`${isNew ? "Insert" : "Update"} error:`, error.message);
+      return newRow;
     }
   };
 
@@ -283,9 +320,12 @@ export default function FullFeaturedCrudGrid({
     },
     {
       field: "item_name",
-      headerName: "Item",
-      width: 220,
+      headerName: "Item Name",
+      width: 200,
       editable: true,
+      renderEditCell: (params) => (
+        <ItemNameEditCell {...params} setRows={setRows} />
+      ),
     },
     {
       field: "category",
@@ -294,32 +334,52 @@ export default function FullFeaturedCrudGrid({
       editable: true,
       type: "singleSelect",
       valueOptions: [
+        "Alcohol",
+        "Appetizers",
         "Bakery",
         "Beverages",
+        "Breads",
         "Canned-goods",
+        "Cereals",
+        "Cheese",
         "Charcuterie",
+        "Chocolate",
+        "Coffee-Tea",
         "complement",
         "Condiments",
+        "Confectionery",
         "Dry",
+        "Dried-Fruits",
+        "Dried-Goods",
+        "Dried-Nuts",
         "Dairy",
         "Dry-Goods",
         "Eggs",
         "Frozen-Foods",
         "Fruits-Vegetables",
         "Grains",
-        "Herbs",
+        "Herbs-Spices",
         "Meat",
+        "Miscellaneous",
         "Nuts",
         "Oils-Fats",
+        "Other",
         "Pasta",
         "Pastry-Goods",
+        "Pickles",
         "Prepared Foods",
+        "Preserves",
         "Produce",
         "Sauces",
         "Seafood",
+        "Seeds",
         "Snacks",
+        "Soups",
         "Spices",
+        "Spirits",
+        "Syrups",
         "Sweets-Desserts",
+        "wines",
       ],
       renderEditCell: (params) => (
         <Select
@@ -362,32 +422,55 @@ export default function FullFeaturedCrudGrid({
       type: "singleSelect",
       valueOptions: [
         "bag",
+        "bar",
+        "barrel",
+        "basket",
+        "batch",
+        "bunch",
+        "bundle",
         "barquette",
         "bottle",
         "box",
+        "brick",
         "bucket",
         "can",
         "carton",
         "case",
+        "cask",
+        "cassette",
+        "chest",
         "container",
         "crate",
         "drum",
+        "flask",
+        "foil",
+        "glass",
         "filet",
         "jar",
         "jug",
+        "kilo",
         "keg",
+        "kit",
+        "miscellaneous",
+        "net",
+        "none",
         "pack",
+        "packet",
         "pail",
         "roll",
         "sack",
+        "sachet",
         "shrink pack",
+        "sheet",
+        "slice",
         "tablettes",
         "tin",
         "tray",
         "tube",
-        "tub",
         "unit",
+        "vial",
         "wrap",
+        "other",
       ],
       renderEditCell: (params) => (
         <Select
@@ -441,16 +524,30 @@ export default function FullFeaturedCrudGrid({
       type: "singleSelect",
       valueOptions: [
         "bottle",
+        "can",
+        "cup",
+        "dash",
+        "dozen",
+        "each",
         "cl",
+        "fl",
         "gm",
         "kg",
         "lt",
         "lb",
+        "miscellaneous",
         "ml",
+        "none",
+        "other",
         "oz",
         "piece",
+        "pinch",
+        "pint",
         "portion",
+        "quart",
+        "slice",
         "sheet",
+        "sprig",
         "slice",
         "sprig",
         "tbsp",
@@ -640,11 +737,11 @@ export default function FullFeaturedCrudGrid({
               fontWeight: "bold",
             },
             "& .MuiButtonBase-root": {
-              color: "#111",
+              color: "#333 !important",
             },
             "& .MuiDataGrid-columnHeader": {
               backgroundColor: "white !important",
-              color: "#111",
+              color: "#333 !important",
             },
             "& .MuiDataGrid-scrollbarFiller": {
               backgroundColor: "white !important",
@@ -653,17 +750,14 @@ export default function FullFeaturedCrudGrid({
               color: "#0d1b2a !important",
             },
             "& .MuiDataGrid-row--editing .MuiDataGrid-cell": {
-              backgroundColor: "#e7ecef !important",
-           //   boxShadow: "2", // remove default shadow if needed
+              backgroundColor: "#edf2fb !important",
+              //   boxShadow: "2", // remove default shadow if needed
             },
             "& .MuiDataGrid-row--editing input": {
+              height: "100% !important",
               color: "dimGray !important",
               fontSize: "15px",
               fontWeight: 600,
-              "&:focus": {
-                border: "3px solid #00a6a6",
-                outline: "none", // Optional: remove default outline
-              },
             },
             "& .MuiDataGrid-cell": {
               borderBlockColor: "lightGray",

@@ -742,22 +742,24 @@ const POSPage = () => {
             {/* 2 nd Column Tab menu */}
             <Box
               sx={{
-                gridColumn: "span 3", // Narrow middle column
+                gridColumn: "span 3",
+                width: "100%", // Narrow middle column
               }}
             >
               {/* StadCards */}
               <Box
                 sx={{
-                  backgroundColor: "#022b3a",
+                  backgroundColor: "#ebf1fa",
                   border: "1px solid #45a29e",
                   mt: 1,
+                  height: "165px",
                 }}
               >
                 <StatCardVend
                   title2={`Today Sales`}
                   icon={
                     <PointOfSaleIcon
-                      sx={{ color: colors.blueAccent[200], fontSize: "26px" }}
+                      sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
                     />
                   }
                   title={`€ ${formatCurrency(totalSalesToday)}`}
@@ -769,7 +771,7 @@ const POSPage = () => {
                   subtitle={`${todaysSales.length} Sales`}
                   icon2={
                     <CategoryOutlinedIcon
-                      sx={{ color: colors.primary[100], fontSize: "26px" }}
+                      sx={{ color: colors.primary[200], fontSize: "26px" }}
                     />
                   }
                   subtitle2={`${totalItemsToday} Items`}
@@ -790,8 +792,10 @@ const POSPage = () => {
                   onChange={(_e, newValue) => setSelectedTab(newValue)}
                   variant="standard"
                   sx={{
+                    height: "100%", // Full height
                     width: "100%", // Fixed width (optional)
                     mt: 0.5,
+                    backgroundColor: "red",
                   }}
                 >
                   {categories.map((cat, index) => (
@@ -801,10 +805,11 @@ const POSPage = () => {
                       sx={{
                         backgroundColor: "#545e75",
                         width: "100%",
+                        maxWidth: "100%",
                         fontSize: 16,
                         fontWeight: 100,
                         color: "#cae9ff",
-                        height: "70px",
+                        height: "50px",
                         justifyContent: "center",
                         borderBottom: "1px solid lightGray",
                         "&.Mui-selected": {
@@ -855,11 +860,16 @@ const POSPage = () => {
                           setReceivedAmount((prev) => prev.slice(0, -1))
                         }
                         sx={{
-                          height: 60,
+                          height: 50,
                           fontSize: 24,
+                          width: "100%", // Makes it fill the grid column
+                          minWidth: 0, // Crucial for responsiveness
                           border: "1px solid #003049",
                           borderRadius: 1,
                           color: "#003049",
+                          "&:hover": {
+                            backgroundColor: "#f0fff1",
+                          },
                         }}
                       >
                         <BackspaceIcon />
@@ -870,10 +880,15 @@ const POSPage = () => {
                         variant="outlined"
                         onClick={() => handleKeypadInput(key)}
                         sx={{
-                          height: 60,
+                          height: 50,
                           fontSize: 34,
                           border: "1px solid #003049",
                           color: "#003049",
+                          width: "100%", // Ensures button fills grid cell
+                          minWidth: 0, // Prevents default button minWidth from breaking layout
+                          "&:hover": {
+                            backgroundColor: "#f0fff1",
+                          },
                         }}
                       >
                         {key}
@@ -891,7 +906,7 @@ const POSPage = () => {
                 alignItems="center"
                 sx={{
                   backgroundColor: "#white",
-                  height: 60,
+                  height: 50,
                 }}
               >
                 <IconButton
@@ -903,7 +918,7 @@ const POSPage = () => {
                     height: "100%",
                     border: "2px solid #003049",
                     "&:hover": {
-                      backgroundColor: "#e5e5e5",
+                      backgroundColor: "#f0fff1",
                     },
                   }}
                 >
@@ -1003,26 +1018,26 @@ const POSPage = () => {
                     {
                       value: "Cash",
                       icon: <AttachMoneyIcon />,
-                      bgColor: "#ebf1fa",
-                      color: "#287271",
+                      bgColor: "#545e75",
+                      color: "#35ff69",
                     },
                     {
                       value: "CB",
                       icon: <CreditCardIcon />,
-                      bgColor: "#ebf1fa",
-                      color: "#72369d",
+                      bgColor: "#545e75",
+                      color: "#54defd",
                     },
                     {
                       value: "Voucher",
                       icon: <LocalActivityOutlinedIcon />,
-                      bgColor: "#ebf1fa",
-                      color: "#f50062",
+                      bgColor: "#545e75",
+                      color: "#ff3cc7",
                     },
                     {
                       value: "Other",
                       icon: <PaymentsOutlinedIcon />,
-                      bgColor: "#ebf1fa",
-                      color: "#0e1428",
+                      bgColor: "#545e75",
+                      color: "#fed811",
                     },
                   ].map(({ value, icon, bgColor, color }) => (
                     <Grid item xs={3} key={value}>
@@ -1049,16 +1064,16 @@ const POSPage = () => {
                             transition: "0.2s",
                             "&:hover": {
                               color: "#3FA89B",
-                              backgroundColor: "#aaf683",
+                              backgroundColor: "#007090",
                             },
                             backgroundColor:
-                              paymentType === value ? "#b2ff9e" : bgColor,
+                              paymentType === value ? "#1a9cb3" : bgColor,
                             borderColor:
                               paymentType === value ? "#005ae0" : "#008083",
                             borderRadius: 0,
                             height: "60px",
                             width: "100%",
-                            border: "1px solid #45a29e",
+                            border: "1px solid white",
                           }}
                         >
                           {React.cloneElement(icon, {
@@ -1086,6 +1101,7 @@ const POSPage = () => {
                       borderRadius: 0,
                       height: "100px",
                       width: "100%",
+                      minWidth: 0, // Prevents default button minWidth from breaking layout
                     }}
                   >
                     Save
@@ -1106,6 +1122,7 @@ const POSPage = () => {
                       borderRadius: 0,
                       height: "100px",
                       width: "100%",
+                      minWidth: 0, // Prevents default button minWidth from breaking layout
                     }}
                   >
                     Print
@@ -1130,6 +1147,10 @@ const POSPage = () => {
                   alignItems="baseline"
                   mb={5}
                   mt={3}
+                  sx={{
+                    width: "100%",
+                    minWidth: "0", // Ensure it doesn't shrink too much
+                  }}
                 >
                   <Box>
                     <Typography
@@ -1172,7 +1193,11 @@ const POSPage = () => {
                   </Box>
                 ))}
 
-                <Box mt={2} mb={3}>
+                <Box
+                  mt={2}
+                  mb={3}
+                  sx={{ width: "100%", minWidth: "0" }}
+                >
                   <Typography sx={{ color: "#777", fontSize: 20 }}>
                     Received: €{formatCurrency(receivedAmount)}
                   </Typography>

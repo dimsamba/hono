@@ -38,8 +38,8 @@ const StatCardVend = ({
           <Typography
             variant="h4"
             sx={{
-              color: colors.greenAccent[500],
-              fontWeight: "bold",
+              color: "#3FA89B",
+              fontWeight: "semiBold",
               textAlign: "center",
             }}
           >
@@ -50,7 +50,7 @@ const StatCardVend = ({
           <Box sx={{ ml: 2 }}>{icon}</Box>
           <Typography
             variant="h4"
-            sx={{ color: colors.blueAccent[200], fontWeight: "bold" }}
+            sx={{ color: colors.greenAccent[600], fontWeight: "bold" }}
           >
             {title}
           </Typography>
@@ -68,7 +68,7 @@ const StatCardVend = ({
           <Box sx={{ ml: 2 }}>{icon2}</Box>
           <Typography
             variant="h5"
-            sx={{ color: colors.primary[100], fontWeight: "bold" }}
+            sx={{ color: colors.primary[200], fontWeight: "bold" }}
           >
             {subtitle2}
           </Typography>

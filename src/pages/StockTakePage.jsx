@@ -48,9 +48,9 @@ const StockTakePage = () => {
       <main className="max-w-5xl mx-auto py-6 px-4 lg:px-8">
         <motion.div
           className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          // initial={{ opacity: 0, y: 20 }}
+          // animate={{ opacity: 1, y: 0 }}
+          // transition={{ duration: 1 }}
         >
           <StockTakeForm
             onRecipeSaved={handleRefresh}

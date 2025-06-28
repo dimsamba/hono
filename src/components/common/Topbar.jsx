@@ -145,15 +145,18 @@ const Topbar = ({ title }) => {
                   sx={{
                     fontSize: 14,
                     color: dayjs(invoice.invoice_date).isBefore(dayjs(), "day")
-                      ? "darkred"
-                      : "#111",
+                      ? "#ff5714"
+                      : "#454955", // Tailwind's text-gray-900
+                    fontWeight: dayjs(invoice.invoice_date).isBefore(dayjs(), "day")
+                      ? "semiBold"
+                      : "normal"
                   }}
                 >
                   {dayjs(invoice.invoice_date).isBefore(dayjs(), "day")
                     ? `Overdue ${dayjs(invoice.invoice_date).format(
                         "DD-MM-YYYY"
                       )}`
-                    : `due on ${dayjs(invoice.invoice_date).format(
+                    : `Due on ${dayjs(invoice.invoice_date).format(
                         "DD-MM-YYYY"
                       )}`}
                   {" - "}€{" "}

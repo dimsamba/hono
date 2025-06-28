@@ -1,15 +1,16 @@
 import ContactPhoneOutlinedIcon from "@mui/icons-material/ContactPhoneOutlined";
 import DateRangeOutlinedIcon from "@mui/icons-material/DateRangeOutlined";
-import PriceCheckOutlinedIcon from '@mui/icons-material/PriceCheckOutlined';
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import LocalAtmOutlinedIcon from "@mui/icons-material/LocalAtmOutlined";
-import RamenDiningOutlinedIcon from '@mui/icons-material/RamenDiningOutlined';
-import PlaylistAddOutlinedIcon from '@mui/icons-material/PlaylistAddOutlined';
+import RamenDiningOutlinedIcon from "@mui/icons-material/RamenDiningOutlined";
+import PlaylistAddOutlinedIcon from "@mui/icons-material/PlaylistAddOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
+import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
+
 import { Tooltip } from "@mui/material";
 
 import { AnimatePresence, motion } from "framer-motion";
@@ -75,7 +76,7 @@ const SIDEBAR_ITEMS = [
   },
   {
     name: "Cost Calculator",
-    icon: PriceCheckOutlinedIcon,
+    icon: SavingsOutlinedIcon,
     color: "#3FA89B",
     href: "/cost",
   },
@@ -96,6 +97,7 @@ const SIDEBAR_ITEMS = [
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const navigate = useNavigate();
+  const [hoveredItem, setHoveredItem] = useState(null);
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -137,9 +139,13 @@ const Sidebar = () => {
 
         {/* Navigation */}
         <nav className="mt-8 flex-grow">
-          {SIDEBAR_ITEMS.map((item) => (
+          {SIDEBAR_ITEMS.map((item, index) => (
             <Link key={item.href} to={item.href}>
-              <motion.div className="flex items-center p-2 pl-2 text-sm font-medium rounded-lg hover:bg-gray-300 transition-colors mb-2">
+              <motion.div
+                onHoverStart={() => setHoveredItem(index)}
+                onHoverEnd={() => setHoveredItem(null)}
+                className="flex items-center p-2 pl-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors mb-2"
+              >
                 <Tooltip
                   title={!isSidebarOpen ? item.name : ""}
                   placement="right"
@@ -147,27 +153,41 @@ const Sidebar = () => {
                   slotProps={{
                     tooltip: {
                       sx: {
-                        fontSize: 14, // Tooltip text size
-                        fontWeight: 400, // Bold text
-                        backgroundColor: "#3FA89B", // Dark background
-                        color: "white", // White text
+                        fontSize: 14,
+                        fontWeight: 600,
+                        backgroundColor: "#3FA89B",
+                        color: "white",
                         borderRadius: 1,
-                        Opacity: "0.6 !important",
                       },
                     },
-                    arrow: {
-                      sx: {
-                        color: "#3FA89B", // Match tooltip background
-                      },
-                    },
+                    arrow: { sx: { color: "#3FA89B" } },
                   }}
                 >
-                  <div>
+                  <motion.div
+                    animate={
+                      hoveredItem === index
+                        ? { scale: 1.2, rotate: 5 }
+                        : { scale: 1, rotate: 0 }
+                    }
+                    transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                    style={{
+                      borderRadius: "6px",
+                      padding: "4px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <item.icon
                       className="text-[16px] sm:text-[20px]"
-                      style={{ color: item.color ?? "#333", minWidth: "16px" }}
+                      style={{
+                        color:
+                          item.color?.match(/#(?:[0-9a-fA-F]{3}){1,2}/)?.[0] ??
+                          "#333",
+                        minWidth: "16px",
+                      }}
                     />
-                  </div>
+                  </motion.div>
                 </Tooltip>
 
                 <AnimatePresence>
@@ -190,7 +210,7 @@ const Sidebar = () => {
           {/* Logout Button */}
           <button
             onClick={signOut}
-            className="flex items-center p-3 pl-2 text-sm font-medium rounded-lg hover:bg-orange-400 transition-colors mb-2 w-full"
+            className="flex items-center p-3 pl-2 text-sm font-medium rounded-lg hover:bg-orange-300 transition-colors mb-2 w-full"
           >
             <LogOutIcon
               className="text-[16px] sm:text-[20px]"

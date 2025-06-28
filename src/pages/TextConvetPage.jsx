@@ -66,114 +66,104 @@ const TestPage = () => {
   const handleCopyClick = () => {
     navigator.clipboard.writeText(converted);
   };
+  // TextField and InputLabel customizations
+  const sharedStyles = {
+    backgroundColor: "#ebf1fa",
+    "& .MuiInputLabel-root": {
+      color: "#007f5f",
+      fontSize: 16,
+      backgroundColor: "#ebf1fa",
+      px: 1,
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        border: "1px solid #60d394",
+      },
+      "&:hover fieldset": {
+        borderColor: "#60d394",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#25a18e",
+      },
+    },
+  };
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <main className="max-w-4xl mx-auto py-6 px-4 lg:px-8">
-        <motion.div
+        {/* <motion.div
           className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-3"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-        >
-          {/* STATS */}
-          <div className="bg-gray-100 p-6 pr-10 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-xl border border-gray-300">
-            <TextField
-              fullWidth
-              value={value}
-              onChange={handleInputChange}
-              variant="outlined"
-              onClick={handleClearClick}
-              name="encryptedText"
-              error={false} // Prevent red underline
-              helperText="" // Remove any error messages
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <IconButton
-                      onClick={() => {
-                        handleClearClick();
-                        handleResetText();
-                      }}
-                      sx={{
-                        color: "#457b9d",
-                        visibility: value ? "visible" : "hidden",
-                      }}
-                    >
-                      <ClearIcon />
-                    </IconButton>
-                  ),
-                },
-              }}
-              sx={{
-                m: 1,
-                input: { color: "#003049", fontSize: "20px" },
-                backgroundColor: "#edf2f4",
-                borderRadius: "10px",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderRadius: "10px",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#457b9d", // Darker border on hover
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#457b9d ", // Focus color
-                  },
-                },
-                "& .MuiFormLabel-root": {
-                  color: "#003049", // Custom label color
-                },
-              }}
-            />
-            <TextField
-              fullWidth
-              value={converted}
-              variant="outlined"
-              name="convertedText"
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <IconButton
-                      onClick={() => {
-                        handleCopyClick();
-                        alert("Text copied successfully!");
-                        handleResetText();
-                      }}
-                      sx={{
-                        color: "#457b9d",
-                        visibility: converted ? "visible" : "hidden",
-                      }}
-                    >
-                      <ContentCopyIcon />
-                    </IconButton>
-                  ),
-                },
-              }}
-              sx={{
-                m: 1,
-                input: { color: "#003049", fontSize: "20px" },
-                backgroundColor: "#edf2f4",
-                borderRadius: "10px",
-
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderRadius: "10px",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#d8e2dc", // Darker border on hover
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#d8e2dc ", // Focus color
-                  },
-                },
-                "& .MuiFormLabel-root": {
-                  color: "#003049", // Custom label color
-                },
-              }}
-            />
-          </div>
-        </motion.div>
+        > */}
+        {/* STATS */}
+        <div className="bg-gray-100 p-6 pr-10 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-xl border border-gray-300">
+          <TextField
+            fullWidth
+            value={value}
+            onChange={handleInputChange}
+            variant="outlined"
+            onClick={handleClearClick}
+            name="encryptedText"
+            error={false} // Prevent red underline
+            helperText="" // Remove any error messages
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <IconButton
+                    onClick={() => {
+                      handleClearClick();
+                      handleResetText();
+                    }}
+                    sx={{
+                      color: "#457b9d",
+                      visibility: value ? "visible" : "hidden",
+                    }}
+                  >
+                    <ClearIcon />
+                  </IconButton>
+                ),
+              },
+            }}
+            sx={{
+              ...sharedStyles,
+              m: 1,
+              input: { color: "#003049", fontSize: "20px" },
+            }}
+          />
+          <TextField
+            fullWidth
+            value={converted}
+            variant="outlined"
+            name="convertedText"
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <IconButton
+                    onClick={() => {
+                      handleCopyClick();
+                      alert("Text copied successfully!");
+                      handleResetText();
+                    }}
+                    sx={{
+                      color: "#457b9d",
+                      visibility: converted ? "visible" : "hidden",
+                    }}
+                  >
+                    <ContentCopyIcon />
+                  </IconButton>
+                ),
+              },
+            }}
+            sx={{
+              ...sharedStyles,
+              m: 1,
+              input: { color: "#003049", fontSize: "20px" },
+            }}
+          />
+        </div>
+        {/* </motion.div> */}
       </main>
     </div>
   );
