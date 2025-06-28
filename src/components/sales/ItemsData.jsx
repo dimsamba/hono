@@ -316,7 +316,7 @@ export default function FullFeaturedCrudGrid({ ItemsData, onItemsChange }) {
   return (
     <Box
       sx={{
-        height: 900,
+        height: 700,
         width: "100%",
         border: "2px solid lightGray",
         borderRadius: 2,

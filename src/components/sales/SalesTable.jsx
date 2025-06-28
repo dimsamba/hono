@@ -247,7 +247,7 @@ export default function FullFeaturedCrudGrid({
       totalItems: totalItemsCount,
     });
   }, [fromDate, toDate, rows]); // Trigger when relevant data changes
-  
+
   // Customize Toolbar
   const themeGrid = createTheme({
     components: {
@@ -459,7 +459,7 @@ export default function FullFeaturedCrudGrid({
   return (
     <Box
       sx={{
-        height: "100%",
+        height: 700,
         width: "100%",
         border: "2px solid lightGray",
         borderRadius: 2,

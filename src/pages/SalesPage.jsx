@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import StatCard from "../components/common/StatCard";
 import StatCardBg from "../components/common/StatCardBg";
-import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
-import EventRepeatOutlinedIcon from '@mui/icons-material/EventRepeatOutlined';
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import EventRepeatOutlinedIcon from "@mui/icons-material/EventRepeatOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import FullFeaturedCrudGrid from "../components/sales/SalesTable";
 import { useState, useEffect } from "react";
@@ -101,9 +101,11 @@ const SalesPage = () => {
             value={`€ ${formatCurrency(totalSalesValue)}`}
             subtitle={`${sales.length} Sales`}
           />
-           <StatCard
+          <StatCard
             icon={
-              <EventRepeatOutlinedIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
+              <EventRepeatOutlinedIcon
+                sx={{ color: "#38a3a5", fontSize: "26px" }}
+              />
             }
             key={refreshKey} // 👈 triggers re-render when key changes
             title={`Last 30 Days`}
@@ -121,7 +123,9 @@ const SalesPage = () => {
           />
           <StatCardBg
             icon={
-              <CalendarMonthOutlinedIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
+              <CalendarMonthOutlinedIcon
+                sx={{ color: "#38a3a5", fontSize: "26px" }}
+              />
             }
             title={`Total Between dates`}
             value={`€ ${formatCurrency(metrics.totalSalesAmount)}`}
@@ -130,7 +134,7 @@ const SalesPage = () => {
           {/* </Box> */}
         </motion.div>
         <motion.div
-          className="grid grid-cols-1 h-[1200px] gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-8"
+          className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1"
           // initial={{ opacity: 0, y: 20 }}
           // animate={{ opacity: 1, y: 0 }}
           // transition={{ duration: 1 }}

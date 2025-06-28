@@ -543,11 +543,11 @@ const POSPage = () => {
   const getCategoryColor = (category) => {
     switch (category.toLowerCase()) {
       case "beverage":
-        return "#545e75"; // warm orange tone
+        return "#722323"; // warm orange tone
       case "produces":
-        return "#545e75 "; // rich green tone
+        return "#2F5249 "; // rich green tone
       default:
-        return "#545e75"; // default purple tone
+        return "#254D70"; // default purple tone
     }
   };
 
@@ -625,8 +625,6 @@ const POSPage = () => {
                       sx={{
                         // flexGrow: 1, // This makes Paper fill its parent Grid2
                         borderRadius: 0,
-                        px: 1,
-                        pt: 1,
                         backgroundColor: getCategoryColor(item.category),
                         mb: 0.5,
                         mr: 0.5,
@@ -639,50 +637,61 @@ const POSPage = () => {
                         gap={0}
                         sx={{
                           height: "100%",
-                          width: "100%",
+                          maxWidth: "100%",
                           flexGrow: 1,
                         }}
                       >
-                        {/* First Row: Full width Typography */}
                         <Box
-                          width="100%"
                           display="flex"
-                          justifyContent="center"
+                          flexDirection="column"
+                          alignContent={"center"}
+                          gap={0}
+                          sx={{
+                            height: "100%",
+                            width: "100%",
+                            flexGrow: 1,
+                          }}
                         >
-                          <Typography
-                            sx={{
-                              fontSize: 18,
-                              fontWeight: 500,
-                              color: "ehite",
-                              flexGrow: 1,
-                            }}
-                          >
-                            {item.name}
-                          </Typography>
-                        </Box>
-
-                        {/* Second Row: IconButtons side by side */}
-                        <Box display="flex" width="100%" alignItems="center">
-                          <IconButton
-                            onClick={() => addToOrder(item)}
-                            sx={{
-                              color: "white",
-                              mb: "8px",
-                              backgroundColor: "#1a9cb3",
-                              width: "100%", // Square size
-                              height: 50,
-                              borderRadius: 0, // Rounded corners (theme spacing unit, or use '8px')
-                              "&:hover": {
-                                backgroundColor: "#007090", // Optional hover color
-                              },
-                            }}
-                          >
-                            <Add />
-                          </IconButton>
+                          {/* Second Row: IconButtons side by side */}
+                          <Box display="flex" width="100%" alignItems="center">
+                            <IconButton
+                              onClick={() => addToOrder(item)}
+                              sx={{
+                                display: "flex",
+                                color: "white",
+                                backgroundColor: getCategoryColor(
+                                  item.category
+                                ),
+                                width: "100%",
+                                height: 100,
+                                borderRadius: 0,
+                                "&:hover": {
+                                  backgroundColor: "#007090",
+                                },
+                              }}
+                            >
+                              <Typography
+                                sx={{
+                                  fontSize: 18,
+                                  fontWeight: 500,
+                                  color: "white",
+                                  flexGrow: 1,
+                                  whiteSpace: "normal", // allow wrapping
+                                  overflow: "hidden", // optional: prevent spillover
+                                  textOverflow: "ellipsis", // optional: handle overflows nicely
+                                  display: "block", // ensure it's not inline
+                                  maxWidth: "100%", // ensure it respects container width
+                                  lineHeight: 1.2, // tighter line spacing
+                                }}
+                              >
+                                {item.name}
+                              </Typography>
+                            </IconButton>
+                          </Box>
                         </Box>
                       </Box>
 
-                      <Box display="flex" alignItems="center" gap={1}>
+                      <Box display="flex" alignItems="center">
                         <TextField
                           type="number"
                           size="small"
@@ -703,18 +712,24 @@ const POSPage = () => {
                             }
                           }}
                           sx={{
-                            ...sharedStyles,
                             flexGrow: 1,
-                            "& .MuiInputBase-inputMultiline": {},
                             width: "100px",
                             height: "40px",
-                            ml: "5px",
-                            mb: "10px",
-                            backgroundColor: "#e6f4f1",
-                            border: "1px solid #1a7e96",
+                            backgroundColor: "#393E46",
+                            color: "white",
                             "& .MuiInputBase-input": {
-                              color: "#111", // Replace "red" with any color you want
+                              color: "white",
                               fontSize: 18,
+                              // 🔽 Remove number input spinners (Chrome, Safari, Edge)
+                              MozAppearance: "textfield",
+                              "&::-webkit-outer-spin-button": {
+                                WebkitAppearance: "none",
+                                margin: 0,
+                              },
+                              "&::-webkit-inner-spin-button": {
+                                WebkitAppearance: "none",
+                                margin: 0,
+                              },
                             },
                           }}
                         />
@@ -722,9 +737,10 @@ const POSPage = () => {
                           onClick={() => resetMenuPrices()}
                           sx={{
                             color: "white",
-                            mr: "8px",
                             backgroundColor: "#d97706",
-                            mb: "10px",
+                            borderRadius: 0,
+                            width: "40px",
+                            height: "40px",
                             "&:hover": {
                               backgroundColor: "#b45309", // Optional hover color
                             },
@@ -1193,11 +1209,7 @@ const POSPage = () => {
                   </Box>
                 ))}
 
-                <Box
-                  mt={2}
-                  mb={3}
-                  sx={{ width: "100%", minWidth: "0" }}
-                >
+                <Box mt={2} mb={3} sx={{ width: "100%", minWidth: "0" }}>
                   <Typography sx={{ color: "#777", fontSize: 20 }}>
                     Received: €{formatCurrency(receivedAmount)}
                   </Typography>
