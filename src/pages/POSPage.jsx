@@ -436,7 +436,8 @@ const POSPage = () => {
     </div>
 
     <div class="thankyou">
-      Merci de soutenir les petits agriculteurs
+    <p></p>
+     <h4 style="margin: 0; font-family: 'Dancing Script', cursive; font-size: 20px;">Merci de soutenir les petits agriculteurs</h4>
     </div>
   </body>
   </html>
@@ -1231,11 +1232,11 @@ const POSPage = () => {
                       paddingTop: 1,
                     }}
                   >
-                    <Typography sx={{ color: "#3FA89B", fontSize: 25 }}>
-                      Received:
+                    <Typography sx={{ color: "#4a4e69", fontSize: 20 }}>
+                      Total:
                     </Typography>
-                    <Typography sx={{ color: "#3FA89B", fontSize: 25 }}>
-                      €{formatCurrency(receivedAmount)}
+                    <Typography sx={{ color: "#4a4e69", fontSize: 40 }}>
+                      €{formatCurrency(calculateTotal())}
                     </Typography>
                   </Box>
 
@@ -1247,9 +1248,11 @@ const POSPage = () => {
                       alignItems: "center",
                     }}
                   >
-                    <Typography sx={{ fontSize: 22 }}>Total:</Typography>
-                    <Typography sx={{ fontSize: 22 }}>
-                      €{formatCurrency(calculateTotal())}
+                    <Typography sx={{ color: "#3FA89B", fontSize: 20 }}>
+                      Received:
+                    </Typography>
+                    <Typography sx={{ color: "#3FA89B", fontSize: 25 }}>
+                      €{formatCurrency(receivedAmount)}
                     </Typography>
                   </Box>
 
@@ -1261,10 +1264,10 @@ const POSPage = () => {
                       alignItems: "center",
                     }}
                   >
-                    <Typography sx={{ color: "#af3800", fontSize: 25 }}>
+                    <Typography sx={{ color: "#f07167", fontSize: 20 }}>
                       Change:
                     </Typography>
-                    <Typography sx={{ color: "#af3800", fontSize: 25 }}>
+                    <Typography sx={{ color: "#f07167", fontSize: 25 }}>
                       €{formatCurrency(calculateChange())}
                     </Typography>
                   </Box>
