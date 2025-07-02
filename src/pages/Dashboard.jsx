@@ -1,4 +1,4 @@
-// Version: 1.2.3
+// Version: 1.2.10
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { useState } from "react";
@@ -19,6 +19,7 @@ import ItemsListPage from "./ItemsListPage";
 import POSPage from "./POSPage";
 import StockTackPage from "./StockTakePage";
 import PrepPage from "./PrepPage.";
+import FamilyFinancePage from "./FamilyFinancePage";
 
 function Dashboard() {
   const [theme] = useMode();
@@ -40,6 +41,7 @@ function Dashboard() {
     "/vendor": "HONO VENDOR",
     "/items": "ITEMS LIST",
     "/prep": "PREP LIST",
+    "/family-finance": "FAMILY FINANCE",
   };
 
   return (
@@ -72,6 +74,7 @@ function Dashboard() {
               <Route path="vendor" element={<POSPage />} />
               <Route path="items" element={<ItemsListPage />} />
               <Route path="prep" element={<PrepPage />} />
+               <Route path="family-finance" element={<FamilyFinancePage />} />
             </Routes>
           </div>{" "}
         </div>

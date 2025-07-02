@@ -11,6 +11,7 @@ import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
+import HouseOutlinedIcon from '@mui/icons-material/HouseOutlined';
 
 import { Tooltip } from "@mui/material";
 
@@ -76,6 +77,12 @@ const SIDEBAR_ITEMS = [
     icon: DateRangeOutlinedIcon,
     color: "#3FA89B",
     href: "/calendar",
+  },
+   {
+    name: "Family Finance",
+    icon: HouseOutlinedIcon,
+    color: "#3FA89B",
+    href: "/family-finance",
   },
   {
     name: "Converter",
@@ -170,7 +177,7 @@ const Sidebar = () => {
                     <motion.div
                       animate={
                         hoveredItem === item.name
-                          ? { scale: 1.5, rotate: 20 }
+                          ? { scale: 1.5, rotate: 10 }
                           : { scale: 1, rotate: 0 }
                       }
                       transition={{
@@ -256,7 +263,7 @@ const Sidebar = () => {
                             <motion.div
                               animate={
                                 hoveredItem === child.name
-                                  ? { scale: 1.5, rotate: 20 }
+                                  ? { scale: 1.5, rotate: 10 }
                                   : { scale: 1, rotate: 0 }
                               }
                               transition={{
