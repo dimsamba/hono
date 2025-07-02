@@ -18,6 +18,7 @@ import CostCalculatorPage from "./CostCalculatorPage";
 import ItemsListPage from "./ItemsListPage";
 import POSPage from "./POSPage";
 import StockTackPage from "./StockTakePage";
+import PrepPage from "./PrepPage.";
 
 function Dashboard() {
   const [theme] = useMode();
@@ -38,6 +39,7 @@ function Dashboard() {
     "/cost": "COST CALCULATOR",
     "/vendor": "HONO VENDOR",
     "/items": "ITEMS LIST",
+    "/prep": "PREP LIST",
   };
 
   return (
@@ -69,6 +71,7 @@ function Dashboard() {
               <Route path="stockTake" element={<StockTackPage />} />
               <Route path="vendor" element={<POSPage />} />
               <Route path="items" element={<ItemsListPage />} />
+              <Route path="prep" element={<PrepPage />} />
             </Routes>
           </div>{" "}
         </div>

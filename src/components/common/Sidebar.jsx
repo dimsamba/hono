@@ -9,7 +9,8 @@ import PlaylistAddOutlinedIcon from "@mui/icons-material/PlaylistAddOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
-import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
+import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 
 import { Tooltip } from "@mui/material";
 
@@ -45,40 +46,30 @@ const SIDEBAR_ITEMS = [
     href: "/items",
   },
   {
-    name: "Inventory",
+    name: "Prep List",
+    icon: PlaylistAddCheckIcon,
+    color: "#3FA89B",
+    href: "/prep",
+  },
+  {
+    name: "Lab",
     icon: Inventory2OutlinedIcon,
     color: "#3FA89B",
-    href: "/inventory",
+    children: [
+      { name: "Inventory", href: "/inventory", icon: Inventory2OutlinedIcon },
+      { name: "Recipe", href: "/recipe", icon: RamenDiningOutlinedIcon },
+      { name: "Suppliers", href: "/supplier", icon: ContactPhoneOutlinedIcon },
+    ],
   },
   {
-    name: "Suppliers",
-    icon: ContactPhoneOutlinedIcon,
-    color: "#3FA89B",
-    href: "/supplier",
-  },
-  {
-    name: "Recipe",
-    icon: RamenDiningOutlinedIcon,
-    color: "#3FA89B",
-    href: "/recipe",
-  },
-  {
-    name: "Expenses",
+    name: "Finances",
     icon: ReceiptLongOutlinedIcon,
     color: "#3FA89B",
-    href: "/invoice",
-  },
-  {
-    name: "Stock Take",
-    icon: InventoryOutlinedIcon,
-    color: "#3FA89B",
-    href: "/stockTake",
-  },
-  {
-    name: "Cost Calculator",
-    icon: SavingsOutlinedIcon,
-    color: "#3FA89B",
-    href: "/cost",
+    children: [
+      { name: "Expenses", href: "/invoice", icon: ReceiptLongOutlinedIcon },
+      { name: "Stock Take", href: "/stockTake", icon: InventoryOutlinedIcon },
+      { name: "Cost Calculator", href: "/cost", icon: SavingsOutlinedIcon },
+    ],
   },
   {
     name: "Agenda",
@@ -95,9 +86,10 @@ const SIDEBAR_ITEMS = [
 ];
 
 const Sidebar = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [hoveredItem, setHoveredItem] = useState(null);
+  const [openGroups, setOpenGroups] = useState({});
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -121,10 +113,8 @@ const Sidebar = () => {
 
   return (
     <motion.div
-      className={`relative z-10 transition-all duration-0 ease-in-out flex-shrink-0 ${
-        isSidebarOpen ? "w-64" : "w-20"
-      }`}
       animate={{ width: isSidebarOpen ? 175 : 65 }}
+      className="sidebar-container"
     >
       <div className="h-full bg-gray-100 bg-opacity-100 p-3 flex flex-col border-r border-gray-200 overflow-y-auto scrollbar-hide">
         {/* Sidebar Toggle Button */}
@@ -139,73 +129,167 @@ const Sidebar = () => {
 
         {/* Navigation */}
         <nav className="mt-8 flex-grow">
-          {SIDEBAR_ITEMS.map((item, index) => (
-            <Link key={item.href} to={item.href}>
-              <motion.div
-                onHoverStart={() => setHoveredItem(index)}
-                onHoverEnd={() => setHoveredItem(null)}
-                className="flex items-center p-2 pl-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors mb-2"
-              >
-                <Tooltip
-                  title={!isSidebarOpen ? item.name : ""}
-                  placement="right"
-                  arrow
-                  slotProps={{
-                    tooltip: {
-                      sx: {
-                        fontSize: 14,
-                        fontWeight: 600,
-                        backgroundColor: "#3FA89B",
-                        color: "white",
-                        borderRadius: 1,
-                      },
-                    },
-                    arrow: { sx: { color: "#3FA89B" } },
-                  }}
-                >
-                  <motion.div
-                    animate={
-                      hoveredItem === index
-                        ? { scale: 1.2, rotate: 5 }
-                        : { scale: 1, rotate: 0 }
+          {SIDEBAR_ITEMS.map((item, index) => {
+            const isGroup = !!item.children;
+            const isOpen = openGroups[item.name] || false;
+
+            return (
+              <div key={item.name}>
+                <div
+                  className="flex items-center p-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors mb-2 cursor-pointer"
+                  onClick={() => {
+                    if (isGroup) {
+                      setOpenGroups((prev) => ({
+                        ...prev,
+                        [item.name]: !prev[item.name],
+                      }));
+                    } else {
+                      navigate(item.href);
                     }
-                    transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                    style={{
-                      borderRadius: "6px",
-                      padding: "4px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
+                  }}
+                  onMouseEnter={() => setHoveredItem(item.name)} // moved here
+                  onMouseLeave={() => setHoveredItem(null)} // moved here
+                >
+                  <Tooltip
+                    title={!isSidebarOpen ? item.name : ""}
+                    placement="right"
+                    arrow
+                    slotProps={{
+                      tooltip: {
+                        sx: {
+                          fontSize: 14,
+                          fontWeight: 600,
+                          backgroundColor: "#3FA89B",
+                          color: "white",
+                          borderRadius: 1,
+                        },
+                      },
+                      arrow: { sx: { color: "#3FA89B" } },
                     }}
                   >
-                    <item.icon
-                      className="text-[16px] sm:text-[20px]"
-                      style={{
-                        color:
-                          item.color?.match(/#(?:[0-9a-fA-F]{3}){1,2}/)?.[0] ??
-                          "#333",
-                        minWidth: "16px",
+                    <motion.div
+                      animate={
+                        hoveredItem === item.name
+                          ? { scale: 1.5, rotate: 20 }
+                          : { scale: 1, rotate: 0 }
+                      }
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 15,
                       }}
-                    />
-                  </motion.div>
-                </Tooltip>
-
-                <AnimatePresence>
-                  {isSidebarOpen && (
-                    <motion.span
-                      className="ml-4 whitespace-nowrap text-gray-700"
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: "auto" }}
-                      exit={{ opacity: 0, width: 0 }}
-                      transition={{ duration: 0.2, delay: 0.3 }}
+                      style={{
+                        borderRadius: "6px",
+                        padding: "4px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
                     >
-                      {item.name}
+                      <item.icon
+                        className="text-[16px] sm:text-[20px]"
+                        style={{
+                          color:
+                            item.color?.match(
+                              /#(?:[0-9a-fA-F]{3}){1,2}/
+                            )?.[0] ?? "#333",
+                          minWidth: "16px",
+                        }}
+                      />
+                    </motion.div>
+                  </Tooltip>
+
+                  {/* Text */}
+                  <AnimatePresence>
+                    {isSidebarOpen && (
+                      <motion.span
+                        className="ml-4 whitespace-nowrap text-gray-700"
+                        initial={{ opacity: 0, width: 0 }}
+                        animate={{ opacity: 1, width: "auto" }}
+                        exit={{ opacity: 0, width: 0 }}
+                        transition={{ duration: 0.2, delay: 0.3 }}
+                      >
+                        {item.name}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Chevron for group */}
+                  {isGroup && isSidebarOpen && (
+                    <motion.span className="ml-auto text-xs text-gray-500">
+                      {isOpen ? "▲" : "▼"}
                     </motion.span>
                   )}
-                </AnimatePresence>
-              </motion.div>
-            </Link>
-          ))}
+                </div>
+
+                {isGroup && isOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="ml-6"
+                  >
+                    {item.children.map((child) => (
+                      <Link key={child.href} to={child.href}>
+                        <div
+                          className="flex items-center pt-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg mb-2"
+                          onMouseEnter={() => setHoveredItem(child.name)}
+                          onMouseLeave={() => setHoveredItem(null)}
+                        >
+                          <Tooltip
+                            title={!isSidebarOpen ? child.name : ""}
+                            placement="right"
+                            arrow
+                            slotProps={{
+                              tooltip: {
+                                sx: {
+                                  fontSize: 14,
+                                  fontWeight: 600,
+                                  backgroundColor: "#3FA89B",
+                                  color: "white",
+                                  borderRadius: 1,
+                                },
+                              },
+                              arrow: { sx: { color: "#3FA89B" } },
+                            }}
+                          >
+                            <motion.div
+                              animate={
+                                hoveredItem === child.name
+                                  ? { scale: 1.5, rotate: 20 }
+                                  : { scale: 1, rotate: 0 }
+                              }
+                              transition={{
+                                type: "spring",
+                                stiffness: 300,
+                                damping: 15,
+                              }}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                paddingTop: "5px",
+                                borderRadius: "6px",
+                              }}
+                            >
+                              <child.icon
+                                className="text-[16px] sm:text-[18px]"
+                                style={{ color: "#f78154" }}
+                              />
+                            </motion.div>
+                          </Tooltip>
+
+                          {isSidebarOpen && (
+                            <span className="ml-3">{child.name}</span>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </motion.div>
+                )}
+              </div>
+            );
+          })}
 
           {/* Logout Button */}
           <button
