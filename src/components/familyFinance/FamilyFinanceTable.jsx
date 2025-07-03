@@ -463,7 +463,7 @@ export default function FullFeaturedCrudGrid({
   // Get value between dates
   const { filteredRows, filteredTotalValue } = useMemo(() => {
     const filtered = (rows || []).filter((row) => {
-      const rowDate = dayjs(row.invoice_date);
+      const rowDate = dayjs(row.date);
 
       if (fromDate && toDate) {
         return (
