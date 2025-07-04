@@ -10,6 +10,8 @@ import {
   Stack,
   Typography,
   useMediaQuery,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -102,6 +104,31 @@ export default function FullFeaturedCrudGrid({
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [, setExpensesFromFF] = React.useState(0);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedFrequency, setSelectedFrequency] = useState("");
+  const [selectedFrom, setSelectedFrom] = useState("");
+  const uniqueCategories = [
+    ...new Set(rows.map((row) => row.category).filter(Boolean)),
+  ];
+  const uniqueFrequencies = [
+    ...new Set(rows.map((row) => row.frequency).filter(Boolean)),
+  ];
+  const uniqueFrom = [...new Set(rows.map((row) => row.from).filter(Boolean))];
+
+  // Filter to calculate amount
+  const filteredAmount = useMemo(() => {
+    if (!Array.isArray(rows)) return 0;
+
+    return rows
+      .filter((row) => {
+        const matchCategory =
+          selectedCategory === "" || row.category === selectedCategory;
+        const matchFrequency =
+          selectedFrequency === "" || row.frequency === selectedFrequency;
+        return matchCategory && matchFrequency;
+      })
+      .reduce((sum, row) => sum + (parseFloat(row.amount) || 0), 0);
+  }, [rows, selectedCategory, selectedFrequency]);
 
   // 👇 Define custom editable date field
   const MyDateField = (params) => {
@@ -461,9 +488,14 @@ export default function FullFeaturedCrudGrid({
 
   // Filter between dates
   // Get value between dates
+  // 1. Filter rows by date
   const { filteredRows, filteredTotalValue } = useMemo(() => {
-    const filtered = (rows || []).filter((row) => {
+    let filtered = rows;
+
+    // Date filter
+    filtered = filtered.filter((row) => {
       const rowDate = dayjs(row.date);
+      if (!rowDate.isValid()) return false;
 
       if (fromDate && toDate) {
         return (
@@ -471,37 +503,41 @@ export default function FullFeaturedCrudGrid({
           rowDate.isSameOrBefore(toDate, "day")
         );
       }
-      if (fromDate) {
-        return rowDate.isSameOrAfter(fromDate, "day");
-      }
-      if (toDate) {
-        return rowDate.isSameOrBefore(toDate, "day");
-      }
+      if (fromDate) return rowDate.isSameOrAfter(fromDate, "day");
+      if (toDate) return rowDate.isSameOrBefore(toDate, "day");
+
       return true;
     });
 
-    const total = filtered.reduce((sum, row) => sum + (row.amount || 0), 0);
+    // Category filter
+    if (selectedCategory) {
+      filtered = filtered.filter((row) => row.category === selectedCategory);
+    }
 
-    const paid = filtered
-      .filter((row) => row.paid === true)
-      .reduce((sum, row) => sum + (row.amount || 0), 0);
+    // Frequency filter
+    if (selectedFrequency) {
+      filtered = filtered.filter((row) => row.frequency === selectedFrequency);
+    }
 
-    const unpaid = filtered
-      .filter((row) => row.paid === false)
-      .reduce((sum, row) => sum + (row.amount || 0), 0);
+    // Frequency filter
+    if (selectedFrom) {
+      filtered = filtered.filter((row) => row.from === selectedFrom);
+    }
 
-    return {
-      filteredRows: filtered,
-      filteredTotalValue: total,
-    };
-  }, [rows, fromDate, toDate]); // Only recompute when these change
+    const total = filtered.reduce(
+      (sum, row) => sum + (parseFloat(row.amount) || 0),
+      0
+    );
 
-  // Format value to 2 decimal places
-  const formattedFilteredTotalValue = new Intl.NumberFormat("en-US", {
-    style: "decimal",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(filteredTotalValue);
+    return { filteredRows: filtered, filteredTotalValue: total };
+  }, [
+    rows,
+    fromDate,
+    toDate,
+    selectedCategory,
+    selectedFrequency,
+    selectedFrom,
+  ]);
 
   // ⬇️ Send filtered results to parent
   useEffect(() => {
@@ -743,7 +779,7 @@ export default function FullFeaturedCrudGrid({
         <Box
           display="grid"
           gap="5px"
-          gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+          gridTemplateColumns="repeat(3, minmax(0, 1fr))"
           sx={{
             "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
             my: 1,
@@ -844,20 +880,144 @@ export default function FullFeaturedCrudGrid({
             onClick={() => {
               setFromDate(null);
               setToDate(null);
+              setSelectedCategory(""); // Reset Category
+              setSelectedFrequency(""); // Reset Frequency
+              setSelectedFrom(""); // Reset Frequency
             }}
             sx={{
-              width: "50px",
+              width: "40px",
               "&:hover": {
                 backgroundColor: "transparent", // remove hover background
+                fontSize: "2rem", // adjust icon size as needed
+                color: "#1d3557", // customize icon color
               },
               "& .MuiSvgIcon-root": {
-                fontSize: "2rem", // adjust icon size as needed
-                color: "#577590", // customize icon color
+                fontSize: "1.5rem", // adjust icon size as needed
+                color: "#2a9d8f", // customize icon color
               },
             }}
           >
             <CachedIcon />
           </IconButton>
+        </Box>
+
+        {/* Filter Selects */}
+        <Box
+          display="grid"
+          gap="5px"
+          gridTemplateColumns="repeat(3, minmax(0, 1fr))"
+          sx={{
+            "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+            my: 1,
+          }}
+        >
+          <FormControl
+            sx={{
+              color: "green",
+              ...sharedStyles,
+              width: "100%",
+              // Selected value text
+              "& .MuiSelect-select": {
+                color: "#81b29a !important", // this is where you set the main text color
+                fontSize: "16px",
+                fontWeight: 600,
+              },
+              // Dropdown icon (arrow)
+              "& .MuiSvgIcon-root": {
+                fontSize: "2.2rem",
+                color: "#264653", // customize icon color
+              },
+            }}
+          >
+            <InputLabel>Category</InputLabel>
+
+            <Select
+              value={selectedCategory}
+              label="Category"
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              sx={{
+                ...sharedStyles,
+              }}
+            >
+              <MenuItem value="">All</MenuItem>
+              {uniqueCategories.map((category) => (
+                <MenuItem key={category} value={category}>
+                  {category}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl
+            sx={{
+              color: "green",
+              ...sharedStyles,
+              width: "100%",
+              // Selected value text
+              "& .MuiSelect-select": {
+                color: "#81b29a !important", // this is where you set the main text color
+                fontSize: "16px",
+                fontWeight: 600,
+              },
+              // Dropdown icon (arrow)
+              "& .MuiSvgIcon-root": {
+                fontSize: "2.2rem",
+                color: "#264653", // customize icon color
+              },
+            }}
+          >
+            <InputLabel>Frequency</InputLabel>
+            <Select
+              value={selectedFrequency}
+              label="Frequency"
+              onChange={(e) => setSelectedFrequency(e.target.value)}
+              sx={{
+                ...sharedStyles,
+              }}
+            >
+              <MenuItem value="">All</MenuItem>
+              {uniqueFrequencies.map((freq) => (
+                <MenuItem key={freq} value={freq}>
+                  {freq}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl
+            sx={{
+              color: "green",
+              ...sharedStyles,
+              width: "100%",
+              // Selected value text
+              "& .MuiSelect-select": {
+                color: "#81b29a !important", // this is where you set the main text color
+                fontSize: "16px",
+                fontWeight: 600,
+              },
+              // Dropdown icon (arrow)
+              "& .MuiSvgIcon-root": {
+                fontSize: "2.2rem",
+                color: "#264653", // customize icon color
+              },
+            }}
+          >
+            <InputLabel>From</InputLabel>
+            <Select
+              value={selectedFrom}
+              label="From"
+              onChange={(e) => setSelectedFrom(e.target.value)}
+              sx={{
+                ...sharedStyles,
+              }}
+            >
+              <MenuItem value="">All</MenuItem>
+              {uniqueFrom.map((from) => (
+                <MenuItem key={from} value={from}>
+                  {from}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
 
         <ThemeProvider theme={theme}>
