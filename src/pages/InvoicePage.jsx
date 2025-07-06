@@ -157,24 +157,21 @@ const invoicePaga = () => {
 
             <StatCardBg
               key={refreshKey} // 👈 triggers re-render when key changes
-              title={`Between Dates € ${formatCurrency(filteredTotalValue)}`}
+              title={`Filtered Data € ${formatCurrency(filteredTotalValue)}`}
               value={`€ ${formatCurrency(filteredPaidValue)}`}
-              subtitle={`Paid`}
+              subtitle={`Paid Amount TTC`}
             />
              <StatCardBg
               key={refreshKey} // 👈 triggers re-render when key changes
-              title={`Between Dates ${filteredRows.length} Entries`}
+              title={`Filtered Data ${filteredRows.length} Entries`}
               valueRed={`€ ${formatCurrency(filteredUnpaidValue)}`}
-              subtitleRed={`Unpaid`}
+              subtitleRed={`Unpaid Amount TTC`}
             />
           </Box>
         </motion.div>
 
         <motion.div
           className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-0"
-          // initial={{ opacity: 0, y: 20 }}
-          // animate={{ opacity: 1, y: 0 }}
-          // transition={{ duration: 1 }}
         >
           {/* <InvoiceData /> */}
           <FullFeaturedCrudGrid

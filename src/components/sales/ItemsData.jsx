@@ -8,6 +8,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import NewItemEditCell from "../inventory/NewItemEditCell";
+import { normalizeText } from "../../utils/normalizeText";
 import {
   DataGrid,
   GridActionsCellItem,
@@ -161,37 +162,38 @@ export default function FullFeaturedCrudGrid({ ItemsData, onItemsChange }) {
 
   const processRowUpdate = async (newRow) => {
     const { isNew, id, ...cleanRow } = newRow;
+    cleanRow.item_name = cleanRow.item_name.trim();
+    const normalizedInput = normalizeText(cleanRow.item_name);
 
     try {
       if (isNew) {
-        // 🔍 Check if item with same name exists
-        const { data: existing, error: fetchError } = await supabase
+        const { data, error: fetchError } = await supabase
           .from("itemsList")
-          .select("id")
-          .eq("item_name", cleanRow.item_name)
-          .limit(1)
-          .maybeSingle();
+          .select("id, item_name");
 
         if (fetchError) throw fetchError;
 
-        if (existing) {
+        const isDuplicate = data.some((item) => {
+          const dbNormalized = normalizeText(item.item_name);
+          return dbNormalized === normalizedInput;
+        });
+
+        if (isDuplicate) {
           alert(`Item "${cleanRow.item_name}" already exists.`);
-          return newRow;
+          return { ...newRow, _error: true }; // Tag for later use if needed
         }
 
-        // 🆕 Insert new item
-        const { data, error } = await supabase
+        const { data: insertData, error } = await supabase
           .from("itemsList")
           .insert([cleanRow])
           .select();
 
         if (error) throw error;
 
-        const [inserted] = data;
+        const [inserted] = insertData;
         setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
         return inserted;
       } else {
-        // ✏️ Update existing item
         const { error } = await supabase
           .from("itemsList")
           .update(cleanRow)

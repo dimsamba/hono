@@ -10,6 +10,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import ItemNameEditCell from "./ItemNameEditCell"; // Adjust path if needed
+import { normalizeText } from "../../utils/normalizeText";
 
 import {
   DataGrid,
@@ -201,20 +202,24 @@ export default function FullFeaturedCrudGrid({
 
     try {
       if (isNew) {
-        // 🔍 Check if item with same name exists
-        const { data: existing, error: fetchError } = await supabase
+        // 🔍 Normalize input name
+        const newNormalized = normalizeText(cleanRow.item_name);
+
+        // 🔍 Fetch all names (lightweight)
+        const { data: allItems, error: fetchError } = await supabase
           .from("inventory")
-          .select("id")
-          .eq("item_name", cleanRow.item_name)
-          .limit(1)
-          .maybeSingle();
+          .select("id, item_name");
 
         if (fetchError) throw fetchError;
 
-        if (existing) {
-          alert(`Item: "${cleanRow.item_name}" already exists.`);
-          setSnackbar({ children: msg, severity: "error" }); // optional snackbar
-          throw new Error(msg); // ✅ cancels the save
+        const isDuplicate = allItems?.some(
+          (item) => normalizeText(item.item_name) === newNormalized
+        );
+
+        if (isDuplicate) {
+          const msg = `Item "${cleanRow.item_name}" already exists.`;
+          alert(msg);
+          throw new Error(msg); // This cancels row insertion in DataGrid
         }
 
         // 🆕 Insert new item

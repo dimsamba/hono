@@ -35,6 +35,8 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import React, { useEffect, useState, useMemo } from "react";
 import dayjs from "dayjs";
 import supabase from "../supabaseClient";
+import NewAmountEditCell from "../familyFinance/NewAmountEditCell";
+
 // Enable plugins once
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
@@ -46,6 +48,7 @@ function EditToolbar({ setRows, setRowModesModel }) {
     const newRow = {
       id,
       amount: "",
+      frequency: "",
       date: new Date(), // <<== Pre-fill today's date
       category: "",
       from: "",
@@ -114,21 +117,6 @@ export default function FullFeaturedCrudGrid({
     ...new Set(rows.map((row) => row.frequency).filter(Boolean)),
   ];
   const uniqueFrom = [...new Set(rows.map((row) => row.from).filter(Boolean))];
-
-  // Filter to calculate amount
-  const filteredAmount = useMemo(() => {
-    if (!Array.isArray(rows)) return 0;
-
-    return rows
-      .filter((row) => {
-        const matchCategory =
-          selectedCategory === "" || row.category === selectedCategory;
-        const matchFrequency =
-          selectedFrequency === "" || row.frequency === selectedFrequency;
-        return matchCategory && matchFrequency;
-      })
-      .reduce((sum, row) => sum + (parseFloat(row.amount) || 0), 0);
-  }, [rows, selectedCategory, selectedFrequency]);
 
   // 👇 Define custom editable date field
   const MyDateField = (params) => {
@@ -519,7 +507,7 @@ export default function FullFeaturedCrudGrid({
       filtered = filtered.filter((row) => row.frequency === selectedFrequency);
     }
 
-    // Frequency filter
+    // From filter
     if (selectedFrom) {
       filtered = filtered.filter((row) => row.from === selectedFrom);
     }
@@ -653,6 +641,9 @@ export default function FullFeaturedCrudGrid({
       type: "number",
       align: "right",
       headerAlign: "right",
+      renderEditCell: (params) => (
+        <NewAmountEditCell {...params} setRows={setRows} />
+      ),
       renderCell: (params) =>
         params.value && !isNaN(params.value)
           ? `€ ${parseFloat(params.value).toFixed(2)}`
@@ -768,7 +759,7 @@ export default function FullFeaturedCrudGrid({
   return (
     <Box
       sx={{
-        height: 700,
+        height: "800px",
         width: "100%",
         border: "2px solid lightGray",
         borderRadius: 2,
@@ -845,7 +836,7 @@ export default function FullFeaturedCrudGrid({
                     color: "#2a9d8f",
                   },
                   "& .MuiInputBase-input": {
-                    color: "#2a9d8f",
+                    color: "#17395d",
                     fontSize: "1rem",
                     fontWeight: 500,
                   },
@@ -868,7 +859,7 @@ export default function FullFeaturedCrudGrid({
                     color: "#2a9d8f",
                   },
                   "& .MuiInputBase-input": {
-                    color: "#2a9d8f",
+                    color: "#17395d",
                     fontSize: "1rem",
                     fontWeight: 500,
                   },
@@ -882,7 +873,7 @@ export default function FullFeaturedCrudGrid({
               setToDate(null);
               setSelectedCategory(""); // Reset Category
               setSelectedFrequency(""); // Reset Frequency
-              setSelectedFrom(""); // Reset Frequency
+              setSelectedFrom(""); // Reset From
             }}
             sx={{
               width: "40px",
@@ -918,9 +909,9 @@ export default function FullFeaturedCrudGrid({
               width: "100%",
               // Selected value text
               "& .MuiSelect-select": {
-                color: "#81b29a !important", // this is where you set the main text color
+                color: "#17395d !important", // this is where you set the main text color
                 fontSize: "16px",
-                fontWeight: 600,
+                fontWeight: 500,
               },
               // Dropdown icon (arrow)
               "& .MuiSvgIcon-root": {
@@ -939,7 +930,6 @@ export default function FullFeaturedCrudGrid({
                 ...sharedStyles,
               }}
             >
-              <MenuItem value="">All</MenuItem>
               {uniqueCategories.map((category) => (
                 <MenuItem key={category} value={category}>
                   {category}
@@ -955,9 +945,9 @@ export default function FullFeaturedCrudGrid({
               width: "100%",
               // Selected value text
               "& .MuiSelect-select": {
-                color: "#81b29a !important", // this is where you set the main text color
+                color: "#17395d !important", // this is where you set the main text color
                 fontSize: "16px",
-                fontWeight: 600,
+                fontWeight: 500,
               },
               // Dropdown icon (arrow)
               "& .MuiSvgIcon-root": {
@@ -975,7 +965,6 @@ export default function FullFeaturedCrudGrid({
                 ...sharedStyles,
               }}
             >
-              <MenuItem value="">All</MenuItem>
               {uniqueFrequencies.map((freq) => (
                 <MenuItem key={freq} value={freq}>
                   {freq}
@@ -990,9 +979,9 @@ export default function FullFeaturedCrudGrid({
               width: "100%",
               // Selected value text
               "& .MuiSelect-select": {
-                color: "#81b29a !important", // this is where you set the main text color
+                color: "#17395d !important", // this is where you set the main text color
                 fontSize: "16px",
-                fontWeight: 600,
+                fontWeight: 500,
               },
               // Dropdown icon (arrow)
               "& .MuiSvgIcon-root": {
@@ -1010,7 +999,6 @@ export default function FullFeaturedCrudGrid({
                 ...sharedStyles,
               }}
             >
-              <MenuItem value="">All</MenuItem>
               {uniqueFrom.map((from) => (
                 <MenuItem key={from} value={from}>
                   {from}
@@ -1042,6 +1030,7 @@ export default function FullFeaturedCrudGrid({
               ),
             }}
             sx={{
+              height: "650px",
               border: "none",
               "& .MuiDataGrid-scrollbar": {
                 overflow: "hidden",

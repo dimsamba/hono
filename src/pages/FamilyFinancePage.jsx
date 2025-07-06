@@ -80,7 +80,7 @@ const FamilyFinancePage = () => {
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <main className="max-w-7x1 mx-auto py-6 px-0 lg:px-8">
+      <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         {/* STATS */}
         <motion.div className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-3">
           <Box
@@ -93,14 +93,13 @@ const FamilyFinancePage = () => {
           >
             <StatCard
               key={refreshKey} // 👈 triggers re-render when key changes
-              // title={`Grand Total € ${formatCurrency(totalAmount)}`}
               title={`Grand Total`}
               value={` € ${formatCurrency(totalAmount)}`}
               subtitle={` ${FamilyFinanceTable.length} Entries`}
             />
             <StatCard
               key={refreshKey}
-              title={`Between Dates (${filteredRows.length} entries)`}
+              title={`Filtered Data (${filteredRows.length} entries)`}
               value={`€ ${formatCurrency(filteredTotalValue)}`}
             />
           </Box>
