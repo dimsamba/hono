@@ -7,8 +7,10 @@ import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import FullFeaturedCrudGrid from "../components/sales/SalesTable";
 import { useState, useEffect } from "react";
 import supabase from "../components/supabaseClient";
+import { Box, useMediaQuery } from "@mui/material";
 
 const SalesPage = () => {
+  const isNonMobile = useMediaQuery("(min-width:600px)");
   const [sales, setSales] = useState([]);
   const [refreshKey, setRefreshKey] = useState(); // used to force re-render
   const [fromDate, setFromDate] = useState(null);
@@ -84,61 +86,59 @@ const SalesPage = () => {
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <main className="max-w-10xl py-6 px-4 lg:px-8">
+      <main className="max-w-9xl mx-auto py-6 px-4 lg:px-8">
         {/* STATS */}
-        <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 mb-3"
-          // initial={{ opacity: 0, y: 20 }}
-          // animate={{ opacity: 1, y: 0 }}
-          // transition={{ duration: 1 }}
-        >
-          <StatCard
-            icon={
-              <PointOfSaleIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
-            }
-            key={refreshKey} // 👈 triggers re-render when key changes
-            title={`Sales Sumary`}
-            value={`€ ${formatCurrency(totalSalesValue)}`}
-            subtitle={`${sales.length} Sales`}
-          />
-          <StatCard
-            icon={
-              <EventRepeatOutlinedIcon
-                sx={{ color: "#38a3a5", fontSize: "26px" }}
-              />
-            }
-            key={refreshKey} // 👈 triggers re-render when key changes
-            title={`Last 30 Days`}
-            value={`€ ${formatCurrency(totalSalesValue30Days)}`}
-            subtitle={`${
-              salesLastMonth.filter((sale) => {
-                const today = new Date();
-                const thirtyDaysAgo = new Date();
-                thirtyDaysAgo.setDate(today.getDate() - 30);
+        <motion.div className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-3">
+          <Box
+            display="grid"
+            gap="15px"
+            gridTemplateColumns="repeat(3, minmax(0, 1fr))"
+            sx={{
+              "& > div": { gridColumn: isNonMobile ? undefined : "span 3" },
+            }}
+          >
+            <StatCard
+              icon={
+                <PointOfSaleIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
+              }
+              key={refreshKey} // 👈 triggers re-render when key changes
+              title={`Sales Sumary`}
+              value={`€ ${formatCurrency(totalSalesValue)}`}
+              subtitle={`${sales.length} Sales`}
+            />
+            <StatCard
+              icon={
+                <EventRepeatOutlinedIcon
+                  sx={{ color: "#38a3a5", fontSize: "26px" }}
+                />
+              }
+              key={refreshKey} // 👈 triggers re-render when key changes
+              title={`Last 30 Days`}
+              value={`€ ${formatCurrency(totalSalesValue30Days)}`}
+              subtitle={`${
+                salesLastMonth.filter((sale) => {
+                  const today = new Date();
+                  const thirtyDaysAgo = new Date();
+                  thirtyDaysAgo.setDate(today.getDate() - 30);
 
-                const saleDate = new Date(sale.date); // or sale.date
-                return saleDate >= thirtyDaysAgo && saleDate <= today;
-              }).length
-            } Sales`}
-          />
-          <StatCardBg
-            icon={
-              <CalendarMonthOutlinedIcon
-                sx={{ color: "#38a3a5", fontSize: "26px" }}
-              />
-            }
-            title={`Total Between dates`}
-            value={`€ ${formatCurrency(metrics.totalSalesAmount)}`}
-            subtitle={`${metrics.totalEntries} Sales / ${metrics.totalItems} Items`}
-          />
-          {/* </Box> */}
+                  const saleDate = new Date(sale.date); // or sale.date
+                  return saleDate >= thirtyDaysAgo && saleDate <= today;
+                }).length
+              } Sales`}
+            />
+            <StatCardBg
+              icon={
+                <CalendarMonthOutlinedIcon
+                  sx={{ color: "#38a3a5", fontSize: "26px" }}
+                />
+              }
+              title={`Total Between dates`}
+              value={`€ ${formatCurrency(metrics.totalSalesAmount)}`}
+              subtitle={`${metrics.totalEntries} Sales / ${metrics.totalItems} Items`}
+            />
+          </Box>
         </motion.div>
-        <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1"
-          // initial={{ opacity: 0, y: 20 }}
-          // animate={{ opacity: 1, y: 0 }}
-          // transition={{ duration: 1 }}
-        >
+        <motion.div className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-0">
           {/* <SalesTable/> */}
           <FullFeaturedCrudGrid
             sales={sales}

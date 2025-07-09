@@ -1,4 +1,4 @@
-import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
+import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
 import { Box, useMediaQuery } from "@mui/material";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -57,9 +57,7 @@ const ItemsListPage = () => {
     <div className="flex-1 overflow-auto relative z-10">
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         {/* STATS */}
-        <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-3"
-        >
+        <motion.div className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-3">
           <Box
             display="grid"
             gap="15px"
@@ -89,9 +87,7 @@ const ItemsListPage = () => {
           </Box>
         </motion.div>
 
-        <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-0"
-        >
+        <motion.div className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-0">
           {/* ✅ Pass inventory data to the table */}
           <FullFeaturedCrudGrid
             ItemsData={itemsListData}

@@ -1,9 +1,20 @@
 import AddIcon from "@mui/icons-material/Add";
 import CancelIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import CachedIcon from "@mui/icons-material/Cached";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import { Stack, Typography } from "@mui/material";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import {
+  Stack,
+  Typography,
+  FormControl,
+  InputLabel,
+  useMediaQuery,
+  IconButton,
+  GlobalStyles,
+} from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -17,11 +28,16 @@ import {
   GridToolbar,
   GridToolbarContainer,
 } from "@mui/x-data-grid";
-import * as React from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import supabase from "../supabaseClient";
 
 // 🔧 Toolbar for adding new rows
-function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
+function EditToolbar({
+  setRows,
+  setNewRowId,
+  setRowModesModel,
+  filtersAreActive,
+}) {
   const handleClick = () => {
     const id = Date.now();
     const newRow = {
@@ -44,9 +60,23 @@ function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
     <GridToolbarContainer>
       <Button
         onClick={handleClick}
-        startIcon={<AddIcon sx={{ color: "#3FA89B" }} />}
+        startIcon={
+          <AddIcon sx={{ color: filtersAreActive ? "#f07167" : "#3FA89B" }} />
+        }
+        disabled={filtersAreActive}
+        sx={{
+          border: `1px solid ${filtersAreActive ? "#f07167" : "#3FA89B"}`,
+          "&:hover": {
+            border: "px solid #3FA89B",
+          },
+        }}
       >
-        <Typography sx={{ color: "#3FA89B", fontWeight: 600 }}>
+        <Typography
+          sx={{
+            color: filtersAreActive ? "#f07167" : "#3FA89B",
+            fontWeight: 600,
+          }}
+        >
           Add new Item to Sell
         </Typography>
       </Button>
@@ -55,13 +85,19 @@ function EditToolbar({ setRows, setNewRowId, setRowModesModel }) {
 }
 
 // 🔧 Combines custom toolbar + MUI toolbar
-function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
+function CombinedToolbar({
+  setRows,
+  setNewRowId,
+  setRowModesModel,
+  filtersAreActive,
+}) {
   return (
     <Stack spacing={1}>
       <EditToolbar
         setRows={setRows}
         setNewRowId={setNewRowId}
         setRowModesModel={setRowModesModel}
+        filtersAreActive={filtersAreActive}
       />
       <GridToolbar
         sx={{
@@ -73,8 +109,21 @@ function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
   );
 }
 
-export default function FullFeaturedCrudGrid({ ItemsData, onItemsChange }) {
+export default function FullFeaturedCrudGrid({
+  ItemsData,
+  onItemsChange,
+  onFilteredRowsChange = () => {},
+  onTotalValueChange = () => {},
+}) {
+  const isNonMobile = useMediaQuery("(min-width:600px)");
   const [rows, setRows] = React.useState(ItemsData);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const uniqueCategories = [
+    ...new Set(rows.map((row) => row.category).filter(Boolean)),
+  ];
+
+  // Active Filters
+  const filtersAreActive = selectedCategory !== "";
 
   React.useEffect(() => {
     setRows(ItemsData); // Update rows whenever SupplierData changes
@@ -236,6 +285,56 @@ export default function FullFeaturedCrudGrid({ ItemsData, onItemsChange }) {
     },
   });
 
+  // Filter between dates
+  // Get value between dates
+  // 1. Filter rows by date
+  const { filteredRows, filteredTotalValue } = useMemo(() => {
+    let filtered = rows;
+
+    // Category filter
+    if (selectedCategory) {
+      filtered = filtered.filter((row) => row.category === selectedCategory);
+    }
+
+    const total = filtered.reduce(
+      (sum, row) => sum + (parseFloat(row.amount) || 0),
+      0
+    );
+
+    return { filteredRows: filtered, filteredTotalValue: total };
+  }, [rows, selectedCategory]);
+
+  // ⬇️ Send filtered results to parent
+  useEffect(() => {
+    onFilteredRowsChange(filteredRows);
+    onTotalValueChange(filteredTotalValue);
+  }, [
+    filteredRows,
+    filteredTotalValue,
+    onFilteredRowsChange,
+    onTotalValueChange,
+  ]);
+
+  // TextField and InputLabel customizations
+  const sharedStyles = {
+    "& .MuiInputLabel-root": {
+      color: "#38a3a5",
+      fontSize: 14,
+      px: 1,
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        border: "1px solid #38a3a5",
+      },
+      "&:hover fieldset": {
+        borderColor: "darkGreen",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#25a18e",
+      },
+    },
+  };
+
   const columns = [
     {
       field: "actions",
@@ -325,9 +424,121 @@ export default function FullFeaturedCrudGrid({ ItemsData, onItemsChange }) {
         p: 1,
       }}
     >
+      <Box
+        display="grid"
+        gap="5px"
+        gridTemplateColumns="repeat(3, minmax(0, 1fr))"
+        sx={{
+          "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+          my: 1,
+        }}
+      >
+        <GlobalStyles
+          styles={{
+            ".MuiPickersPopper-root .MuiPaper-root": {
+              backgroundColor: "#f5f5f5 !important",
+              color: "#577590 !important",
+              fontSize: "1rem",
+              lineHeight: 1.8,
+              borderRadius: "8px",
+            },
+
+            // Day numbers (default state)
+            ".MuiDayCalendar-weekContainer .MuiPickersDay-root": {
+              color: "#577590 !important",
+            },
+
+            // Selected day (override white-on-white)
+            ".MuiDayCalendar-weekContainer .MuiPickersDay-root.Mui-selected": {
+              backgroundColor: "#2a9d8f !important",
+              color: "#577590 !important",
+            },
+
+            // Today’s date
+            ".MuiDayCalendar-weekContainer .MuiPickersDay-root.MuiDayCalendar-dayWithMargin.MuiPickersDay-today":
+              {
+                border: "1px solid #2a9d8f",
+              },
+
+            // ✅ Day-of-week headers (top row: S, M, T, etc.)
+            ".MuiDayCalendar-header .MuiTypography-root": {
+              color: "#577590 !important",
+              fontWeight: 800,
+            },
+            ".MuiPickersCalendarHeader-root .MuiIconButton-root": {
+              color: "#577590 !important", // or any color you prefer
+            },
+            "& .MuiMenu-paper": {
+              backgroundColor: "white !important",
+              color: "#577590 !important",
+            },
+            "& .MuiMenuItem-root:hover": {
+              backgroundColor: "#eff1ed !important",
+            },
+            "& .MuiMenuItem-root:selected": {
+              backgroundColor: "red !important",
+            },
+          }}
+        />
+        <FormControl
+          sx={{
+            ...sharedStyles,
+            width: "100%",
+            // Selected value text
+            "& .MuiSelect-select": {
+              color: "#17395d !important", // this is where you set the main text color
+              fontSize: "16px",
+              fontWeight: 500,
+            },
+            // Dropdown icon (arrow)
+            "& .MuiSvgIcon-root": {
+              fontSize: "2.2rem",
+              color: "#38a3a5", // customize icon color
+            },
+          }}
+        >
+          <InputLabel>Category</InputLabel>
+
+          <Select
+            value={selectedCategory}
+            label="Category"
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            sx={{
+              ...sharedStyles,
+            }}
+          >
+            {uniqueCategories.map((category) => (
+              <MenuItem key={category} value={category}>
+                {category}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <IconButton
+          onClick={() => {
+            setSelectedCategory("");
+          }}
+          sx={{
+            width: "70px",
+            "& .MuiSvgIcon-root": {
+              fontSize: "1.5rem", // adjust icon size as needed
+              color: filtersAreActive ? "#f07167" : "#3FA89B",
+              border: `1px solid ${filtersAreActive ? "#f07167" : "#3FA89B"}`,
+              borderRadius: 10,
+              width: "40px",
+              height: "40px",
+              "&:hover": {
+                backgroundColor: "#ebf2fa", // remove hover background
+              },
+            },
+          }}
+        >
+          <CachedIcon />
+        </IconButton>
+      </Box>
       <ThemeProvider theme={theme}>
         <DataGrid
-          rows={rows}
+          rows={filteredRows}
           columns={columns}
           editMode="row"
           rowModesModel={rowModesModel}
@@ -340,6 +551,7 @@ export default function FullFeaturedCrudGrid({ ItemsData, onItemsChange }) {
               <CombinedToolbar
                 setRows={setRows}
                 setRowModesModel={setRowModesModel}
+                filtersAreActive={filtersAreActive}
               />
             ),
           }}

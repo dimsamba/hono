@@ -1,4 +1,3 @@
-import StatCardBg from "../components/common/StatCardBg";
 import { Box, useMediaQuery } from "@mui/material";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";

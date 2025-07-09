@@ -1,17 +1,24 @@
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import CachedIcon from "@mui/icons-material/Cached";
-import { GlobalStyles, Stack, IconButton, useMediaQuery } from "@mui/material";
+import {
+  GlobalStyles,
+  Stack,
+  IconButton,
+  useMediaQuery,
+  InputLabel,
+  FormControl,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import Box from "@mui/material/Box";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import React, { useState, useEffect } from "react";
-
 import {
   DataGrid,
   GridActionsCellItem,
@@ -57,44 +64,12 @@ export default function FullFeaturedCrudGrid({
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [, setNewRowId] = React.useState(null);
-
-  // 👇 Define custom editable date field
-  const MyDateField = (params) => {
-    const { id, field, value, api } = params;
-    const dateValue = value ? dayjs(value) : dayjs();
-
-    return (
-      <DatePicker
-        value={dateValue}
-        onChange={(newValue) => {
-          api.setEditCellValue(
-            { id, field, value: newValue?.toISOString() },
-            event
-          ); // or without `event` if not available
-        }}
-        format="DD-MM-YYYY"
-        slotProps={{
-          textField: {
-            variant: "outlined",
-            size: "small",
-            sx: {
-              backgroundColor: "#e7ecef !important", // ✅ light red background
-              "& .MuiInputBase-input": {
-                color: "dimGray", // ✅ text color
-                fontSize: "0.9rem",
-                fontWeight: 400,
-                padding: "14px", // adjust if needed
-              },
-
-              "& fieldset": {
-                border: "1px solid #777", // optional border styling
-              },
-            },
-          },
-        }}
-      />
-    );
-  };
+  const [selectedPaiment, setSelectedPaiment] = useState("");
+  const uniquePaiment = [
+    ...new Set((rows || []).map((row) => row.payment_type).filter(Boolean)),
+  ];
+  const filtersAreActive =
+    fromDate !== null || toDate !== null || selectedPaiment !== "";
 
   React.useEffect(() => {
     setRows(SalesTable); // Update rows whenever SalesTable changes
@@ -214,7 +189,7 @@ export default function FullFeaturedCrudGrid({
 
   // Filter between dates
   // Get value between dates
-  const filteredRows = (rows || []).filter((row) => {
+  let filteredRows = (rows || []).filter((row) => {
     const rowDate = dayjs(row.date);
     if (fromDate && toDate) {
       return (
@@ -226,6 +201,13 @@ export default function FullFeaturedCrudGrid({
     if (toDate) return rowDate.isSameOrBefore(toDate, "day");
     return true;
   });
+
+  // payment_type filter
+  if (selectedPaiment) {
+    filteredRows = filteredRows.filter(
+      (row) => row.payment_type === selectedPaiment
+    );
+  }
 
   const totalItemsCount = filteredRows.reduce((sum, row) => {
     const value = Number(row.total_items);
@@ -245,8 +227,9 @@ export default function FullFeaturedCrudGrid({
       totalSalesAmount: filteredTotalValue,
       totalEntries: entryCount,
       totalItems: totalItemsCount,
+      filteredRows,
     });
-  }, [fromDate, toDate, rows]); // Trigger when relevant data changes
+  }, [fromDate, toDate, rows, selectedPaiment]); // Trigger when relevant data changes
 
   // Customize Toolbar
   const themeGrid = createTheme({
@@ -256,7 +239,7 @@ export default function FullFeaturedCrudGrid({
           root: {
             "&.MuiDataGrid-paper": {
               backgroundColor: "#F2FAF8",
-              color: "#333",
+              color: "red",
               fontWeight: 600,
             },
           },
@@ -264,6 +247,26 @@ export default function FullFeaturedCrudGrid({
       },
     },
   });
+
+  // TextField and InputLabel customizations
+  const sharedStyles = {
+    "& .MuiInputLabel-root": {
+      color: "#38a3a5",
+      fontSize: 14,
+      px: 1,
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        border: "1px solid #38a3a5",
+      },
+      "&:hover fieldset": {
+        borderColor: "darkGreen",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#25a18e",
+      },
+    },
+  };
 
   const columns = [
     {
@@ -459,7 +462,7 @@ export default function FullFeaturedCrudGrid({
   return (
     <Box
       sx={{
-        height: 700,
+        height: "600px",
         width: "100%",
         border: "2px solid lightGray",
         borderRadius: 2,
@@ -473,14 +476,14 @@ export default function FullFeaturedCrudGrid({
           gridTemplateColumns="repeat(4, minmax(0, 1fr))"
           sx={{
             "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-            mb: "5px",
+            mb: "20px",
           }}
         >
           <GlobalStyles
             styles={{
               ".MuiPickersPopper-root .MuiPaper-root": {
                 backgroundColor: "#f5f5f5 !important",
-                color: "#4a5759 !important",
+                color: "#577590 !important",
                 fontSize: "1rem",
                 lineHeight: 1.8,
                 borderRadius: "8px",
@@ -488,14 +491,14 @@ export default function FullFeaturedCrudGrid({
 
               // Day numbers (default state)
               ".MuiDayCalendar-weekContainer .MuiPickersDay-root": {
-                color: "#4a5759 !important",
+                color: "#577590 !important",
               },
 
               // Selected day (override white-on-white)
               ".MuiDayCalendar-weekContainer .MuiPickersDay-root.Mui-selected":
                 {
                   backgroundColor: "#2a9d8f !important",
-                  color: "#fff !important",
+                  color: "#577590 !important",
                 },
 
               // Today’s date
@@ -506,11 +509,21 @@ export default function FullFeaturedCrudGrid({
 
               // ✅ Day-of-week headers (top row: S, M, T, etc.)
               ".MuiDayCalendar-header .MuiTypography-root": {
-                color: "#4a5759 !important",
+                color: "#577590 !important",
                 fontWeight: 800,
               },
               ".MuiPickersCalendarHeader-root .MuiIconButton-root": {
-                color: "#2a9d8f !important", // or any color you prefer
+                color: "#577590 !important", // or any color you prefer
+              },
+              "& .MuiMenu-paper": {
+                backgroundColor: "white !important",
+                color: "#577590 !important",
+              },
+              "& .MuiMenuItem-root:hover": {
+                backgroundColor: "#eff1ed !important",
+              },
+              "& .MuiMenuItem-root:selected": {
+                backgroundColor: "red !important",
               },
             }}
           />
@@ -549,7 +562,7 @@ export default function FullFeaturedCrudGrid({
                     },
                   },
                   "& .MuiSvgIcon-root": {
-                    color: "#38a3a5",
+                    color: "#577590",
                   },
                 },
               },
@@ -589,19 +602,58 @@ export default function FullFeaturedCrudGrid({
               },
             }}
           />
+          <FormControl
+            sx={{
+              color: "green",
+              ...sharedStyles,
+              width: "100%",
+              // Selected value text
+              "& .MuiSelect-select": {
+                color: "#17395d !important", // this is where you set the main text color
+                fontSize: "16px",
+                fontWeight: 500,
+              },
+              // Dropdown icon (arrow)
+              "& .MuiSvgIcon-root": {
+                fontSize: "2.2rem",
+                color: "#264653", // customize icon color
+              },
+            }}
+          >
+            <InputLabel>Paiment Type</InputLabel>
+            <Select
+              value={selectedPaiment}
+              label="Paiment Type"
+              onChange={(e) => setSelectedPaiment(e.target.value)}
+              sx={{
+                ...sharedStyles,
+              }}
+            >
+              {uniquePaiment.map((paimt) => (
+                <MenuItem key={paimt} value={paimt}>
+                  {paimt}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <IconButton
             onClick={() => {
               setFromDate(null);
               setToDate(null);
+              setSelectedPaiment(""); // Reset payment_type
             }}
             sx={{
-              width: "50px",
-              "&:hover": {
-                backgroundColor: "transparent", // remove hover background
-              },
+              width: "70px",
               "& .MuiSvgIcon-root": {
-                fontSize: "2rem", // adjust icon size as needed
-                color: "#577590", // customize icon color
+                fontSize: "1.5rem", // adjust icon size as needed
+                color: filtersAreActive ? "#f07167" : "#3FA89B",
+                border: `1px solid ${filtersAreActive ? "#f07167" : "#3FA89B"}`,
+                borderRadius: 10,
+                width: "40px",
+                height: "40px",
+                "&:hover": {
+                  backgroundColor: "#ebf2fa", // remove hover background
+                },
               },
             }}
           >
@@ -609,7 +661,6 @@ export default function FullFeaturedCrudGrid({
           </IconButton>
         </Box>
 
-        {/* </Box> */}
         <ThemeProvider theme={themeGrid}>
           <DataGrid
             rows={filteredRows}
