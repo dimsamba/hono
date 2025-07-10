@@ -253,7 +253,6 @@ export default function FullFeaturedCrudGrid({
     "& .MuiInputLabel-root": {
       color: "#38a3a5",
       fontSize: 14,
-      px: 1,
     },
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
@@ -472,7 +471,7 @@ export default function FullFeaturedCrudGrid({
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Box
           display="grid"
-          gap="5px"
+          gap="10px"
           gridTemplateColumns="repeat(4, minmax(0, 1fr))"
           sx={{
             "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
@@ -542,27 +541,26 @@ export default function FullFeaturedCrudGrid({
             format="DD-MM-YYYY"
             slotProps={{
               textField: {
-                fullWidth: true,
+                fullWidth: "100%",
                 sx: {
                   "& .MuiInputBase-input": {
                     color: "dimGray !important",
                     fontSize: "16px",
-                    fontWeight: 500,
+                    fontWeight: 500, // semibold
                   },
                   "& .MuiInputLabel-root": {
                     color: "#38a3a5",
-                    fontSize: "16px",
                   },
                   "& .MuiOutlinedInput-root": {
                     "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#38a3a5",
+                      borderColor: "#38a3a5", // default border
                     },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "darkGreen",
+                      borderColor: "darkGreen", // hover border
                     },
                   },
                   "& .MuiSvgIcon-root": {
-                    color: "#577590",
+                    color: "#38a3a5",
                   },
                 },
               },
@@ -585,7 +583,6 @@ export default function FullFeaturedCrudGrid({
                   },
                   "& .MuiInputLabel-root": {
                     color: "#38a3a5",
-                    fontSize: "16px",
                   },
                   "& .MuiOutlinedInput-root": {
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -604,19 +601,21 @@ export default function FullFeaturedCrudGrid({
           />
           <FormControl
             sx={{
-              color: "green",
               ...sharedStyles,
               width: "100%",
               // Selected value text
               "& .MuiSelect-select": {
-                color: "#17395d !important", // this is where you set the main text color
+                color: "dimGray !important",
                 fontSize: "16px",
-                fontWeight: 500,
+                fontWeight: 500, // semibold
               },
               // Dropdown icon (arrow)
               "& .MuiSvgIcon-root": {
                 fontSize: "2.2rem",
-                color: "#264653", // customize icon color
+                color: "#38a3a5", // customize icon color
+              },
+              "& .MuiFormLabel-root": {
+                color: "#38a3a5 !important",
               },
             }}
           >
@@ -629,6 +628,11 @@ export default function FullFeaturedCrudGrid({
                 ...sharedStyles,
               }}
             >
+              {/* NEW: “All” option */}
+              <MenuItem value="">
+                <em>All</em>
+              </MenuItem>
+
               {uniquePaiment.map((paimt) => (
                 <MenuItem key={paimt} value={paimt}>
                   {paimt}

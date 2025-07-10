@@ -164,6 +164,7 @@ export default function FullFeaturedCrudGrid({
   const [rows, setRows] = React.useState(InvoiceData); // Use the passed inventoryData
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
+  const [entryDate, setEntryDate] = useState(null);
   const [, setExpensesFromInvoices] = React.useState(0);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedPaid, setSelectedPaid] = useState("");
@@ -179,6 +180,7 @@ export default function FullFeaturedCrudGrid({
   const filtersAreActive =
     fromDate !== null ||
     toDate !== null ||
+    entryDate !== null ||
     selectedCategory !== "" ||
     selectedPaid !== "" ||
     selectedFrom !== "";
@@ -195,6 +197,7 @@ export default function FullFeaturedCrudGrid({
       // Log fromDate and toDate before processing
       console.log("From Date:", fromDate);
       console.log("To Date:", toDate);
+      console.log("To Date:", entryDate);
 
       // Ensure fromDate and toDate are not null and fallback to defaults
       const validFromDate = fromDate
@@ -234,7 +237,7 @@ export default function FullFeaturedCrudGrid({
     };
 
     fetchData();
-  }, [fromDate, toDate]);
+  }, [fromDate, toDate, entryDate]);
 
   const handleRowEditStop = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -456,6 +459,12 @@ export default function FullFeaturedCrudGrid({
       return true;
     });
 
+    if (entryDate) {
+      filtered = filtered.filter((row) =>
+        dayjs(row.created_at).isSame(entryDate, "day")
+      );
+    }
+
     // Category filter
     if (selectedCategory) {
       filtered = filtered.filter((row) => row.category === selectedCategory);
@@ -489,7 +498,7 @@ export default function FullFeaturedCrudGrid({
       filteredUnpaidValue: unpaid,
       filtered,
     };
-  }, [rows, fromDate, toDate, selectedCategory, selectedPaid, selectedFrom]); // Only recompute when these change
+  }, [rows, fromDate, toDate, entryDate, selectedCategory, selectedPaid, selectedFrom]); // Only recompute when these change
 
   // ⬇️ Send filtered results to parent
   useEffect(() => {
@@ -531,7 +540,6 @@ export default function FullFeaturedCrudGrid({
     "& .MuiInputLabel-root": {
       color: "#38a3a5",
       fontSize: 14,
-      px: 1,
     },
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
@@ -734,6 +742,18 @@ export default function FullFeaturedCrudGrid({
       width: 250,
       editable: true,
     },
+    {
+      field: "created_at",
+      headerName: "Entry Date",
+      width: 180,
+      editable: false,  
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        const date = new Date(params.value);
+        return <span>{formatDate(date)}</span>;
+      },
+    },
   ];
 
   return (
@@ -828,7 +848,6 @@ export default function FullFeaturedCrudGrid({
                   },
                   "& .MuiInputLabel-root": {
                     color: "#38a3a5",
-                    fontSize: "16px",
                   },
                   "& .MuiOutlinedInput-root": {
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -862,7 +881,6 @@ export default function FullFeaturedCrudGrid({
                   },
                   "& .MuiInputLabel-root": {
                     color: "#38a3a5",
-                    fontSize: "16px",
                   },
                   "& .MuiOutlinedInput-root": {
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -879,10 +897,45 @@ export default function FullFeaturedCrudGrid({
               },
             }}
           />
+
+          <DesktopDatePicker
+            label="Entry Date"
+            value={entryDate}
+            onChange={(newValue) => setEntryDate(dayjs(newValue))}
+            format="DD-MM-YYYY"
+            slotProps={{
+              textField: {
+                variant: "outlined",
+                sx: {
+                  "& .MuiInputBase-input": {
+                    color: "dimGray !important",
+                    fontSize: "16px",
+                    fontWeight: 500,
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#38a3a5",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#38a3a5",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "darkGreen",
+                    },
+                  },
+                  "& .MuiSvgIcon-root": {
+                    color: "#38a3a5",
+                  },
+                },
+              },
+            }}
+          />
+
           <IconButton
             onClick={() => {
               setFromDate(null);
               setToDate(null);
+              setEntryDate(null);
               setSelectedCategory(""); // Reset Category
               setSelectedPaid(""); // Reset paid
               setSelectedFrom(""); // Reset from
@@ -930,6 +983,9 @@ export default function FullFeaturedCrudGrid({
                 fontSize: "2.2rem",
                 color: "#38a3a5", // customize icon color
               },
+              "& .MuiFormLabel-root": {
+                color: "#38a3a5 !important",
+              },
             }}
           >
             <InputLabel>Category</InputLabel>
@@ -942,6 +998,11 @@ export default function FullFeaturedCrudGrid({
                 ...sharedStyles,
               }}
             >
+              {/* NEW: “All” option */}
+              <MenuItem value="">
+                <em>All</em>
+              </MenuItem>
+
               {uniqueCategories.map((category) => (
                 <MenuItem key={category} value={category}>
                   {category}
@@ -965,17 +1026,25 @@ export default function FullFeaturedCrudGrid({
                 fontSize: "2.2rem",
                 color: "#38a3a5", // customize icon color
               },
+              "& .MuiFormLabel-root": {
+                color: "#38a3a5 !important",
+              },
             }}
           >
             <InputLabel>Paid / Unpaid</InputLabel>
             <Select
               value={selectedPaid}
-              label="Paid"
+              label="Paid / Unpaid"
               onChange={(e) => setSelectedPaid(e.target.value)}
               sx={{
                 ...sharedStyles,
               }}
             >
+              {/* NEW: “All” option */}
+              <MenuItem value="">
+                <em>All</em>
+              </MenuItem>
+
               {uniquePaid.map((paid) => (
                 <MenuItem key={paid} value={String(paid)}>
                   {String(paid).toUpperCase()}
@@ -998,6 +1067,9 @@ export default function FullFeaturedCrudGrid({
                 fontSize: "2.2rem",
                 color: "#38a3a5", // customize icon color
               },
+              "& .MuiFormLabel-root": {
+                color: "#38a3a5 !important",
+              },
             }}
           >
             <InputLabel>From</InputLabel>
@@ -1009,6 +1081,11 @@ export default function FullFeaturedCrudGrid({
                 ...sharedStyles,
               }}
             >
+              {/* NEW: “All” option */}
+              <MenuItem value="">
+                <em>All</em>
+              </MenuItem>
+
               {uniqueFrom.map((from) => (
                 <MenuItem key={from} value={from}>
                   {from}

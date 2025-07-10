@@ -49,7 +49,7 @@ const POSPage = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const inputRef = useRef(null);
   const [resetFlag, setResetFlag] = useState(false);
-  const [paymentType, setPaymentType] = useState("cash");
+  const [paymentType, setPaymentType] = useState("Cash");
   const [sampleMenu, setSampleMenu] = useState([]);
   const [selectedTab, setSelectedTab] = useState(0);
   const categories = ["Food", "Beverage", "Produces"];
@@ -249,7 +249,7 @@ const POSPage = () => {
         { ...saleData, date: new Date(saleData.date) },
       ]);
 
-      setPaymentType("cash");
+      setPaymentType("Cash");
       setResetFlag(true);
 
       if (isPrint) {

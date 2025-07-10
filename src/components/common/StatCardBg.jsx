@@ -14,7 +14,7 @@ const StatCardBg = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
-    <div className="flex justify-between px-1 py-2 sm:p-6 border-2 bg-[#e7ecef] border-gray-300 rounded-lg">
+    <div className="flex justify-between px-1 py-2 sm:p-6 border-2 border-gray-300 rounded-lg">
       <Box
         display="grid"
         gap="5px"

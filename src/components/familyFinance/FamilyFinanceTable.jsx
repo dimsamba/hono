@@ -582,7 +582,6 @@ export default function FullFeaturedCrudGrid({
     "& .MuiInputLabel-root": {
       color: "#38a3a5",
       fontSize: 14,
-      px: 1,
     },
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
@@ -867,7 +866,6 @@ export default function FullFeaturedCrudGrid({
                   },
                   "& .MuiInputLabel-root": {
                     color: "#38a3a5",
-                    fontSize: "16px",
                   },
                   "& .MuiOutlinedInput-root": {
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -901,7 +899,6 @@ export default function FullFeaturedCrudGrid({
                   },
                   "& .MuiInputLabel-root": {
                     color: "#38a3a5",
-                    fontSize: "16px",
                   },
                   "& .MuiOutlinedInput-root": {
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -970,6 +967,9 @@ export default function FullFeaturedCrudGrid({
                 fontSize: "2.2rem",
                 color: "#38a3a5", // customize icon color
               },
+              "& .MuiFormLabel-root": {
+                color: "#38a3a5 !important",
+              },
             }}
           >
             <InputLabel>Category</InputLabel>
@@ -982,6 +982,11 @@ export default function FullFeaturedCrudGrid({
                 ...sharedStyles,
               }}
             >
+              {/* NEW: “All” option */}
+              <MenuItem value="">
+                <em>All</em>
+              </MenuItem>
+
               {uniqueCategories.map((category) => (
                 <MenuItem key={category} value={category}>
                   {category}
@@ -1005,6 +1010,9 @@ export default function FullFeaturedCrudGrid({
                 fontSize: "2.2rem",
                 color: "#38a3a5", // customize icon color
               },
+              "& .MuiFormLabel-root": {
+                color: "#38a3a5 !important",
+              },
             }}
           >
             <InputLabel>Frequency</InputLabel>
@@ -1016,6 +1024,11 @@ export default function FullFeaturedCrudGrid({
                 ...sharedStyles,
               }}
             >
+              {/* NEW: “All” option */}
+              <MenuItem value="">
+                <em>All</em>
+              </MenuItem>
+
               {uniqueFrequencies.map((freq) => (
                 <MenuItem key={freq} value={freq}>
                   {freq}
@@ -1038,6 +1051,9 @@ export default function FullFeaturedCrudGrid({
                 fontSize: "2.2rem",
                 color: "#38a3a5", // customize icon color
               },
+              "& .MuiFormLabel-root": {
+                color: "#38a3a5 !important",
+              },
             }}
           >
             <InputLabel>From</InputLabel>
@@ -1049,6 +1065,11 @@ export default function FullFeaturedCrudGrid({
                 ...sharedStyles,
               }}
             >
+              {/* NEW: “All” option */}
+              <MenuItem value="">
+                <em>All</em>
+              </MenuItem>
+
               {uniqueFrom.map((from) => (
                 <MenuItem key={from} value={from}>
                   {from}
