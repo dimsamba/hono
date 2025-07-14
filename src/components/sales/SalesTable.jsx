@@ -9,6 +9,7 @@ import {
   FormControl,
   Select,
   MenuItem,
+  Typography,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -18,7 +19,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   DataGrid,
   GridActionsCellItem,
@@ -65,11 +66,23 @@ export default function FullFeaturedCrudGrid({
   const [toDate, setToDate] = useState(null);
   const [, setNewRowId] = React.useState(null);
   const [selectedPaiment, setSelectedPaiment] = useState("");
+  const [selectedItem, setSelectedItem] = useState("");
   const uniquePaiment = [
     ...new Set((rows || []).map((row) => row.payment_type).filter(Boolean)),
   ];
+  const uniqueItem = [
+    ...new Set(
+      (rows || [])
+        .flatMap((row) => row.items?.map((item) => item.name) ?? [])
+        .filter(Boolean)
+    ),
+  ];
+
   const filtersAreActive =
-    fromDate !== null || toDate !== null || selectedPaiment !== "";
+    fromDate !== null ||
+    toDate !== null ||
+    selectedPaiment !== "" ||
+    selectedItem !== "";
 
   React.useEffect(() => {
     setRows(SalesTable); // Update rows whenever SalesTable changes
@@ -189,47 +202,148 @@ export default function FullFeaturedCrudGrid({
 
   // Filter between dates
   // Get value between dates
-  let filteredRows = (rows || []).filter((row) => {
-    const rowDate = dayjs(row.date);
-    if (fromDate && toDate) {
-      return (
-        rowDate.isSameOrAfter(fromDate, "day") &&
-        rowDate.isSameOrBefore(toDate, "day")
-      );
-    }
-    if (fromDate) return rowDate.isSameOrAfter(fromDate, "day");
-    if (toDate) return rowDate.isSameOrBefore(toDate, "day");
-    return true;
-  });
+  const filteredData = useMemo(() => {
+    let totalSalesAmount = 0;
+    let totalEntries = 0;
+    let totalItemsCount = 0;
+    let totalIndvItems = 0;
+    let filteredItemCount = 0;
 
-  // payment_type filter
-  if (selectedPaiment) {
-    filteredRows = filteredRows.filter(
-      (row) => row.payment_type === selectedPaiment
-    );
-  }
+    const filteredRows = (rows || []).filter((row) => {
+      const rowDate = dayjs(row.date);
 
-  const totalItemsCount = filteredRows.reduce((sum, row) => {
-    const value = Number(row.total_items);
-    return sum + (isNaN(value) ? 0 : value);
-  }, 0);
+      if (fromDate && rowDate.isBefore(fromDate, "day")) return false;
+      if (toDate && rowDate.isAfter(toDate, "day")) return false;
+      if (selectedPaiment && row.payment_type !== selectedPaiment) return false;
 
-  const entryCount = filteredRows.length;
+      const rowItems =
+        typeof row.items === "string" ? JSON.parse(row.items) : row.items || [];
 
-  const filteredTotalValue = filteredRows.reduce(
-    (sum, row) => sum + (row.sale_total_disc || 0),
-    0
-  );
+      if (selectedItem) {
+        const hasItem = rowItems.some(
+          (i) =>
+            i.name?.trim().toLowerCase() === selectedItem.trim().toLowerCase()
+        );
+        if (!hasItem) return false;
+      }
 
-  // Notify parent with updated metrics
-  useEffect(() => {
-    onMetricsChange({
-      totalSalesAmount: filteredTotalValue,
-      totalEntries: entryCount,
-      totalItems: totalItemsCount,
-      filteredRows,
+      // Passed all filters — count things
+      totalEntries += 1;
+      totalSalesAmount += Number(row.sale_total_disc) || 0;
+      totalItemsCount += Number(row.total_items) || 0;
+
+      rowItems.forEach((i) => {
+        totalIndvItems += Number(i.quantity) || 0;
+
+        if (
+          selectedItem &&
+          i.name?.trim().toLowerCase() === selectedItem.trim().toLowerCase()
+        ) {
+          filteredItemCount += Number(i.quantity) || 0;
+        }
+      });
+
+      return true;
     });
-  }, [fromDate, toDate, rows, selectedPaiment]); // Trigger when relevant data changes
+
+    return {
+      filteredRows,
+      totalSalesAmount,
+      totalEntries,
+      totalItems: totalItemsCount,
+      totalindvItems: totalIndvItems,
+      filteredItemCount,
+    };
+  }, [rows, fromDate, toDate, selectedPaiment, selectedItem]);
+
+  // Notify parent of changes
+  useEffect(() => {
+    onMetricsChange(filteredData);
+  }, [filteredData]);
+
+  // 👇 Now you can safely use these in your JSX or other logic
+  const {
+    filteredRows,
+    filteredItemCount,
+  } = filteredData;
+
+  // let filteredRows = (rows || []).filter((row) => {
+  //   const rowDate = dayjs(row.date);
+  //   if (fromDate && toDate) {
+  //     return (
+  //       rowDate.isSameOrAfter(fromDate, "day") &&
+  //       rowDate.isSameOrBefore(toDate, "day")
+  //     );
+  //   }
+  //   if (fromDate) return rowDate.isSameOrAfter(fromDate, "day");
+  //   if (toDate) return rowDate.isSameOrBefore(toDate, "day");
+  //   return true;
+  // });
+
+  // // payment_type filter
+  // if (selectedPaiment) {
+  //   filteredRows = filteredRows.filter(
+  //     (row) => row.payment_type === selectedPaiment
+  //   );
+  // }
+
+  // // Item filter
+  // if (selectedItem) {
+  //   filteredRows = filteredRows.filter((row) =>
+  //     (row.items ?? []).some((item) => item.name === selectedItem)
+  //   );
+  // }
+
+  // const totalItemsCount = filteredRows.reduce((sum, row) => {
+  //   const value = Number(row.total_items);
+  //   return sum + (isNaN(value) ? 0 : value);
+  // }, 0);
+
+  // const filteredItemCount = filteredRows.reduce((sum, row) => {
+  //   // Parse row.items if it’s still a JSON string
+  //   const rowItems =
+  //     typeof row.items === "string" ? JSON.parse(row.items) : row.items || [];
+
+  //   // Sum quantity for the selected item
+  //   const itemQtySum = rowItems.reduce((itemSum, item) => {
+  //     const namesMatch =
+  //       selectedItem &&
+  //       item.name?.toLowerCase().trim() === selectedItem.toLowerCase().trim();
+  //     return namesMatch ? itemSum + (Number(item.quantity) || 0) : itemSum;
+  //   }, 0);
+
+  //   return sum + itemQtySum;
+  // }, 0);
+
+  // const totalIndvItemsCount = filteredRows.reduce((sum, row) => {
+  //   const rowItems =
+  //     typeof row.items === "string" ? JSON.parse(row.items) : row.items || [];
+
+  //   const itemQtySum = rowItems.reduce(
+  //     (itemSum, item) => itemSum + (Number(item.quantity) || 0),
+  //     0
+  //   );
+  //   return sum + itemQtySum;
+  // }, 0);
+
+  // const entryCount = filteredRows.length;
+
+  // const filteredTotalValue = filteredRows.reduce(
+  //   (sum, row) => sum + (row.sale_total_disc || 0),
+  //   0
+  // );
+
+  // // Notify parent with updated metrics
+  // useEffect(() => {
+  //   onMetricsChange({
+  //     totalSalesAmount: filteredTotalValue,
+  //     totalEntries: entryCount,
+  //     totalItems: totalItemsCount,
+  //     totalindvItems: totalIndvItemsCount,
+  //     filteredItemCount,
+  //     filteredRows,
+  //   });
+  // }, [fromDate, toDate, rows, selectedPaiment, selectedItem]); // Trigger when relevant data changes
 
   // Customize Toolbar
   const themeGrid = createTheme({
@@ -266,6 +380,42 @@ export default function FullFeaturedCrudGrid({
       },
     },
   };
+
+  //Fetch from sales table
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data, error } = await supabase.from("sales").select("items");
+
+      if (error) {
+        console.error("Error fetching sales data:", error.message);
+        return;
+      }
+
+      const itemCounts = {};
+
+      data.forEach(({ items }) => {
+        if (items) {
+          let parsedItems;
+
+          try {
+            // Supabase might return items already as an object, or as a JSON string
+            parsedItems = typeof items === "string" ? JSON.parse(items) : items;
+          } catch (e) {
+            console.error("Error parsing item JSON:", e);
+            return;
+          }
+
+          parsedItems.forEach(({ name, quantity }) => {
+            if (!name || !quantity) return;
+            itemCounts[name] = (itemCounts[name] || 0) + Number(quantity);
+          });
+        }
+      });
+
+    };
+
+    fetchData();
+  }, []);
 
   const columns = [
     {
@@ -640,11 +790,54 @@ export default function FullFeaturedCrudGrid({
               ))}
             </Select>
           </FormControl>
+          <FormControl
+            sx={{
+              ...sharedStyles,
+              width: "100%",
+              // Selected value text
+              "& .MuiSelect-select": {
+                color: "dimGray !important",
+                fontSize: "16px",
+                fontWeight: 500, // semibold
+              },
+              // Dropdown icon (arrow)
+              "& .MuiSvgIcon-root": {
+                fontSize: "2.2rem",
+                color: "#38a3a5", // customize icon color
+              },
+              "& .MuiFormLabel-root": {
+                color: "#38a3a5 !important",
+              },
+            }}
+          >
+            <InputLabel>Item</InputLabel>
+            <Select
+              value={selectedItem}
+              label="Iteme"
+              onChange={(e) => setSelectedItem(e.target.value)}
+              sx={{
+                ...sharedStyles,
+              }}
+            >
+              {/* NEW: “All” option */}
+              <MenuItem value="">
+                <em>All</em>
+              </MenuItem>
+
+              {uniqueItem.map((itemName) => (
+                <MenuItem key={itemName} value={itemName}>
+                  {itemName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <IconButton
             onClick={() => {
               setFromDate(null);
               setToDate(null);
               setSelectedPaiment(""); // Reset payment_type
+              setSelectedItem(""); // Reset payment_type
             }}
             sx={{
               width: "70px",

@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import supabase from "../components/supabaseClient";
 import { tokens } from "../components/theme";
-import { Add, Print, Save } from "@mui/icons-material";
+import { Print, Save } from "@mui/icons-material";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
@@ -463,27 +463,6 @@ const POSPage = () => {
     console.log("Selected payment type:", value);
   };
 
-  // TextField and InputLabel customizations
-  const sharedStyles = {
-    backgroundColor: "#ebf1fa",
-    "& .MuiInputLabel-root": {
-      color: "#364958",
-      fontSize: 18,
-      backgroundColor: "#ebf1fa",
-    },
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        border: "1px solid #45a29e",
-      },
-      "&:hover fieldset": {
-        borderColor: "#45a29e",
-      },
-      "&.Mui-focused fieldset": {
-        border: "3px solid #08bdbd",
-      },
-    },
-  };
-
   // Fetch data from Supabase
   useEffect(() => {
     const fetchData = async () => {
@@ -726,7 +705,8 @@ const POSPage = () => {
                             flexGrow: 1,
                             width: "100px",
                             height: "40px",
-                            backgroundColor: "#393E46",
+                            backgroundColor: "#33415c",
+                            border: "1px solid white",
                             color: "white",
                             "& .MuiInputBase-input": {
                               color: "white",
@@ -748,8 +728,9 @@ const POSPage = () => {
                           onClick={() => resetMenuPrices()}
                           sx={{
                             color: "white",
-                            backgroundColor: "#d97706",
+                            backgroundColor: "#33415c",
                             borderRadius: 0,
+                            border: "1px solid white",
                             width: "40px",
                             height: "40px",
                             "&:hover": {

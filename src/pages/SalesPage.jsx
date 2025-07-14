@@ -15,26 +15,54 @@ const SalesPage = () => {
   const [refreshKey, setRefreshKey] = useState(); // used to force re-render
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
+  const [selectedItem, setSelectedItem] = useState("");
 
   const [metrics, setMetrics] = useState({
     totalSalesAmount: 0,
     totalEntries: 0,
     totalItems: 0,
+    filteredItemCount: 0,
+    filteredRows: [],
   });
+  const [itemCounts, setItemCounts] = useState([]);
 
-  // Filter sales from last 30 days
+  // Fetch sales data from Supabase (Sales table)
+  useEffect(() => {
+    const fetchSalesData = async () => {
+      const { data, error } = await supabase.from("sales").select("*");
+
+      if (error) {
+        console.error("Error fetching sales data:", error.message);
+        return;
+      }
+
+      setSales(data);
+    };
+
+    fetchSalesData();
+  }, []);
+
+  // Handle item counts updates from SalesTable
+  const handleItemCountChange = (counts) => {
+    setItemCounts(counts);
+  };
+
+  const filteredItemCount = itemCounts.reduce((sum, item) => {
+    // Apply filter for selectedItem here (if applicable)
+    if (selectedItem && item.name === selectedItem) {
+      return sum + item.value;
+    }
+    return sum;
+  }, 0);
+
+  // Filter sales from the last 30 days
   const now = new Date();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(now.getDate() - 30);
 
   const salesLastMonth = sales.filter((sale) => {
     const saleDate = new Date(sale.date);
-
-    // Debug log to verify filtering
-    const isInLast30Days = saleDate >= thirtyDaysAgo && saleDate <= now;
-    console.log(`Sale on ${saleDate.toISOString()} included?`, isInLast30Days);
-
-    return isInLast30Days;
+    return saleDate >= thirtyDaysAgo && saleDate <= now;
   });
 
   const totalSalesValue = sales.reduce(
@@ -47,34 +75,6 @@ const SalesPage = () => {
     0
   );
 
-  // Fetch data from Supabase
-  // Place this function **outside** of useEffect
-  const fetchData = async () => {
-    const { data, error } = await supabase.from("sales").select("*");
-
-    if (error) {
-      console.error("Supabase SELECT error:", error.message);
-      return;
-    }
-
-    const formattedData = data.map((row) => ({
-      ...row,
-      date: row.date ? new Date(row.date) : new Date(),
-    }));
-
-    setSales(formattedData);
-  };
-
-  // Inside the component
-  useEffect(() => {
-    fetchData(); // ✅ call it here
-  }, []);
-
-  const handleSalesChange = () => {
-    fetchData();
-    setRefreshKey(Date.now()); // update with new timestamp to force StatCard re-render
-  };
-
   // Customization for decimals and thousands separators
   const formatCurrency = (value) => {
     const validNumber = !isNaN(parseFloat(value)) && isFinite(value);
@@ -83,6 +83,12 @@ const SalesPage = () => {
       maximumFractionDigits: 2,
     }).format(validNumber ? parseFloat(value) : 0);
   };
+
+  useEffect(() => {
+    console.log("Metrics (from SalesTable):", metrics);
+  }, [metrics]);
+
+  console.log("Selected Item:", selectedItem);
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
@@ -102,7 +108,7 @@ const SalesPage = () => {
                 <PointOfSaleIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
               }
               key={refreshKey} // 👈 triggers re-render when key changes
-              title={`Sales Sumary`}
+              title={`Sales Summary`}
               value={`€ ${formatCurrency(totalSalesValue)}`}
               subtitle={`${sales.length} Sales`}
             />
@@ -115,16 +121,7 @@ const SalesPage = () => {
               key={refreshKey} // 👈 triggers re-render when key changes
               title={`Last 30 Days`}
               value={`€ ${formatCurrency(totalSalesValue30Days)}`}
-              subtitle={`${
-                salesLastMonth.filter((sale) => {
-                  const today = new Date();
-                  const thirtyDaysAgo = new Date();
-                  thirtyDaysAgo.setDate(today.getDate() - 30);
-
-                  const saleDate = new Date(sale.date); // or sale.date
-                  return saleDate >= thirtyDaysAgo && saleDate <= today;
-                }).length
-              } Sales`}
+              subtitle={`${salesLastMonth.length} Sales`} // Simplified filter logic here
             />
             <StatCardBg
               icon={
@@ -135,23 +132,28 @@ const SalesPage = () => {
               title={`Total Between dates`}
               value={`€ ${formatCurrency(metrics.totalSalesAmount)}`}
               subtitle={`${metrics.totalEntries} Sales / ${metrics.totalItems} Items`}
+              subtitle2={`${metrics.filteredItemCount} Selected item`}
             />
           </Box>
         </motion.div>
         <motion.div className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-0">
-          {/* <SalesTable/> */}
+          {/* Sales Table */}
           <FullFeaturedCrudGrid
             sales={sales}
-            onSalesChange={handleSalesChange}
+            onSalesChange={() => fetchSalesData()} // Re-fetch sales data on change
             fromDate={fromDate}
             toDate={toDate}
             setFromDate={setFromDate}
             setToDate={setToDate}
+            selectedItem={selectedItem}
+            setSelectedItem={setSelectedItem}
             onMetricsChange={setMetrics}
+            onItemCountChange={handleItemCountChange}
           />
         </motion.div>
       </main>
     </div>
   );
 };
+
 export default SalesPage;

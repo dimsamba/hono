@@ -35,8 +35,6 @@ const OverviewPage = () => {
   const expenses =
     financialsData.length > 0 ? financialsData[0].total_expenses : 0;
 
-  const profitMargin = revenue > 0 ? (revenue - expenses) / revenue : 0;
-
   const formatCurrency = (value) => {
     const validNumber = !isNaN(parseFloat(value)) && isFinite(value);
     return new Intl.NumberFormat("en-US", {
@@ -183,7 +181,7 @@ const OverviewPage = () => {
     >
       <main className="max-w-9xl mx-auto py-6 px-1 lg:px-8">
         <motion.div
-          className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mb-3"
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mb-5"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
@@ -196,12 +194,13 @@ const OverviewPage = () => {
               />
             }
             title={`30 days Financial Summary`}
-            value={ 
-            <>
-              <span className={netProfit < 0 ? "text-red-400" : ""}>
+            value={
+              <>
+                <span className={netProfit < 0 ? "text-red-400" : ""}>
                   Net profit: € {formatCurrency(netProfit)}
                 </span>
-            </>}
+              </>
+            }
             subtitle={`Revenue € ${formatCurrency(revenue)}`}
             subtitleRed2={`Expenses € ${formatCurrency(expenses)}`}
           />
@@ -213,7 +212,9 @@ const OverviewPage = () => {
             }
             title={`Sales Summary`}
             value={`Total: € ${formatCurrency(totalSalesValue)}`}
-            subtitle={`Last 30 Days: € ${formatCurrency(totalSalesValue30Days)}`}
+            subtitle={`Last 30 Days: € ${formatCurrency(
+              totalSalesValue30Days
+            )}`}
             subtitle2={`N. Sales: ${sales.length} / ${
               salesLastMonth.filter((sale) => {
                 const today = new Date();
@@ -243,7 +244,7 @@ const OverviewPage = () => {
                 : "No data available"
             }
           />
-           <StatCard
+          <StatCard
             icon={
               <InventoryOutlinedIcon
                 sx={{ color: "#38a3a5", fontSize: "26px" }}
