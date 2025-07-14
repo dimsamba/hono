@@ -129,7 +129,7 @@ const SalesPage = () => {
                   sx={{ color: "#38a3a5", fontSize: "26px" }}
                 />
               }
-              title={`Total Between dates`}
+              title={`Filtered`}
               value={`€ ${formatCurrency(metrics.totalSalesAmount)}`}
               subtitle={`${metrics.totalEntries} Sales / ${metrics.totalItems} Items`}
               subtitle2={`${metrics.filteredItemCount} Selected item`}

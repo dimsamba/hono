@@ -79,7 +79,7 @@ const invoicePaga = () => {
           >
             <StatCard
               key={refreshKey} // 👈 triggers re-render when key changes
-              title={`OVERVIEW`}
+              title={`Overview`}
               value={`€ ${formatCurrency(totalAmountTTC)}`}
               subtitleRed={(() => {
                 const now = new Date();
@@ -131,7 +131,7 @@ const invoicePaga = () => {
 
             <StatCard
               key={refreshKey} // 👈 triggers re-render when key changes
-              title={`OVERVIEW`}
+              title={`Overview`}
               value={`${invoicesData.length} Entries`}
               subtitle={`${(() => {
                 const paidInvoices = invoicesData.filter((inv) => inv.paid);
@@ -158,7 +158,7 @@ const invoicePaga = () => {
 
             <StatCardBg
               key={refreshKey} // 👈 triggers re-render when key changes
-              title={`FILTERED`}
+              title={`Filtered`}
               value={`€ ${formatCurrency(filteredTotalValue)}`}
               subtitle={`Paid TTC € ${formatCurrency(filteredPaidValue)}`}
               subtitleRed2={`Unpaid TTC € ${formatCurrency(

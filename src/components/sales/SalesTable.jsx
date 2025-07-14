@@ -622,9 +622,9 @@ export default function FullFeaturedCrudGrid({
         <Box
           display="grid"
           gap="10px"
-          gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+          gridTemplateColumns="repeat(5, minmax(0, 1fr))"
           sx={{
-            "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+            "& > div": { gridColumn: isNonMobile ? undefined : "span 5" },
             mb: "20px",
           }}
         >

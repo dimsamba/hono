@@ -530,11 +530,11 @@ const POSPage = () => {
   const getCategoryColor = (category) => {
     switch (category.toLowerCase()) {
       case "beverage":
-        return "#722323"; // warm orange tone
+        return "#fad2e1"; // warm orange tone
       case "produces":
-        return "#2F5249 "; // rich green tone
+        return "#bee1e6 "; // rich green tone
       default:
-        return "#254D70"; // default purple tone
+        return "#dfe7fd"; // default purple tone
     }
   };
 
@@ -597,7 +597,7 @@ const POSPage = () => {
                 pt: 1,
               }}
             >
-              <Grid2 container spacing={0} sx={{ width: "100%" }}>
+              <Grid2 container spacing={0.2} sx={{ width: "100%" }}>
                 {sampleMenu.map((item) => (
                   <Grid2
                     item
@@ -615,6 +615,8 @@ const POSPage = () => {
                         backgroundColor: getCategoryColor(item.category),
                         mb: 0.5,
                         mr: 0.5,
+                        border: "1px solid #086788",
+                        p: 0.5
                       }}
                     >
                       <Box
@@ -625,7 +627,7 @@ const POSPage = () => {
                         sx={{
                           height: "100%",
                           maxWidth: "100%",
-                          flexGrow: 1,
+                          flexGrow: 1,                       
                         }}
                       >
                         <Box
@@ -654,7 +656,7 @@ const POSPage = () => {
                                 height: 100,
                                 borderRadius: 0,
                                 "&:hover": {
-                                  backgroundColor: "#007090",
+                                  backgroundColor: "#e2eafc",
                                 },
                                 opacity:
                                   !item.price || item.price === "" ? 0.5 : 1, // optional visual cue
@@ -662,9 +664,9 @@ const POSPage = () => {
                             >
                               <Typography
                                 sx={{
-                                  fontSize: 18,
-                                  fontWeight: 500,
-                                  color: "white",
+                                  fontSize: 20,
+                                  fontWeight: 700,
+                                  color: "#1b4965",
                                   flexGrow: 1,
                                   whiteSpace: "normal",
                                   overflow: "hidden",
@@ -705,7 +707,7 @@ const POSPage = () => {
                             flexGrow: 1,
                             width: "100px",
                             height: "40px",
-                            backgroundColor: "#33415c",
+                            backgroundColor: "#5c677d",
                             border: "1px solid white",
                             color: "white",
                             "& .MuiInputBase-input": {
@@ -728,13 +730,13 @@ const POSPage = () => {
                           onClick={() => resetMenuPrices()}
                           sx={{
                             color: "white",
-                            backgroundColor: "#33415c",
+                            backgroundColor: "#ff6392",
                             borderRadius: 0,
                             border: "1px solid white",
                             width: "40px",
                             height: "40px",
                             "&:hover": {
-                              backgroundColor: "#b45309", // Optional hover color
+                              backgroundColor: "#ea7317", // Optional hover color
                             },
                           }} // Smaller button padding
                         >
