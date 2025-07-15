@@ -599,7 +599,11 @@ const RecipeForm = ({
           }
           title={`Cost Info`}
           value={`Recipe Cost: € ${formatCurrency(totalCost)}`}
-          value2={`Actual FC: ${formatCurrency(actualFoodCostPct)}%`}
+          value2={
+            <span style={{ color: actualFoodCostPct > 28 ? "#f78154" : "inherit" }}>
+              Actual FC: {formatCurrency(actualFoodCostPct)}%
+            </span>
+          }
         />
       </motion.div>
       <Box

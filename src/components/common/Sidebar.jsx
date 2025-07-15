@@ -305,7 +305,7 @@ const Sidebar = () => {
           >
             <LogOutIcon
               className="text-[16px] sm:text-[20px]"
-              style={{ color: "#CC4444", minWidth: "16px" }}
+              style={{ color: "#f78154", minWidth: "16px" }}
             />
             {isSidebarOpen && (
               <span className="ml-4 whitespace-nowrap text-gray-700">
