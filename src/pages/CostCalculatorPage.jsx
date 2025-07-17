@@ -5,7 +5,6 @@ import supabase from "../components/supabaseClient";
 
 // ✅ Import Supabase
 const CostCalculatorPage = () => {
-
   const [totalValue] = useState(0); // 🔄 comes from IngredientTable
   const [refreshTrigger, setRefreshTrigger] = useState(false); // optional
   const [, setItems] = useState([]); // Initialize ingredients state
@@ -50,14 +49,9 @@ const CostCalculatorPage = () => {
   }, []);
 
   return (
-    <div className="flex-1 overflow-auto relative z-10">
-      <main className="max-w-5xl mx-auto">
-            <motion.div
-            className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-8"
-            // initial={{ opacity: 0, y: 20 }}
-            // animate={{ opacity: 1, y: 0 }}
-            // transition={{ duration: 1 }}
-          >
+    <div className="flex-1 overflow-hidden relative z-10 bg-primary-700">
+      <main className="max-w-9xl mx-auto py-6 px-4 lg:px-8 scrollbar-hide">
+        <motion.div className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-8">
           {/* Pass CostData to FullFeaturedCrudGrid */}
           <CostForm
             onRecipeSaved={handleRefresh}
@@ -65,7 +59,7 @@ const CostCalculatorPage = () => {
             setItems={setItems}
             onTotalValueChange={handleTotalValueChange}
           />
-          </motion.div>
+        </motion.div>
       </main>
     </div>
   );

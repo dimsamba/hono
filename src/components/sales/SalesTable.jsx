@@ -9,7 +9,6 @@ import {
   FormControl,
   Select,
   MenuItem,
-  Typography,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -262,88 +261,7 @@ export default function FullFeaturedCrudGrid({
   }, [filteredData]);
 
   // 👇 Now you can safely use these in your JSX or other logic
-  const {
-    filteredRows,
-    filteredItemCount,
-  } = filteredData;
-
-  // let filteredRows = (rows || []).filter((row) => {
-  //   const rowDate = dayjs(row.date);
-  //   if (fromDate && toDate) {
-  //     return (
-  //       rowDate.isSameOrAfter(fromDate, "day") &&
-  //       rowDate.isSameOrBefore(toDate, "day")
-  //     );
-  //   }
-  //   if (fromDate) return rowDate.isSameOrAfter(fromDate, "day");
-  //   if (toDate) return rowDate.isSameOrBefore(toDate, "day");
-  //   return true;
-  // });
-
-  // // payment_type filter
-  // if (selectedPaiment) {
-  //   filteredRows = filteredRows.filter(
-  //     (row) => row.payment_type === selectedPaiment
-  //   );
-  // }
-
-  // // Item filter
-  // if (selectedItem) {
-  //   filteredRows = filteredRows.filter((row) =>
-  //     (row.items ?? []).some((item) => item.name === selectedItem)
-  //   );
-  // }
-
-  // const totalItemsCount = filteredRows.reduce((sum, row) => {
-  //   const value = Number(row.total_items);
-  //   return sum + (isNaN(value) ? 0 : value);
-  // }, 0);
-
-  // const filteredItemCount = filteredRows.reduce((sum, row) => {
-  //   // Parse row.items if it’s still a JSON string
-  //   const rowItems =
-  //     typeof row.items === "string" ? JSON.parse(row.items) : row.items || [];
-
-  //   // Sum quantity for the selected item
-  //   const itemQtySum = rowItems.reduce((itemSum, item) => {
-  //     const namesMatch =
-  //       selectedItem &&
-  //       item.name?.toLowerCase().trim() === selectedItem.toLowerCase().trim();
-  //     return namesMatch ? itemSum + (Number(item.quantity) || 0) : itemSum;
-  //   }, 0);
-
-  //   return sum + itemQtySum;
-  // }, 0);
-
-  // const totalIndvItemsCount = filteredRows.reduce((sum, row) => {
-  //   const rowItems =
-  //     typeof row.items === "string" ? JSON.parse(row.items) : row.items || [];
-
-  //   const itemQtySum = rowItems.reduce(
-  //     (itemSum, item) => itemSum + (Number(item.quantity) || 0),
-  //     0
-  //   );
-  //   return sum + itemQtySum;
-  // }, 0);
-
-  // const entryCount = filteredRows.length;
-
-  // const filteredTotalValue = filteredRows.reduce(
-  //   (sum, row) => sum + (row.sale_total_disc || 0),
-  //   0
-  // );
-
-  // // Notify parent with updated metrics
-  // useEffect(() => {
-  //   onMetricsChange({
-  //     totalSalesAmount: filteredTotalValue,
-  //     totalEntries: entryCount,
-  //     totalItems: totalItemsCount,
-  //     totalindvItems: totalIndvItemsCount,
-  //     filteredItemCount,
-  //     filteredRows,
-  //   });
-  // }, [fromDate, toDate, rows, selectedPaiment, selectedItem]); // Trigger when relevant data changes
+  const { filteredRows } = filteredData;
 
   // Customize Toolbar
   const themeGrid = createTheme({
@@ -411,7 +329,6 @@ export default function FullFeaturedCrudGrid({
           });
         }
       });
-
     };
 
     fetchData();
@@ -749,6 +666,8 @@ export default function FullFeaturedCrudGrid({
               },
             }}
           />
+
+          {/* Payment Type */}
           <FormControl
             sx={{
               ...sharedStyles,

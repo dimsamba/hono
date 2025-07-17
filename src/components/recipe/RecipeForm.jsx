@@ -536,19 +536,16 @@ const RecipeForm = ({
 
   // TextField and InputLabel customizations
   const sharedStyles = {
-    backgroundColor: "#ebf1fa",
     "& .MuiInputLabel-root": {
-      color: "#007f5f",
-      fontSize: 16,
-      backgroundColor: "#ebf1fa",
-      px: 1,
+      color: "#38a3a5",
+      fontSize: 14,
     },
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
-        border: "1px solid #60d394",
+        border: "1px solid #38a3a5",
       },
       "&:hover fieldset": {
-        borderColor: "#60d394",
+        borderColor: "darkGreen",
       },
       "&.Mui-focused fieldset": {
         borderColor: "#25a18e",
@@ -600,498 +597,603 @@ const RecipeForm = ({
           title={`Cost Info`}
           value={`Recipe Cost: € ${formatCurrency(totalCost)}`}
           value2={
-            <span style={{ color: actualFoodCostPct > 28 ? "#f78154" : "inherit" }}>
+            <span
+              style={{ color: actualFoodCostPct > 28 ? "#f78154" : "inherit" }}
+            >
               Actual FC: {formatCurrency(actualFoodCostPct)}%
             </span>
           }
         />
       </motion.div>
+      
       <Box
+        className="Main Box"
         sx={{
-          height: 3000,
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          height: { xs: "auto", md: "100%" }, // ← KEY LINE!
           width: "100%",
           border: "2px solid lightGray",
           borderRadius: 2,
-          padding: 1,
+          p: 2,
         }}
       >
-        <form onSubmit={handleSubmit}>
-          <h3 className="text-base mb-5 ml-3 mt-2 text-[#3FA89B] font-bold">
-            ADD / UPDATE RECIPE
-          </h3>
-          <Box
-            display="grid"
-            gap="15px"
-            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-            sx={{
-              "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-            }}
-          >
-            <FormControl
-              fullWidth
-              variant="outlined"
-              sx={{ gridColumn: "span 2" }}
+        {/* Left Box: Recipe Calculator */}
+        <Box
+          className="Recipe Calculator"
+          sx={{
+            flex: "1 1 auto",
+            minHeight: 0,
+            height: "auto", // Make sure not to force height
+          }}
+        >
+          <form onSubmit={handleSubmit} className="p-2 bg-gray-100 text-[#444]">
+            <h3 className="text-base mb-4 text-[#3FA89B] font-bold">
+              ADD / UPDATE RECIPE
+            </h3>
+            <Box
+              display="grid"
+              gap="15px"
+              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+              sx={{
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+              }}
             >
-              <TextField
+              <FormControl
                 fullWidth
                 variant="outlined"
-                label="Recipe Name"
-                value={recipeName}
-                onChange={(e) => setRecipeName(e.target.value)}
-                required
-                sx={{
-                  ...sharedStyles,
-                  input: { color: "#333", fontSize: 16 },
-                }}
-              />
-            </FormControl>
+                sx={{ gridColumn: "span 2" }}
+              >
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Recipe Name"
+                  value={recipeName}
+                  onChange={(e) => setRecipeName(e.target.value)}
+                  required
+                  sx={{
+                    ...sharedStyles,
+                    input: { color: "#333", fontSize: 16 },
+                  }}
+                />
+              </FormControl>
 
-            {/* Recipe Type */}
-            <FormControl
-              fullWidth
-              variant="outlined"
-              sx={{ gridColumn: "span 2" }}
-            >
-              <InputLabel
-                id="recipe-type-label"
+              {/* Recipe Type */}
+              <FormControl
                 sx={{
-                  color: "#007f5f",
-                  fontSize: 16,
-                  backgroundColor: "#ebf1fa",
-                  px: 1,
+                  gridColumn: "span 2",
+                  ...sharedStyles,
+                  width: "100%",
+                  // Selected value text
+                  "& .MuiSelect-select": {
+                    color: "dimGray !important",
+                    fontSize: "16px",
+                    fontWeight: 500, // semibold
+                  },
+                  // Dropdown icon (arrow)
+                  "& .MuiSvgIcon-root": {
+                    fontSize: "2.2rem",
+                    color: "#38a3a5", // customize icon color
+                  },
+                  "& .MuiFormLabel-root": {
+                    color: "#38a3a5 !important",
+                  },
                 }}
               >
-                Category
-              </InputLabel>
-              <Select
-                labelId="recipe-type-label"
-                value={recipeType}
-                onChange={(e) => setRecipeType(e.target.value)}
-                required
-                sx={{
-                  "& .MuiSelect-select": {
-                    color: "#333",
-                    fontSize: 16,
-                  },
-                  border: "1px solid #60d394",
-                  "& .MuiInputLabel-animated": {
-                    color: "#60d394",
-                    fontSize: 16,
-                  },
-                  backgroundColor: "#ebf1fa",
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      backgroundColor: "#f5f5f5", // ✅ gray background for dropdown
-                      color: "#777",
-                    },
-                  },
-                  MenuListProps: {
-                    sx: {
-                      "& .MuiMenuItem-root": {
-                        fontSize: 16,
+                <InputLabel>Recipe Type</InputLabel>
+                <Select
+                  value={recipeType}
+                  label="Recipe Type"
+                  onChange={(e) => setRecipeType(e.target.value)}
+                  required
+                  sx={{
+                    ...sharedStyles,
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        ...sharedStyles,
+                        backgroundColor: "#f5f5f5", // ✅ gray background for dropdown
+                        color: "#777",
                       },
                     },
+                    MenuListProps: {
+                      sx: {
+                        ...sharedStyles,
+                        "& .MuiMenuItem-root": {
+                          fontSize: 16,
+                        },
+                      },
+                    },
+                  }}
+                >
+                  {recipeTypes.map((type) => (
+                    <MenuItem key={type.value} value={type.value}>
+                      {type.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl
+                sx={{
+                  gridColumn: "span 2",
+                  ...sharedStyles,
+                  width: "100%",
+                  // Selected value text
+                  "& .MuiSelect-select": {
+                    color: "dimGray !important",
+                    fontSize: "16px",
+                    fontWeight: 500, // semibold
+                  },
+                  // Dropdown icon (arrow)
+                  "& .MuiSvgIcon-root": {
+                    fontSize: "2.2rem",
+                    color: "#38a3a5", // customize icon color
+                  },
+                  "& .MuiFormLabel-root": {
+                    color: "#38a3a5 !important",
                   },
                 }}
               >
-                {recipeTypes.map((type) => (
-                  <MenuItem key={type.value} value={type.value}>
-                    {type.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                {/* Number of Portions */}
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Number of Portions"
+                  type="number"
+                  value={numberOfPortions}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string to let the user delete and type freely
+                    if (val === "") {
+                      setNumberOfPortions("");
+                    } else {
+                      setNumberOfPortions(Number(val));
+                    }
+                  }}
+                  slotProps={{ min: 1 }}
+                  required
+                  sx={{
+                    ...sharedStyles,
+                    input: { color: "#333", fontSize: 16 },
+                  }}
+                />
+              </FormControl>
 
-            <FormControl
-              fullWidth
-              variant="outlined"
-              sx={{ gridColumn: "span 2" }}
-            >
-              {/* Number of Portions */}
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Number of Portions"
-                type="number"
-                value={numberOfPortions}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  // Allow empty string to let the user delete and type freely
-                  if (val === "") {
-                    setNumberOfPortions("");
-                  } else {
-                    setNumberOfPortions(Number(val));
-                  }
-                }}
-                slotProps={{ min: 1 }}
-                required
+              <FormControl
                 sx={{
+                  gridColumn: "span 2",
                   ...sharedStyles,
-                  input: { color: "#333", fontSize: 16 },
-                }}
-              />
-            </FormControl>
-
-            <FormControl
-              fullWidth
-              variant="outlined"
-              sx={{ gridColumn: "span 2" }}
-            >
-              {/* Actual Sale Price */}
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Actual Sale Price (€)"
-                type="number"
-                value={actualSalePrice}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  // Allow empty string to let the user delete and type freely
-                  if (val === "") {
-                    setActualSalePrice("");
-                  } else {
-                    setActualSalePrice(Number(val));
-                  }
-                }}
-                slotProps={{ min: 0, step: "0.01" }}
-                required
-                sx={{
-                  ...sharedStyles,
-                  input: { color: "#333", fontSize: 16 },
-                }}
-              />
-            </FormControl>
-
-            <FormControl
-              fullWidth
-              variant="outlined"
-              sx={{ gridColumn: "span 4" }}
-            >
-              {/* Note */}
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Note"
-                value={recipeNote}
-                onChange={(e) => setRecipeNote(e.target.value)}
-                multiline
-                minRows={2} // or rows={4} if you want a fixed height
-                sx={{
-                  ...sharedStyles,
-                  "& .MuiInputBase-inputMultiline": {
-                    color: "#333", // ✅ text color for textarea
-                    fontSize: 16,
+                  width: "100%",
+                  // Selected value text
+                  "& .MuiSelect-select": {
+                    color: "dimGray !important",
+                    fontSize: "16px",
+                    fontWeight: 500, // semibold
+                  },
+                  // Dropdown icon (arrow)
+                  "& .MuiSvgIcon-root": {
+                    fontSize: "2.2rem",
+                    color: "#38a3a5", // customize icon color
+                  },
+                  "& .MuiFormLabel-root": {
+                    color: "#38a3a5 !important",
                   },
                 }}
-              />
-            </FormControl>
-          </Box>
+              >
+                {/* Actual Sale Price */}
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Actual Sale Price (€)"
+                  type="number"
+                  value={actualSalePrice}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string to let the user delete and type freely
+                    if (val === "") {
+                      setActualSalePrice("");
+                    } else {
+                      setActualSalePrice(Number(val));
+                    }
+                  }}
+                  slotProps={{ min: 0, step: "0.01" }}
+                  required
+                  sx={{
+                    ...sharedStyles,
+                    input: { color: "#333", fontSize: 16 },
+                  }}
+                />
+              </FormControl>
 
-          {/* IngredientsTable */}
-          <Box
-            sx={{
-              ...sharedStyles,
-              mt: 2,
-              px: "5px",
-              pb: "5px",
-              fontSize: 14,
-              border: "1px solid #60d394",
-              "& .bg-gray-200": {
-                backgroundColor: "#ebf1fa",
-              },
-              "& .text-white": {
-                color: "#007f5f",
-              },
-            }}
-          >
-            <table className="table-auto w-full text-sm bg-[#ebf1fa] text-[#333] rounded shadow">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="p-2 font-semibold text-white text-left">
-                    Select an Ingredient
-                  </th>
-                  <th className="p-2 font-semibold text-white text-left">
-                    Qty Used
-                  </th>
-                  <th className="p-2 font-semibold text-white text-left">
-                    Unit type
-                  </th>
-                  <th className="p-2 font-semibold text-white text-left">
-                    Price/Unit
-                  </th>
-                  <th className="p-2 font-semibold text-white text-left">
-                    Cost
-                  </th>
-                  <th className="p-2">Del</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ingredients.map((item, index) => (
-                  <tr key={index}>
-                    <td className="p-2">
-                      <select
-                        className="bg-gray-100 p-1 rounded w-full"
-                        value={item.item_id || ""}
-                        onChange={(e) =>
-                          handleIngredientChange(
-                            index,
-                            "item_id",
-                            e.target.value
-                          )
-                        }
-                      >
-                        <option value="">Select Ingredeient</option>
-                        {[...inventoryItems]
-                          .sort((a, b) =>
-                            a.item_name.localeCompare(b.item_name)
-                          )
-                          .map((item) => (
-                            <option key={item.item_name} value={item.item_name}>
-                              {item.item_name}
-                            </option>
-                          ))}
-                      </select>
-                    </td>
-                    <td className="p-2">
-                      <input
-                        type="number"
-                        className="bg-gray-100 p-1 rounded w-20"
-                        value={item.quantity_used}
-                        onChange={(e) =>
-                          handleIngredientChange(
-                            index,
-                            "quantity_used",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td>
-                    <td className="p-2">{item.unit_type}</td>
-                    <td className="p-2">€{item.price_per_unit?.toFixed(5)}</td>
-                    <td className="p-2">€{item.cost?.toFixed(4)}</td>
-                    <td className="p-2 text-right">
-                      <button
-                        type="button" // <<<<< THIS is critical
-                        onClick={() => removeIngredientRow(index)}
-                        className="hover:text-red-400 text-lightGray font-semibold px-2 py-1 rounded"
-                      >
-                        𝘅
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {/* Finish item Table */}
-          </Box>
-
-          <Box
-            display="grid"
-            gap="10px"
-            gridTemplateColumns={isMobile ? "repeat(2, 1fr)" : "repeat(8, 1fr)"}
-            sx={{
-              "& > div": { gridColumn: isNonMobile ? undefined : "span 1" },
-            }}
-          >
-            {/* Add Ingredients button */}
-            <Button
-              onClick={addIngredientRow}
-              variant="contained"
-              disabled={!formFilled}
-              sx={{
-                gridColumn: isMobile ? "span 2" : "span 2",
-                backgroundColor: "#26A889",
-                color: "white",
-                fontSize: 14,
-                "&:hover": {
-                  backgroundColor: "#62CDB4",
-                },
-                marginTop: isMobile ? 2 : 2,
-                height: 40,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "1.5rem",
-                  fontWeight: "bold",
-                  marginRight: "0.5rem",
+              <FormControl
+                sx={{
+                  gridColumn: "span 4",
+                  ...sharedStyles,
+                  width: "100%",
+                  // Selected value text
+                  "& .MuiSelect-select": {
+                    color: "dimGray !important",
+                    fontSize: "16px",
+                    fontWeight: 500, // semibold
+                  },
+                  // Dropdown icon (arrow)
+                  "& .MuiSvgIcon-root": {
+                    fontSize: "2.2rem",
+                    color: "#38a3a5", // customize icon color
+                  },
+                  "& .MuiFormLabel-root": {
+                    color: "#38a3a5 !important",
+                  },
                 }}
               >
-                +{" "}
-              </span>
-              Ingredients
-            </Button>
+                {/* Note */}
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Note"
+                  value={recipeNote}
+                  onChange={(e) => setRecipeNote(e.target.value)}
+                  multiline
+                  minRows={2} // or rows={4} if you want a fixed height
+                  sx={{
+                    ...sharedStyles,
+                    "& .MuiInputBase-inputMultiline": {
+                      color: "#333", // ✅ text color for textarea
+                      fontSize: 16,
+                    },
+                  }}
+                />
+              </FormControl>
+            </Box>
 
-            {/* Save Recipe Button */}
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={loading || recipeSelected}
+            {/* IngredientsTable */}
+            <Box
               sx={{
-                gridColumn: isMobile ? "span 1" : "span 2",
-                backgroundColor: "#26A889",
-                color: "white",
+                flex: 1,
+                height: "100%",
+                mt: 2,
                 fontSize: 14,
-                "&:hover": {
-                  backgroundColor: "#62CDB4",
+                minWidth: 0,
+                minHeight: 0,
+                border: "1px solid #60d394",
+                "& .text-white": {
+                  color: "#007f5f",
                 },
-                marginTop: isMobile ? 0 : 2,
-                height: 40,
               }}
             >
-              {loading ? "Saving..." : "Save"}
-            </Button>
-
-            {/* Update Recipe Button */}
-            <Button
-              type="button"
-              onClick={handleUpdate}
-              variant="contained"
-              disabled={loading}
-              sx={{
-                gridColumn: isMobile ? "span 1" : "span 2",
-                backgroundColor: "#00b4d8",
-                color: "white",
-                fontSize: 14,
-                "&:hover": {
-                  backgroundColor: "#90e0ef",
-                },
-                marginTop: isMobile ? 0 : 2,
-                height: 40,
-              }}
-            >
-              {loading ? "Saving..." : "Update"}
-            </Button>
-
-            {/* Delete Recipe */}
-            <Button
-              type="button"
-              variant="contained"
-              onClick={() => handleDeleteRecipe(recipeId)} // Make sure recipeId is defined
-              sx={{
-                gridColumn: isMobile ? "span 1" : "span 1",
-                backgroundColor: "#ff4d6d",
-                color: "white",
-                fontSize: 14,
-                "&:hover": {
-                  backgroundColor: "#ff758f",
-                },
-                marginTop: isMobile ? 0 : 2,
-                height: 40,
-              }}
-            >
-              Del
-            </Button>
-
-            {/* Clear button */}
-            <Button
-              type="button"
-              variant="contained"
-              onClick={() => {
-                setRecipeName("");
-                setRecipeType("");
-                setNumberOfPortions("");
-                setActualSalePrice("");
-                setRecipeNote("");
-                setIngredients([]);
-                setRecipeSelected(false);
-              }}
-              sx={{
-                gridColumn: isMobile ? "span 1" : "span 1",
-                backgroundColor: "#EAB308",
-                "&:hover": {
-                  backgroundColor: "#facc15",
-                },
-                marginTop: isMobile ? 0 : 2,
-                height: 40,
-              }}
-            >
-              Clear
-            </Button>
-          </Box>
-
-          <Snackbar
-            open={openSnackbar}
-            autoHideDuration={3000}
-            onClose={() => setOpenSnackbar(false)}
-          >
-            <Alert
-              onClose={() => setOpenSnackbar(false)}
-              severity={snackbarSeverity}
-              sx={{ width: "100%" }}
-            >
-              {snackbarMessage}
-            </Alert>
-          </Snackbar>
-        </form>
-
-        {/* Recipe List  */}
-        <div className="p-4 bg-gray-100 text-[#444] my-2 ">
-          <h2 className="text-xl mb-4">Saved Recipes</h2>
-
-          {loading ? (
-            <p>Loading recipes...</p>
-          ) : recipes.length === 0 ? (
-            <p>No recipes saved yet.</p>
-          ) : (
-            <div className="overflow-x-auto max-h-[500px] overflow-y-auto hide-scrollbar">
-              <table className="table-auto w-full text-sm">
-                <thead className="bg-[#2a303a] sticky top-0 z-10">
-                  <tr>
-                    <th className="p-2 text-left text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                      Name
+              <table className="table-auto w-full text-sm text-[#333] rounded shadow">
+                <thead>
+                  <tr
+                    className="bg-gray-200"
+                    style={{ borderBottom: "1px solid #60d394" }}
+                  >
+                    <th className="p-2 font-semibold text-white bg-[#ebf1fa] text-left">
+                      Select an Ingredient
                     </th>
-                    <th className="p-2 text-Center text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                      N. Items
+                    <th className="p-2 font-semibold text-white bg-[#ebf1fa] text-left">
+                      Qty Used
                     </th>
-                    <th className="p-2 text-left text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                      Type
+                    <th className="p-2 font-semibold text-white bg-[#ebf1fa] text-left">
+                      Unit type
                     </th>
-                    <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                      Cost (€)
+                    <th className="p-2 font-semibold text-white bg-[#ebf1fa] text-left">
+                      Price/Unit
                     </th>
-                    <th className="p-2 text-Center text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                      # Portions
+                    <th className="p-2 font-semibold text-white bg-[#ebf1fa] text-left">
+                      Cost
                     </th>
-                    <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                      Price (€)
-                    </th>
-                    <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                      Food Cost %
+                    <th className="p-2 font-semibold text-white bg-[#ebf1fa] text-left">
+                      Del
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {recipes.map((recipe) => (
-                    <tr
-                      key={recipe.id}
-                      className="border-b border-gray-700 hover:bg-gray-200"
-                      onClick={() => handleRecipeSelect(recipe.id)} // 👈 Add this line
-                    >
-                      <td className="p-2">{recipe.recipe_name}</td>
-                      <td className="p-2 text-center">{recipe.num_items}</td>
-                      <td className="p-2 capitalize">{recipe.recipe_type}</td>
-                      <td className="p-2 text-right">
-                        €{recipe.total_cost?.toFixed(2)}
+                  {ingredients.map((item, index) => (
+                    <tr key={index} className="border-b hover:bg-gray-200">
+                      <td className="p-2">
+                        <select
+                          className="bg-gray-100 p-1 rounded w-full"
+                          value={item.item_id || ""}
+                          onChange={(e) =>
+                            handleIngredientChange(
+                              index,
+                              "item_id",
+                              e.target.value
+                            )
+                          }
+                        >
+                          <option value="">Select Ingredeient</option>
+                          {[...inventoryItems]
+                            .sort((a, b) =>
+                              a.item_name.localeCompare(b.item_name)
+                            )
+                            .map((item) => (
+                              <option
+                                key={item.item_name}
+                                value={item.item_name}
+                              >
+                                {item.item_name}
+                              </option>
+                            ))}
+                        </select>
                       </td>
-                      <td className="p-2 text-center">
-                        {recipe.number_of_portions}
+                      <td className="p-2">
+                        <input
+                          type="number"
+                          className="bg-gray-100 p-1 rounded w-20"
+                          value={item.quantity_used}
+                          onChange={(e) =>
+                            handleIngredientChange(
+                              index,
+                              "quantity_used",
+                              e.target.value
+                            )
+                          }
+                        />
                       </td>
-                      <td className="p-2 text-right">
-                        €{recipe.actual_sale_price?.toFixed(2)}
+                      <td className="p-2">{item.unit_type}</td>
+                      <td className="p-2">
+                        €{item.price_per_unit?.toFixed(5)}
                       </td>
+                      <td className="p-2">€{item.cost?.toFixed(4)}</td>
                       <td className="p-2 text-right">
-                        {recipe.actual_food_cost_pct?.toFixed(1)}%
+                        <button
+                          type="button" // <<<<< THIS is critical
+                          onClick={() => removeIngredientRow(index)}
+                          className="hover:text-red-400 text-lightGray font-semibold px-2 py-1 rounded"
+                        >
+                          𝘅
+                        </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            </div>
-          )}
-        </div>
+              {/* Finish item Table */}
+            </Box>
+
+            {/* Buttons */}
+            <Box
+              display="grid"
+              gap="5px"
+              gridTemplateColumns={
+                isMobile ? "repeat(2, 1fr)" : "repeat(8, 1fr)"
+              }
+              sx={{
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 1" },
+                pb: 1,
+              }}
+            >
+              {/* Add Ingredients button */}
+              <Button
+                onClick={addIngredientRow}
+                variant="contained"
+                disabled={!formFilled}
+                sx={{
+                  gridColumn: isMobile ? "span 2" : "span 2",
+                  backgroundColor: "#26A889",
+                  color: "white",
+                  fontSize: 14,
+                  "&:hover": {
+                    backgroundColor: "#62CDB4",
+                  },
+                  marginTop: isMobile ? 2 : 2,
+                  height: 40,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    marginRight: "0.5rem",
+                  }}
+                >
+                  +{" "}
+                </span>
+                Ingredients
+              </Button>
+
+              {/* Save Recipe Button */}
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading || recipeSelected}
+                sx={{
+                  gridColumn: isMobile ? "span 1" : "span 2",
+                  backgroundColor: "#26A889",
+                  color: "white",
+                  fontSize: 14,
+                  "&:hover": {
+                    backgroundColor: "#62CDB4",
+                  },
+                  marginTop: isMobile ? 0 : 2,
+                  height: 40,
+                }}
+              >
+                {loading ? "Saving..." : "Save"}
+              </Button>
+
+              {/* Update Recipe Button */}
+              <Button
+                type="button"
+                onClick={handleUpdate}
+                variant="contained"
+                disabled={loading}
+                sx={{
+                  gridColumn: isMobile ? "span 1" : "span 2",
+                  backgroundColor: "#00b4d8",
+                  color: "white",
+                  fontSize: 14,
+                  "&:hover": {
+                    backgroundColor: "#90e0ef",
+                  },
+                  marginTop: isMobile ? 0 : 2,
+                  height: 40,
+                }}
+              >
+                {loading ? "Saving..." : "Update"}
+              </Button>
+
+              {/* Delete Recipe */}
+              <Button
+                type="button"
+                variant="contained"
+                onClick={() => handleDeleteRecipe(recipeId)} // Make sure recipeId is defined
+                sx={{
+                  gridColumn: isMobile ? "span 1" : "span 1",
+                  backgroundColor: "#ff4d6d",
+                  color: "white",
+                  fontSize: 14,
+                  "&:hover": {
+                    backgroundColor: "#ff758f",
+                  },
+                  marginTop: isMobile ? 0 : 2,
+                  height: 40,
+                }}
+              >
+                Del
+              </Button>
+
+              {/* Clear button */}
+              <Button
+                type="button"
+                variant="contained"
+                onClick={() => {
+                  setRecipeName("");
+                  setRecipeType("");
+                  setNumberOfPortions("");
+                  setActualSalePrice("");
+                  setRecipeNote("");
+                  setIngredients([]);
+                  setRecipeSelected(false);
+                }}
+                sx={{
+                  gridColumn: isMobile ? "span 1" : "span 1",
+                  backgroundColor: "#EAB308",
+                  "&:hover": {
+                    backgroundColor: "#facc15",
+                  },
+                  marginTop: isMobile ? 0 : 2,
+                  height: 40,
+                }}
+              >
+                Clear
+              </Button>
+            </Box>
+
+            <Snackbar
+              open={openSnackbar}
+              autoHideDuration={3000}
+              onClose={() => setOpenSnackbar(false)}
+            >
+              <Alert
+                onClose={() => setOpenSnackbar(false)}
+                severity={snackbarSeverity}
+                sx={{ width: "100%" }}
+              >
+                {snackbarMessage}
+              </Alert>
+            </Snackbar>
+          </form>
+        </Box>
+
+        {/* Saved Recipe List  */}
+        <Box
+          className="Saved Recipe List"
+          sx={{
+            flexGrow: 1,
+            flexShrink: 1,
+            flexBasis: "auto",
+            height: "auto", // Make sure not to force height
+            minHeight: 0, // Allow shrinking if needed
+          }}
+        >
+          <div className="p-2 bg-gray-100 text-[#444]">
+            <h2 className="text-base mb-4 text-[#3FA89B] font-bold">
+              SAVED RECIPES
+            </h2>
+            <Box
+              className="Saved Recipe List"
+              sx={{
+                widows: "100%",
+                 minWidth: 0,
+                borderRadius: 0,
+                border: "1px solid #60d394",
+               
+              }}
+            >
+              {loading ? (
+                <p>Loading recipes...</p>
+              ) : recipes.length === 0 ? (
+                <p>No recipes saved yet.</p>
+              ) : (
+                <div className="overflow-x-auto max-h-[500px] overflow-y-auto hide-scrollbar">
+                  <table className="table-auto w-full text-sm">
+                    <thead
+                      className="bg-[#2a303a] sticky top-0 z-10"
+                      style={{ borderBottom: "1px solid #60d394" }}
+                    >
+                      <tr>
+                        <th className="p-2 text-left text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                          Name
+                        </th>
+                        <th className="p-2 text-Center text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                          N. Items
+                        </th>
+                        <th className="p-2 text-left text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                          Type
+                        </th>
+                        <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                          Cost (€)
+                        </th>
+                        <th className="p-2 text-Center text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                          # Portions
+                        </th>
+                        <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                          Price (€)
+                        </th>
+                        <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                          Food Cost %
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {recipes.map((recipe) => (
+                        <tr
+                          key={recipe.id}
+                          className="border-b hover:bg-gray-200"
+                          onClick={() => handleRecipeSelect(recipe.id)} // 👈 Add this line
+                        >
+                          <td className="p-2">{recipe.recipe_name}</td>
+                          <td className="p-2 text-center">
+                            {recipe.num_items}
+                          </td>
+                          <td className="p-2 capitalize">
+                            {recipe.recipe_type}
+                          </td>
+                          <td className="p-2 text-right">
+                            €{recipe.total_cost?.toFixed(2)}
+                          </td>
+                          <td className="p-2 text-center">
+                            {recipe.number_of_portions}
+                          </td>
+                          <td className="p-2 text-right">
+                            €{recipe.actual_sale_price?.toFixed(2)}
+                          </td>
+                          <td className="p-2 text-right">
+                            {recipe.actual_food_cost_pct?.toFixed(1)}%
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </Box>
+          </div>
+        </Box>
       </Box>
     </main>
   );
