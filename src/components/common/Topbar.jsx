@@ -84,7 +84,19 @@ const Topbar = ({ title }) => {
           sx={{ color: colors.grey[700] }}
           onClick={(event) => setAnchorEl(event.currentTarget)}
         >
-          <Badge badgeContent={invoiceAlerts.length} sx={{ color: "#3FA89B",}} color="error">
+          <Badge
+            badgeContent={invoiceAlerts.length}
+             sx={{
+              color: "#3FA89B",
+              "& .MuiBadge-badge": {
+                fontSize: "1rem", // ✅ Increase font size here
+                minWidth: 20, // optional: widen the badge if needed
+                height: 20, // optional: adjust height
+                backgroundColor: "#eb6424"
+              },
+            }}
+            color="error"
+          >
             <NotificationsOutlinedIcon />
           </Badge>
         </IconButton>
@@ -147,9 +159,12 @@ const Topbar = ({ title }) => {
                     color: dayjs(invoice.invoice_date).isBefore(dayjs(), "day")
                       ? "#ff5714"
                       : "#454955", // Tailwind's text-gray-900
-                    fontWeight: dayjs(invoice.invoice_date).isBefore(dayjs(), "day")
+                    fontWeight: dayjs(invoice.invoice_date).isBefore(
+                      dayjs(),
+                      "day"
+                    )
                       ? "semiBold"
-                      : "normal"
+                      : "normal",
                   }}
                 >
                   {dayjs(invoice.invoice_date).isBefore(dayjs(), "day")
@@ -243,15 +258,26 @@ const Topbar = ({ title }) => {
         {/* Agenda Notifications Icon */}
         <IconButton
           sx={{ color: colors.grey[700] }}
-            // open Menu on hover
-            onClick={(event) => setAgendaAnchorEl(event.currentTarget)}
-            >
-            <Badge badgeContent={agendaTasks.length} sx={{ color: "#3FA89B",}} color="error">
-              <EventAvailableOutlinedIcon />
-            </Badge>
-            </IconButton> 
+          onClick={(event) => setAgendaAnchorEl(event.currentTarget)}
+        >
+          <Badge
+            badgeContent={agendaTasks.length}
+            color="error"
+            sx={{
+              color: "#3FA89B",
+              "& .MuiBadge-badge": {
+                fontSize: "1rem", // ✅ Increase font size here
+                minWidth: 20, // optional: widen the badge if needed
+                height: 20, // optional: adjust height
+                backgroundColor: "#eb6424"
+              },
+            }}
+          >
+            <EventAvailableOutlinedIcon />
+          </Badge>
+        </IconButton>
 
-            {/* Agenda Dropdown */}
+        {/* Agenda Dropdown */}
         <Menu
           anchorEl={agendaAnchorEl}
           open={Boolean(agendaAnchorEl)}

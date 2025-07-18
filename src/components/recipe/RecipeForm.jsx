@@ -1159,33 +1159,37 @@ const RecipeForm = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {recipes.map((recipe) => (
-                        <tr
-                          key={recipe.id}
-                          className="border-b hover:bg-gray-200"
-                          onClick={() => handleRecipeSelect(recipe.id)} // 👈 Add this line
-                        >
-                          <td className="p-2">{recipe.recipe_name}</td>
-                          <td className="p-2 text-center">
-                            {recipe.num_items}
-                          </td>
-                          <td className="p-2 capitalize">
-                            {recipe.recipe_type}
-                          </td>
-                          <td className="p-2 text-right">
-                            €{recipe.total_cost?.toFixed(2)}
-                          </td>
-                          <td className="p-2 text-center">
-                            {recipe.number_of_portions}
-                          </td>
-                          <td className="p-2 text-right">
-                            €{recipe.actual_sale_price?.toFixed(2)}
-                          </td>
-                          <td className="p-2 text-right">
-                            {recipe.actual_food_cost_pct?.toFixed(1)}%
-                          </td>
-                        </tr>
-                      ))}
+                      {[...recipes]
+                        .sort((a, b) =>
+                          a.recipe_name.localeCompare(b.recipe_name)
+                        ) // Alphabetical by recipe_name
+                        .map((recipe) => (
+                          <tr
+                            key={recipe.id}
+                            className="border-b hover:bg-gray-200"
+                            onClick={() => handleRecipeSelect(recipe.id)} // 👈 Add this line
+                          >
+                            <td className="p-2">{recipe.recipe_name}</td>
+                            <td className="p-2 text-center">
+                              {recipe.num_items}
+                            </td>
+                            <td className="p-2 capitalize">
+                              {recipe.recipe_type}
+                            </td>
+                            <td className="p-2 text-right">
+                              €{recipe.total_cost?.toFixed(2)}
+                            </td>
+                            <td className="p-2 text-center">
+                              {recipe.number_of_portions}
+                            </td>
+                            <td className="p-2 text-right">
+                              €{recipe.actual_sale_price?.toFixed(2)}
+                            </td>
+                            <td className="p-2 text-right">
+                              {recipe.actual_food_cost_pct?.toFixed(1)}%
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>

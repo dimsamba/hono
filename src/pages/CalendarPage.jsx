@@ -135,12 +135,7 @@ const CalendarPage = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10 bg-gray-100">
       <main className="max-w-7xl mx-auto">
-        <motion.div
-          className="grid grid-cols-1 gap-0 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 mb-3 content-center"
-          // initial={{ opacity: 0, y: 20 }}
-          // animate={{ opacity: 1, y: 0 }}
-          // transition={{ duration: 1 }}
-        >
+        <motion.div className="grid grid-cols-1 gap-0 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 mb-3 content-center">
           <Box sx={{ px: 1 }}>
             {/* Box  */}
             <Box
@@ -192,55 +187,62 @@ const CalendarPage = () => {
                   "&::-webkit-scrollbar": { display: "none" },
                 }}
               >
-                {events.map((event) => (
-                  <ListItem key={event.id} disablePadding>
-                    <ListItemButton
-                      onClick={() => {
-                        setSelectedTask(event.task);
+                {[...events]
+                  .filter((e) => !!e.date)
+                  .sort((a, b) => new Date(a.date) - new Date(b.date)) // ascending
+                  .map((event) => {
+                    const isPast =
+                      new Date(event.date).setHours(0, 0, 0, 0) <
+                      new Date().setHours(0, 0, 0, 0); // compares only by date
 
-                        // Assuming event.date is a valid date string like "2025-06-22"
-                        if (calendarRef.current) {
-                          const calendarApi = calendarRef.current.getApi();
-                          calendarApi.gotoDate(event.date); // ✅ Scrolls to the event's date
-                        }
-                      }}
-                      selected={selectedTask === event.task} // ✅ check if this item is selected
-                      sx={{
-                        backgroundColor:
-                          selectedTask === event.task
-                            ? "#b7efc5"
-                            : "transparent", // keep background after click
-                        "&:hover": {
-                          backgroundColor: "#b7efc5", // same as selected color
-                        },
-                        py: 0.01,
-                      }}
-                    >
-                      <ListItemText
-                        primary={event.title}
-                        primaryTypographyProps={{
-                          fontSize: 14,
-                          color: "#777",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      />
-
-                      <Box sx={{ width: "30%", textAlign: "right" }}>
-                        <ListItemText
-                          primary={new Date(event.date).toLocaleDateString(
-                            "fr-FR"
-                          )}
-                          primaryTypographyProps={{
-                            fontSize: 14,
-                            color: "#777",
+                    return (
+                      <ListItem key={event.id} disablePadding>
+                        <ListItemButton
+                          onClick={() => {
+                            setSelectedTask(event.task);
+                            if (calendarRef.current) {
+                              const calendarApi = calendarRef.current.getApi();
+                              calendarApi.gotoDate(event.date);
+                            }
                           }}
-                        />
-                      </Box>
-                    </ListItemButton>
-                  </ListItem>
-                ))}
+                          selected={selectedTask === event.task}
+                          sx={{
+                            backgroundColor:
+                              selectedTask === event.task
+                                ? "#b7efc5"
+                                : "transparent",
+                            "&:hover": {
+                              backgroundColor: "#b7efc5",
+                            },
+                            py: 0.01,
+                          }}
+                        >
+                          <ListItemText
+                            primary={event.title}
+                            primaryTypographyProps={{
+                              fontSize: 14,
+                              color: isPast ? "#cc6600" : "#777", // dark orange if past
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          />
+
+                          <Box sx={{ width: "30%", textAlign: "right" }}>
+                            <ListItemText
+                              primary={new Date(event.date).toLocaleDateString(
+                                "fr-FR"
+                              )}
+                              primaryTypographyProps={{
+                                fontSize: 14,
+                                color: isPast ? "#cc6600" : "#777", // dark orange if past
+                              }}
+                            />
+                          </Box>
+                        </ListItemButton>
+                      </ListItem>
+                    );
+                  })}
               </List>
             </FormControl>
 

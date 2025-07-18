@@ -950,22 +950,27 @@ const StockTakeForm = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {stockTake.map((stockTake) => (
-                        <tr
-                          key={stockTake.id}
-                          className="border-b hover:bg-gray-200"
-                          onClick={() => handleStockTakeSelect(stockTake.id)} // 👈 Add this line
-                        >
-                          <td className="p-2"> {formatDate(stockTake.date)}</td>
-                          <td className="p-2 text-center">
-                            {stockTake.total_items}
-                          </td>
-                          <td className="p-2 text-right">
-                            €{stockTake.total_value?.toFixed(2)}
-                          </td>
-                          <td className="p-2">{stockTake.note}</td>
-                        </tr>
-                      ))}
+                      {[...stockTake]
+                        .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by date, descending
+                        .map((stockTake) => (
+                          <tr
+                            key={stockTake.id}
+                            className="border-b hover:bg-gray-200"
+                            onClick={() => handleStockTakeSelect(stockTake.id)} // 👈 Add this line
+                          >
+                            <td className="p-2">
+                              {" "}
+                              {formatDate(stockTake.date)}
+                            </td>
+                            <td className="p-2 text-center">
+                              {stockTake.total_items}
+                            </td>
+                            <td className="p-2 text-right">
+                              €{stockTake.total_value?.toFixed(2)}
+                            </td>
+                            <td className="p-2">{stockTake.note}</td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>

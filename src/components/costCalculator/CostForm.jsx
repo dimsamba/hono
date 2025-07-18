@@ -755,7 +755,7 @@ const CostForm = () => {
             flexBasis: "auto",
             height: "auto", // Make sure not to force height
             minHeight: 0, // Allow shrinking if needed
-            p: 0.5
+            p: 0.5,
           }}
         >
           <div className="p-0 bg-gray-100 text-[#444]">
@@ -798,35 +798,39 @@ const CostForm = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {financialsData.map((item, index) => (
-                      <tr
-                        key={index}
-                        className="border-b hover:bg-gray-200"
-                        onClick={() => handleCostSelect(item.id)} // 👈 Add this line
-                      >
-                        <td className="p-2 text-center">
-                          {dayjs(item.date_from).format("DD-MM-YYYY")}
-                        </td>
-                        <td className="p-2 text-center">
-                          {dayjs(item.date_to).format("DD-MM-YYYY")}
-                        </td>
-                        <td className="p-2 text-right">
-                          {item.total_expenses.toFixed(2)}€
-                        </td>
-                        <td className="p-2 text-right">
-                          {item.total_revenue.toFixed(2)}€
-                        </td>
-                        <td className="p-2 text-right">
-                          {(item.total_revenue - item.total_expenses).toFixed(
-                            2
-                          )}
-                          €
-                        </td>
-                        <td className="p-2 text-left">
-                          {item.comment || "No comment"}
-                        </td>
-                      </tr>
-                    ))}
+                    {[...financialsData]
+                      .sort(
+                        (a, b) => new Date(b.date_from) - new Date(a.date_from)
+                      ) // descending order
+                      .map((item, index) => (
+                        <tr
+                          key={index}
+                          className="border-b hover:bg-gray-200"
+                          onClick={() => handleCostSelect(item.id)} // 👈 Add this line
+                        >
+                          <td className="p-2 text-center">
+                            {dayjs(item.date_from).format("DD-MM-YYYY")}
+                          </td>
+                          <td className="p-2 text-center">
+                            {dayjs(item.date_to).format("DD-MM-YYYY")}
+                          </td>
+                          <td className="p-2 text-right">
+                            {item.total_expenses.toFixed(2)}€
+                          </td>
+                          <td className="p-2 text-right">
+                            {item.total_revenue.toFixed(2)}€
+                          </td>
+                          <td className="p-2 text-right">
+                            {(item.total_revenue - item.total_expenses).toFixed(
+                              2
+                            )}
+                            €
+                          </td>
+                          <td className="p-2 text-left">
+                            {item.comment || "No comment"}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
