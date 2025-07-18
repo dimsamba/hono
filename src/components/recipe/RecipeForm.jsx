@@ -14,7 +14,6 @@ import {
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import supabase from "../supabaseClient"; // Import Supabase client
-import StatCard from "../common/StatCard";
 import StatCardRecipe from "../common/StatCardRecipe";
 import RamenDiningOutlinedIcon from "@mui/icons-material/RamenDiningOutlined";
 import LoyaltyOutlinedIcon from "@mui/icons-material/LoyaltyOutlined";
@@ -440,10 +439,11 @@ const RecipeForm = ({
     { value: "prep", label: "Prep" },
     { value: "preserve", label: "Preserve" },
     { value: "sauce", label: "Sauce" },
-    { value: "sorbet", label: "Sorbet" },
     { value: "side", label: "Side" },
+    { value: "sorbet", label: "Sorbet" },
     { value: "soup", label: "Soup" },
     { value: "starter", label: "Starter" },
+    { value: "sweets", label: "Sweets" },
     { value: "tart", label: "Tart" },
     { value: "tartare", label: "Tartare" },
     { value: "terrine", label: "Terrine" },
@@ -565,7 +565,7 @@ const RecipeForm = ({
   return (
     <main>
       <motion.div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 mb-3">
-        <StatCard
+        <StatCardRecipe
           icon={
             <RamenDiningOutlinedIcon
               sx={{ color: "#38a3a5", fontSize: "26px" }}
@@ -573,7 +573,7 @@ const RecipeForm = ({
           }
           title={"Recipes Sumary"}
           value={`${recipes.length} Saved Recipes`}
-          subtitle={
+          value2={
             latestEntryDate
               ? `Last Entry: ${format(new Date(latestEntryDate), "dd-MM-yyyy")}`
               : "No data available"
@@ -605,7 +605,7 @@ const RecipeForm = ({
           }
         />
       </motion.div>
-      
+
       <Box
         className="Main Box"
         sx={{
@@ -1118,10 +1118,9 @@ const RecipeForm = ({
               className="Saved Recipe List"
               sx={{
                 widows: "100%",
-                 minWidth: 0,
+                minWidth: 0,
                 borderRadius: 0,
                 border: "1px solid #60d394",
-               
               }}
             >
               {loading ? (

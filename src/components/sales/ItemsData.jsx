@@ -507,11 +507,13 @@ export default function FullFeaturedCrudGrid({
               ...sharedStyles,
             }}
           >
-            {uniqueCategories.map((category) => (
-              <MenuItem key={category} value={category}>
-                {category}
-              </MenuItem>
-            ))}
+            {[...uniqueCategories]
+              .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+              .map((category) => (
+                <MenuItem key={category} value={category}>
+                  {category}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
         <IconButton

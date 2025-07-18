@@ -987,11 +987,13 @@ export default function FullFeaturedCrudGrid({
                 <em>All</em>
               </MenuItem>
 
-              {uniqueCategories.map((category) => (
-                <MenuItem key={category} value={category}>
-                  {category}
-                </MenuItem>
-              ))}
+              {[...uniqueCategories]
+                .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+                .map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
 
@@ -1029,11 +1031,13 @@ export default function FullFeaturedCrudGrid({
                 <em>All</em>
               </MenuItem>
 
-              {uniqueFrequencies.map((freq) => (
-                <MenuItem key={freq} value={freq}>
-                  {freq}
-                </MenuItem>
-              ))}
+              {[...uniqueFrequencies]
+                .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+                .map((freq) => (
+                  <MenuItem key={freq} value={freq}>
+                    {freq}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
           <FormControl
@@ -1070,11 +1074,13 @@ export default function FullFeaturedCrudGrid({
                 <em>All</em>
               </MenuItem>
 
-              {uniqueFrom.map((from) => (
-                <MenuItem key={from} value={from}>
-                  {from}
-                </MenuItem>
-              ))}
+              {[...uniqueFrom]
+                .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+                .map((from) => (
+                  <MenuItem key={from} value={from}>
+                    {from}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         </Box>

@@ -498,7 +498,15 @@ export default function FullFeaturedCrudGrid({
       filteredUnpaidValue: unpaid,
       filtered,
     };
-  }, [rows, fromDate, toDate, entryDate, selectedCategory, selectedPaid, selectedFrom]); // Only recompute when these change
+  }, [
+    rows,
+    fromDate,
+    toDate,
+    entryDate,
+    selectedCategory,
+    selectedPaid,
+    selectedFrom,
+  ]); // Only recompute when these change
 
   // ⬇️ Send filtered results to parent
   useEffect(() => {
@@ -746,7 +754,7 @@ export default function FullFeaturedCrudGrid({
       field: "created_at",
       headerName: "Entry Date",
       width: 180,
-      editable: false,  
+      editable: false,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
@@ -1003,11 +1011,13 @@ export default function FullFeaturedCrudGrid({
                 <em>All</em>
               </MenuItem>
 
-              {uniqueCategories.map((category) => (
-                <MenuItem key={category} value={category}>
-                  {category}
-                </MenuItem>
-              ))}
+              {[...uniqueCategories]
+                .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+                .map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
 
@@ -1040,14 +1050,13 @@ export default function FullFeaturedCrudGrid({
                 ...sharedStyles,
               }}
             >
-              {/* NEW: “All” option */}
               <MenuItem value="">
                 <em>All</em>
               </MenuItem>
 
               {uniquePaid.map((paid) => (
                 <MenuItem key={paid} value={String(paid)}>
-                  {String(paid).toUpperCase()}
+                  {paid === true ? "Paid" : "Unpaid"}
                 </MenuItem>
               ))}
             </Select>
@@ -1086,11 +1095,13 @@ export default function FullFeaturedCrudGrid({
                 <em>All</em>
               </MenuItem>
 
-              {uniqueFrom.map((from) => (
-                <MenuItem key={from} value={from}>
-                  {from}
-                </MenuItem>
-              ))}
+              {[...uniqueFrom]
+                .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+                .map((from) => (
+                  <MenuItem key={from} value={from}>
+                    {from}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         </Box>
