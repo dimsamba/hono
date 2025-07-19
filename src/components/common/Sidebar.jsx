@@ -47,7 +47,7 @@ const SIDEBAR_ITEMS = [
     href: "/items",
   },
   {
-    name: "Prep List",
+    name: "Task List",
     icon: PlaylistAddCheckIcon,
     color: "#3FA89B",
     href: "/prep",

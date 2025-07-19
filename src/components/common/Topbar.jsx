@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import AgendaNotification from "../common/AgendaNotification";
 import Notification from "../common/Notification";
 import { tokens } from "../theme";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 const Topbar = ({ title }) => {
   const theme = useTheme();
@@ -33,6 +34,25 @@ const Topbar = ({ title }) => {
   const [agendaAnchorEl, setAgendaAnchorEl] = useState(null);
   const [agendaTasks, setAgendaTasks] = useState([]);
   const navigate = useNavigate();
+  const [currentTime, setCurrentTime] = useState(dayjs().format("HH:mm:ss"));
+
+  // Clock function Date and Time
+ useEffect(() => {
+  const updateClock = () => {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, "0");
+    const month = now.toLocaleString("default", { month: "short" }); // e.g. Jul
+    const year = now.getFullYear();
+    const time = now.toLocaleTimeString("en-GB"); // HH:MM:SS format
+
+    setCurrentTime(`${day} ${month} ${year} - ${time}`);
+  };
+
+  updateClock(); // set initial time
+  const intervalId = setInterval(updateClock, 1000); // update every second
+
+  return () => clearInterval(intervalId);
+}, []);
 
   // Fetch agend Notifications
   useEffect(() => {
@@ -79,6 +99,26 @@ const Topbar = ({ title }) => {
       </Typography>
 
       <Box display="flex" backgroundColor="#f3f4f6" borderRadius="3px">
+        {/*  Clock */}
+        {/* Clock */}
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            px: 2,
+            fontSize: "1.5rem",
+            fontWeight: 600,
+            color: "#3FA899",
+            fontFamily: "monospace",
+            borderRadius: "6px",
+            ml: 2,
+          }}
+        >
+          <AccessTimeIcon sx={{ fontSize: 22, mr: 1, color: "#3FA89B" }} />
+          {currentTime}
+        </Box>
+
         {/* Notification Icon */}
         <IconButton
           sx={{ color: colors.grey[700] }}
@@ -86,13 +126,13 @@ const Topbar = ({ title }) => {
         >
           <Badge
             badgeContent={invoiceAlerts.length}
-             sx={{
+            sx={{
               color: "#3FA89B",
               "& .MuiBadge-badge": {
                 fontSize: "1rem", // ✅ Increase font size here
                 minWidth: 20, // optional: widen the badge if needed
                 height: 20, // optional: adjust height
-                backgroundColor: "#eb6424"
+                backgroundColor: "#eb6424",
               },
             }}
             color="error"
@@ -100,7 +140,6 @@ const Topbar = ({ title }) => {
             <NotificationsOutlinedIcon />
           </Badge>
         </IconButton>
-
         {/* Notification Dropdown */}
         <Menu
           anchorEl={anchorEl}
@@ -187,7 +226,6 @@ const Topbar = ({ title }) => {
             ))
           )}
         </Menu>
-
         {/* Invoice Detail Dialog */}
         <Dialog
           open={dialogOpen}
@@ -254,7 +292,6 @@ const Topbar = ({ title }) => {
             </Button>
           </DialogActions>
         </Dialog>
-
         {/* Agenda Notifications Icon */}
         <IconButton
           sx={{ color: colors.grey[700] }}
@@ -269,14 +306,13 @@ const Topbar = ({ title }) => {
                 fontSize: "1rem", // ✅ Increase font size here
                 minWidth: 20, // optional: widen the badge if needed
                 height: 20, // optional: adjust height
-                backgroundColor: "#eb6424"
+                backgroundColor: "#eb6424",
               },
             }}
           >
             <EventAvailableOutlinedIcon />
           </Badge>
         </IconButton>
-
         {/* Agenda Dropdown */}
         <Menu
           anchorEl={agendaAnchorEl}

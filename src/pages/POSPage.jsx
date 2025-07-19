@@ -571,7 +571,7 @@ const POSPage = () => {
 
   return (
     <div className="flex-1 overflow-hidden relative z-10 bg-[#fcfeff] border-t-2">
-      <main className="max-w-8xl mx-auto scrollbar-hide h-[1500px]">
+      <main className="max-w-8xl mx-auto scrollbar-hide h-[640px] bg-[#e7ecef]">
         {/* Items buttons and Sale Summary */}
         <motion.div
           className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-3"
@@ -591,13 +591,35 @@ const POSPage = () => {
           >
             {/* 1st Column Items grid */}
             <Box
+              /* 1️⃣  The scrollable wrapper */
               sx={{
-                gridColumn: "span 6", // Half of the 8 columns
-                px: 0,
-                pt: 1,
+                gridColumn: "span 6", // keep your original layout rule
+                p: 0,
+                m: 1,
+                border: "1px solid #45a29e",
+                /* the important bits ↓ */
+                height: 630, // or "200px" — fixed box height
+              //  backgroundColor: "orange",
+
+                overflowY: "auto", // allow vertical scrolling
+                overflowX: "hidden", // no horizontal scrollbars
+
+                /* hide the scrollbar everywhere */
+                scrollbarWidth: "none", // Firefox
+                "-ms-overflow-style": "none", // old Edge / IE
+                "&::-webkit-scrollbar": { display: "none" }, // Chrome, Safari, new Edge
               }}
             >
-              <Grid2 container spacing={0.5} sx={{ width: "100%" }}>
+              <Grid2
+                container
+                spacing={0.5}
+                sx={{
+                  width: "100%",
+                  m: 0, // cancel the default negative margins Grid adds
+                  /* keep items packed to the top, so empty space is below them */
+                  alignContent: "flex-start",
+                }}
+              >
                 {sampleMenu.map((item) => (
                   <Grid2
                     item
@@ -612,7 +634,7 @@ const POSPage = () => {
                       sx={{
                         backgroundColor: getCategoryColor(item.category),
                         mb: 0.5,
-                        mr: 0.5,
+                        mr: 0,
                         border: "2px solid #277da1",
                         borderRadius: 0,
                         padding: "5px 5px 5px 5px",
@@ -642,7 +664,6 @@ const POSPage = () => {
                       >
                         <Typography
                           sx={{
-
                             fontSize: 18,
                             fontWeight: 700,
                             color: "#1b4965",
@@ -786,7 +807,7 @@ const POSPage = () => {
                         fontSize: 16,
                         fontWeight: 100,
                         color: "#cae9ff",
-                        height: "50px",
+                        height: "61px",
                         justifyContent: "center",
                         borderBottom: "1px solid lightGray",
                         "&.Mui-selected": {
@@ -883,7 +904,7 @@ const POSPage = () => {
                 alignItems="center"
                 sx={{
                   backgroundColor: "#white",
-                  height: 50,
+                  height: 66,
                 }}
               >
                 <IconButton
@@ -1142,33 +1163,55 @@ const POSPage = () => {
                 </Box>
 
                 {/* Order Items */}
-                {order.map((item) => (
-                  <Box
-                    key={item.id}
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mt={0} // Reduced vertical spacing
-                  >
-                    <Typography sx={{ fontSize: "0.875rem", lineHeight: 1.2 }}>
-                      {item.quantity} {item.name} (€
-                      {item.originalPrice?.toFixed(2)})
-                      {item.price !== item.originalPrice &&
-                        ` → €${item.price.toFixed(2)}`}
-                    </Typography>
-                    <Box display="flex" alignItems="center" gap={0.5}>
-                      <Typography>
-                        €{(item.quantity * item.price).toFixed(2)}
-                      </Typography>
-                      <IconButton
-                        onClick={() => removeFromOrder(item)}
-                        sx={{ color: "#af3800", p: "4px" }} // Smaller button padding
+                <Box
+                  sx={{
+                    maxHeight: "205px",
+                    overflowY: "auto",
+                    pr: 1,
+                    scrollbarWidth: "none",
+                    "&::-webkit-scrollbar": {
+                      display: "none",
+                    },
+                  }}
+                >
+                  {order.map((item) => (
+                    <Box
+                      key={item.id}
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      mt={0} // Reduced vertical spacing
+                      sx={{
+                        maxHeight: "200px !important",
+                        overflowY: "auto",
+                        scrollbarWidth: "none", // Firefox
+                        "&::-webkit-scrollbar": {
+                          display: "none", // Chrome, Safari, Edge
+                        },
+                      }}
+                    >
+                      <Typography
+                        sx={{ fontSize: "0.875rem", lineHeight: 1.2 }}
                       >
-                        <CancelOutlinedIcon fontSize="small" />
-                      </IconButton>
+                        {item.quantity} {item.name} (€
+                        {item.originalPrice?.toFixed(2)})
+                        {item.price !== item.originalPrice &&
+                          ` → €${item.price.toFixed(2)}`}
+                      </Typography>
+                      <Box display="flex" alignItems="center" gap={0.5}>
+                        <Typography>
+                          €{(item.quantity * item.price).toFixed(2)}
+                        </Typography>
+                        <IconButton
+                          onClick={() => removeFromOrder(item)}
+                          sx={{ color: "#af3800", p: "4px" }} // Smaller button padding
+                        >
+                          <CancelOutlinedIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
                     </Box>
-                  </Box>
-                ))}
+                  ))}
+                </Box>
 
                 {/* Footer */}
                 <Box mt={2} sx={{ width: "100%", minWidth: 0 }}>
