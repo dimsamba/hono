@@ -82,15 +82,23 @@ const SalesCategory = () => {
     fetchData();
   }, []);
 
+  // Sort Function
+  const sortedCategoryData = [...categoryData].sort(
+    (a, b) => b.value - a.value
+  );
+
   return (
     <motion.div className="bg-gray-100 bg-opacity-50 backdrop-blur-md rounded-xl p-6 border border-gray-100">
       <h2 className="text-lg font-medium mb-4 text-[#3FA89B]">ITEMS SOLD</h2>
       <div className="w-full h-full">
-        <ResponsiveContainer width="100%" height={categoryData.length * 25 + 10}>
+        <ResponsiveContainer
+          width="100%"
+          height={sortedCategoryData.length * 25 + 10}
+        >
           <BarChart
-            data={categoryData}
+            data={sortedCategoryData}
             layout="vertical"
-            height={categoryData.length * 40} // 40px per item (adjust if needed)
+            height={sortedCategoryData.length * 40}
             margin={{ top: 1, right: 50, left: 5, bottom: 1 }}
           >
             <CartesianGrid strokeMiterlimit="1 1" stroke="lightGray" />
@@ -99,8 +107,8 @@ const SalesCategory = () => {
               dataKey="name"
               type="category"
               stroke="#111"
-              interval={0} // Force show all
-              width={140} // Increased from 100
+              interval={0}
+              width={140}
               style={{ fontSize: 12, fill: "#111" }}
               tickLine={false}
             />
@@ -112,17 +120,17 @@ const SalesCategory = () => {
                 borderColor: "#4B5563",
               }}
               itemStyle={{ color: "dimGray" }}
-              formatter={(value) => [` ${""}: ${value} sales`]} // Shows name and value only
+              formatter={(value) => [` ${""}: ${value} sales`]}
             />
-            {/* <Legend /> */}
+
             <Bar
               dataKey="value"
               fill="#4cc9f0"
               barSize={25}
               isAnimationActive={true}
-              height={categoryData.length * 40} // Adjust height based on number of items
+              height={sortedCategoryData.length * 40}
             >
-              {categoryData.map((_entry, index) => (
+              {sortedCategoryData.map((_entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
@@ -131,8 +139,7 @@ const SalesCategory = () => {
               <LabelList
                 content={(props) => {
                   const { x, y, width, height, index } = props;
-                  const percent = categoryData[index]?.percent;
-
+                  const percent = sortedCategoryData[index]?.percent;
                   return (
                     <text
                       x={x + width + 5}
