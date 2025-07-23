@@ -1,5 +1,5 @@
 // src/pages/PrepPage.jsx
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   TextField,
   Checkbox,
@@ -10,11 +10,10 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
 } from "@mui/material";
-import { Delete as DeleteIcon, Undo as UndoIcon } from "@mui/icons-material";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import supabase from "../components/supabaseClient";
+import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 
 const PrepPage = () => {
   const [prepName, setPrepName] = useState("");
@@ -139,7 +138,7 @@ const PrepPage = () => {
               gutterBottom
               sx={{ color: "#3FA89B", mb: 2 }}
             >
-              MISE-EN-PLACE LIST
+              TASKS LIST
             </Typography>
             <Box // Container for the input and clear button
               display="grid"
@@ -178,7 +177,7 @@ const PrepPage = () => {
                   minWidth: "0",
                   width: "100%",
                   height: "70px",
-                  borderColor: "#ef476f",
+                  borderColor: "#eb6424",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -191,7 +190,7 @@ const PrepPage = () => {
               >
                 <DeleteForeverOutlinedIcon
                   sx={{
-                    color: "#ef476f",
+                    color: "#eb6424",
                     fontSize: "2rem", // Try 2.5rem or larger if needed
                   }}
                 />
@@ -215,19 +214,27 @@ const PrepPage = () => {
                   <ListItem
                     key={task.id}
                     divider
+                    onClick={() => handleToggleTask(task)}
                     sx={{
-                      py: 0, // Reduces vertical padding (default is 1)
-                      minHeight: "32px", // Optional: controls total height of the list item
+                      py: 0,
+                      minHeight: "32px",
+                      cursor: "pointer", // Makes the cursor a hand
+                      "&:hover": {
+                        backgroundColor: "#e7ecef", // Background color on hover
+                      },
                     }}
                   >
                     <Checkbox
-                      onClick={() => handleToggleTask(task)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent checkbox click from triggering parent onClick
+                        handleToggleTask(task);
+                      }}
                       sx={{ color: "#3FA89B" }}
                     />
                     <ListItemText
                       primary={task.task}
                       primaryTypographyProps={{
-                        fontSize: "1.1rem", // ≈14px
+                        fontSize: "1.1rem",
                         fontWeight: 300,
                         color: "#4a4e69",
                       }}
@@ -265,8 +272,22 @@ const PrepPage = () => {
                   sx={{
                     py: 0, // Reduces vertical padding (default is 1)
                     minHeight: "32px", // Optional: controls total height of the list item
+                    "&:hover": {
+                      backgroundColor: "#e7ecef", // Background color on hover
+                    },
                   }}
                 >
+                  <IconButton
+                    onClick={() => handleToggleTask(task)}
+                    edge="end"
+                    size="small"
+                    sx={{
+                      color: "#eb6424",
+                      mr: 1,
+                    }}
+                  >
+                    <CheckBoxOutlinedIcon />
+                  </IconButton>
                   <ListItemText
                     primary={task.task}
                     onClick={() => handleToggleTask(task)}
@@ -276,21 +297,10 @@ const PrepPage = () => {
                       color: "#4a4e69",
                       sx: {
                         cursor: "pointer",
-                        "&:hover": {
-                          color: "#457b9d",
-                        },
+                        mr: 1,
                       }, // Optional: for pointer style
                     }}
                   />
-                  <ListItemSecondaryAction>
-                    <IconButton
-                      onClick={() => handleToggleTask(task)}
-                      edge="end"
-                      size="small"
-                    >
-                      <UndoIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
                 </ListItem>
               ))}
             </List>

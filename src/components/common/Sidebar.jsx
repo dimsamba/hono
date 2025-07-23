@@ -11,7 +11,7 @@ import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
-import HouseOutlinedIcon from '@mui/icons-material/HouseOutlined';
+import HouseOutlinedIcon from "@mui/icons-material/HouseOutlined";
 
 import { Tooltip } from "@mui/material";
 
@@ -20,6 +20,7 @@ import { LogOutIcon, Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../supabaseClient";
+import icon from "../../../public/icons/icon-192x192.png";
 
 const SIDEBAR_ITEMS = [
   {
@@ -78,7 +79,7 @@ const SIDEBAR_ITEMS = [
     color: "#3FA89B",
     href: "/calendar",
   },
-   {
+  {
     name: "Family Finance",
     icon: HouseOutlinedIcon,
     color: "#3FA89B",
@@ -123,19 +124,47 @@ const Sidebar = () => {
       animate={{ width: isSidebarOpen ? 175 : 65 }}
       className="sidebar-container"
     >
-      <div className="h-full bg-gray-100 bg-opacity-100 p-3 flex flex-col border-r border-gray-200 overflow-y-auto scrollbar-hide">
-        {/* Sidebar Toggle Button */}
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="p-2 rounded-full hover:bg-gray-200 transition-colors max-w-fit"
+      <div className="h-full bg-gray-100 bg-opacity-100 px-2.5 flex flex-col border-r border-gray-200 overflow-y-auto scrollbar-hide">
+        {/* Sidebar Toggle Icon "LOGO" */}
+        <div
+          className={`flex transition-all duration-1000
+    ${
+      isSidebarOpen
+        ? "items-center justify-start"
+        : "items-center justify-center mb-3 mt-5"
+    }
+  `}
         >
-          <Menu className="text-[16px] sm:text-[24px] text-gray-800" />
-        </motion.button>
+          <AnimatePresence>
+            {isSidebarOpen && (
+              <motion.img
+                whileHover={{ scale: 0.8 }}
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="rounded-full transition-colors cursor-pointer"
+                src={icon}
+                alt="icon"
+                animate={{ opacity: 0.8, scale: 0.7 }}
+                exit={{ opacity: 1, scale: 0.7 }}
+              />
+            )}
+          </AnimatePresence>
+
+          {!isSidebarOpen && (
+            <motion.div
+              whileHover={{ scale: 1.6 }}
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1.3 }}
+              exit={{ opacity: 0, scale: 1.3 }}
+              className="flex items-center justify-center w-full cursor-pointer"
+            >
+              <img src={icon} alt="icon" className="h-6 w-auto" />
+            </motion.div>
+          )}
+        </div>
 
         {/* Navigation */}
-        <nav className="mt-8 flex-grow">
+        <nav className="flex-grow">
           {SIDEBAR_ITEMS.map((item, index) => {
             const isGroup = !!item.children;
             const isOpen = openGroups[item.name] || false;
