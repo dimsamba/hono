@@ -569,9 +569,18 @@ const POSPage = () => {
     });
   };
 
+  const disableActionButtons =
+    order.length === 0 || !receivedAmount || receivedAmount <= 0;
+
   return (
     <div className="flex-1 overflow-hidden relative z-10 bg-[#fcfeff] border-t-2">
-      <main className="max-w-8xl mx-auto scrollbar-hide h-[640px] bg-[#e7ecef]">
+      <main
+        className="max-w-8xl mx-auto scrollbar-hide h-[640px] bg-[#e7ecef]"
+        style={{
+          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+          border: "1px solid #3FA89B",
+        }}
+      >
         {/* Items buttons and Sale Summary */}
         <motion.div
           className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-3"
@@ -599,7 +608,7 @@ const POSPage = () => {
                 border: "1px solid #45a29e",
                 /* the important bits ↓ */
                 height: 630, // or "200px" — fixed box height
-              //  backgroundColor: "orange",
+                //  backgroundColor: "orange",
 
                 overflowY: "auto", // allow vertical scrolling
                 overflowX: "hidden", // no horizontal scrollbars
@@ -1089,6 +1098,7 @@ const POSPage = () => {
                     variant="outlined"
                     startIcon={<Save />}
                     onClick={() => saveSale(false)}
+                    disabled={disableActionButtons}
                     sx={{
                       backgroundColor: "#26A889",
                       color: "white",
@@ -1100,15 +1110,19 @@ const POSPage = () => {
                       height: "100px",
                       width: "100%",
                       minWidth: 0, // Prevents default button minWidth from breaking layout
+                      minWidth: 0,
+                      opacity: disableActionButtons ? 0.5 : 1, // Optional: visual feedback
+                      pointerEvents: disableActionButtons ? "none" : "auto", // Optional: make fully inactive
                     }}
                   >
-                    Save
+                    Pay & Save
                   </Button>
 
                   <Button
                     variant="outlined"
                     startIcon={<Print />}
                     onClick={() => saveSale(true)}
+                    disabled={disableActionButtons}
                     sx={{
                       backgroundColor: "#00b4d8",
                       color: "white",
@@ -1121,9 +1135,12 @@ const POSPage = () => {
                       height: "100px",
                       width: "100%",
                       minWidth: 0, // Prevents default button minWidth from breaking layout
+                      minWidth: 0,
+                      opacity: disableActionButtons ? 0.5 : 1,
+                      pointerEvents: disableActionButtons ? "none" : "auto",
                     }}
                   >
-                    Print
+                    Pay & Print
                   </Button>
                 </Box>
               </Box>

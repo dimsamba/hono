@@ -179,11 +179,19 @@ const CalendarPage = () => {
               <List
                 dense
                 sx={{
-                  height: 155,
+                  height: 305,
+                  fontWeight: 500,
+                  fontSize: "1.5rem",
+                  backgroundColor: "#f5f5f5",
+                  borderRadius: "8px",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                   border: "1px solid #3FA89B",
-                  borderRadius: 1,
-                  overflowY: "auto",
-                  backgroundColor: "#ebf2fa",
+                  "& .MuiOutlinedInput-root": {
+                    "& textarea": {
+                      color: "#777",
+                      fontSize: 16,
+                    },
+                  },
                   "&::-webkit-scrollbar": { display: "none" },
                 }}
               >
@@ -228,10 +236,17 @@ const CalendarPage = () => {
                             }}
                           />
 
-                          <Box sx={{ width: "30%", textAlign: "right" }}>
+                          <Box sx={{ width: "45%", textAlign: "right" }}>
                             <ListItemText
-                              primary={new Date(event.date).toLocaleDateString(
-                                "fr-FR"
+                              primary={new Date(event.date).toLocaleString(
+                                "en-GB",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "2-digit",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
                               )}
                               primaryTypographyProps={{
                                 fontSize: 14,
@@ -278,21 +293,18 @@ const CalendarPage = () => {
                   value={selectedTask}
                   onChange={(e) => setSelectedTask(e.target.value)}
                   sx={{
-                    backgroundColor: "#ebf2fa",
+                    color: "#777",
+                    fontWeight: 500,
+                    fontSize: "1.5rem",
+                    backgroundColor: "#f5f5f5",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    border: "1px solid #3FA89B",
                     height: 150,
                     "& .MuiOutlinedInput-root": {
                       "& textarea": {
                         color: "#777",
                         fontSize: 16,
-                      },
-                      "& fieldset": {
-                        border: "1px solid #3FA89B", // default border
-                      },
-                      "&:hover fieldset": {
-                        border: "1px solid #3FA89B", // keep border on hover
-                      },
-                      "&.Mui-focused fieldset": {
-                        border: "1px solid #3FA89B", // keep border on focus
                       },
                     },
                   }}
@@ -306,8 +318,10 @@ const CalendarPage = () => {
               m: 1,
               mt: 3,
               p: 1,
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
               border: "1px solid #3FA89B",
               backgroundColor: "#ebf2fa",
+              borderRadius: 1,
             }}
           >
             <Box

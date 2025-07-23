@@ -1,7 +1,6 @@
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ClearIcon from "@mui/icons-material/HighlightOff";
 import { IconButton, TextField } from "@mui/material";
-import { motion } from "framer-motion";
 import { useState } from "react";
 
 const translationMap = {
@@ -91,14 +90,14 @@ const TestPage = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <main className="max-w-4xl mx-auto py-6 px-4 lg:px-8">
-        {/* <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        > */}
         {/* STATS */}
-        <div className="bg-gray-100 p-6 pr-10 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-xl border border-gray-300">
+        <div
+          className="bg-gray-100 p-6 pr-10 bg-opacity-80 backdrop-blur-md overflow-hidden rounded-xl border border-gray-300"
+          style={{
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+            border: "1px solid #3FA89B",
+          }}
+        >
           <TextField
             fullWidth
             value={value}
@@ -163,7 +162,6 @@ const TestPage = () => {
             }}
           />
         </div>
-        {/* </motion.div> */}
       </main>
     </div>
   );

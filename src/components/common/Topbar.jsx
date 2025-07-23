@@ -292,6 +292,7 @@ const Topbar = ({ title }) => {
             </Button>
           </DialogActions>
         </Dialog>
+
         {/* Agenda Notifications Icon */}
         <IconButton
           sx={{ color: colors.grey[700] }}
@@ -313,6 +314,7 @@ const Topbar = ({ title }) => {
             <EventAvailableOutlinedIcon />
           </Badge>
         </IconButton>
+
         {/* Agenda Dropdown */}
         <Menu
           anchorEl={agendaAnchorEl}
@@ -331,7 +333,6 @@ const Topbar = ({ title }) => {
             },
           }}
           onClick={() => {
-            navigate("/calendar");
             setAgendaAnchorEl(null); // close menu
           }}
         >
@@ -384,7 +385,7 @@ const Topbar = ({ title }) => {
                     fontSize: 14,
                   }}
                 >
-                  {dayjs(item.date).format("DD-MM-YYYY")} - {item.entry_name}
+                  {dayjs(item.date).format("DD-MM-YYYY HH:mm")} - {item.entry_name}
                 </Typography>
               </MenuItem>
             ))
