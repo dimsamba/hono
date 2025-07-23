@@ -184,7 +184,10 @@ const Topbar = ({ title }) => {
             invoiceAlerts.map((invoice) => (
               <MenuItem
                 key={invoice.id}
-                onClick={() => handleOpenDialog(invoice)}
+                  onClick={() => {
+                  navigate("/invoice");
+                  handleOpenDialog(invoice);
+                }}
                 sx={{
                   display: "flex",
                   backgroundColor: "#f3f4f6",
