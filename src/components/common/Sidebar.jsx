@@ -138,7 +138,7 @@ const Sidebar = () => {
           <AnimatePresence>
             {isSidebarOpen && (
               <motion.img
-                whileHover={{ scale: 0.8 }}
+                whileHover={{ rotate: 12, scale: 0.8 }}
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="rounded-full transition-colors cursor-pointer"
                 src={icon}
@@ -151,7 +151,7 @@ const Sidebar = () => {
 
           {!isSidebarOpen && (
             <motion.div
-              whileHover={{ scale: 1.6 }}
+              whileHover={{ rotate: 12, scale: 1.6 }}
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1.3 }}
