@@ -88,10 +88,12 @@ const Topbar = ({ title }) => {
     <Box
       display="flex"
       justifyContent="space-between"
-      p={2}
+      pt={1}
+      pl={1}
+      pr={1}
       sx={{
         backgroundColor: "#f3f4f6", // Tailwind's bg-gray-100
-        borderBottom: "1px solid #e5e7eb", // Tailwind's border-gray-200
+        borderBottom: "2px solid #e5e7eb", // Tailwind's border-gray-200
       }}
     >
       <Typography variant="h4" color="#3FA89B">
@@ -99,15 +101,14 @@ const Topbar = ({ title }) => {
       </Typography>
 
       <Box display="flex" backgroundColor="#f3f4f6" borderRadius="3px">
-        {/*  Clock */}
         {/* Clock */}
 
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            px: 2,
-            fontSize: "1.5rem",
+            pr: 1,
+            fontSize: "1.1rem",
             fontWeight: 600,
             color: "#3FA899",
             fontFamily: "monospace",
@@ -115,7 +116,6 @@ const Topbar = ({ title }) => {
             ml: 2,
           }}
         >
-          <AccessTimeIcon sx={{ fontSize: 22, mr: 1, color: "#3FA89B" }} />
           {currentTime}
         </Box>
 
