@@ -1,4 +1,4 @@
-// Version: 1.2.20 23/07/2025
+// Version: 1.2.20 26/07/2025
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { useState } from "react";
@@ -20,6 +20,7 @@ import POSPage from "./POSPage";
 import StockTackPage from "./StockTakePage";
 import PrepPage from "./PrepPage.";
 import FamilyFinancePage from "./FamilyFinancePage";
+import TimerPage from "./TimerPage";
 
 function Dashboard() {
   const [theme] = useMode();
@@ -42,6 +43,7 @@ function Dashboard() {
     "/items": "ITEMS LIST",
     "/prep": "PREP LIST",
     "/family-finance": "FAMILY FINANCE",
+    "/timer": "TIMER",
   };
 
   return (
@@ -74,7 +76,8 @@ function Dashboard() {
               <Route path="vendor" element={<POSPage />} />
               <Route path="items" element={<ItemsListPage />} />
               <Route path="prep" element={<PrepPage />} />
-               <Route path="family-finance" element={<FamilyFinancePage />} />
+              <Route path="family-finance" element={<FamilyFinancePage />} />
+              <Route path="timer" element={<TimerPage />} />
             </Routes>
           </div>{" "}
         </div>

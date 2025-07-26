@@ -57,3 +57,14 @@
     background: white;
   }
 }
+@keyframes flashBg {
+  0% {
+    background-color: #ffdddd;
+  }
+  50% {
+    background-color: #ffffff;
+  }
+  100% {
+    background-color: #ffdddd;
+  }
+}

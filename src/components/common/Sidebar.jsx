@@ -12,6 +12,7 @@ import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import HouseOutlinedIcon from "@mui/icons-material/HouseOutlined";
+import AlarmOnOutlinedIcon from '@mui/icons-material/AlarmOnOutlined';
 
 import { Tooltip } from "@mui/material";
 
@@ -90,6 +91,12 @@ const SIDEBAR_ITEMS = [
     icon: SyncProblemOutlinedIcon,
     color: "#3FA89B",
     href: "/converter",
+  },
+    {
+    name: "Timer",
+    icon: AlarmOnOutlinedIcon,
+    color: "#3FA89B",
+    href: "/timer",
   },
 ];
 
