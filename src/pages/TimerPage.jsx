@@ -161,7 +161,13 @@ const Timer = ({
         boxShadow: "0 1px 1px rgba(0, 0, 0, 0.2)",
       }}
     >
-      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 1,
+        }}
+      >
         <Typography
           sx={{
             fontSize: 38,
@@ -190,7 +196,27 @@ const Timer = ({
             borderRadius: "4px",
             transition: "background-color 0.3s ease",
             animation: isFlashing ? "flashBg 1s infinite" : "none",
-            "& input": { color: "#111", fontSize: 28, fontWeight: 400 },
+            "& input": {
+             // color: "#f07167",
+              fontSize: 28,
+              fontWeight: 400,
+              color: isActive ? "#f07167" : "#38a3a5",
+            },
+            // Change background and border when focused
+            "& .MuiOutlinedInput-root.Mui-focused": {
+              backgroundColor: "#fff0f0", // example color
+              "& fieldset": {
+                borderColor: "red",
+                borderWidth: 2,
+              },
+            },
+            "&.Mui-focused": {
+              backgroundColor: isRunning ? "#fff0f0" : "#fff", // keep same bg
+              "& fieldset": {
+                borderColor: "red", // keep same border color
+                borderWidth: 2, // increase thickness on focus
+              },
+            },
           }}
         />
 
@@ -269,7 +295,10 @@ const Timer = ({
               key={file}
               value={file}
               sx={{
-                "&:hover": { ...sharedStyles, backgroundColor: "#f0f0f0" },
+                "&:hover": {
+                  ...sharedStyles,
+                  backgroundColor: "#f0f0f0",
+                },
               }}
             >
               {soundLabels[file]}
