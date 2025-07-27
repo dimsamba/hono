@@ -1,5 +1,16 @@
 import { useState, useRef } from "react";
-import { Box, Button, Typography, TextField, Grid } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  TextField,
+  Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  GlobalStyles,
+} from "@mui/material";
 import { motion } from "framer-motion";
 
 // Keypad Component
@@ -9,15 +20,16 @@ const Keypad = ({ onKeyPress, onBackspace, onEnter }) => {
   return (
     <Box
       sx={{
-        backgroundColor: "#fff",
-        padding: 2,
-        border: "1px solid #38a3a5",
-        borderRadius: "8px",
-        boxShadow: 1,
+        display: "flex",
         width: 200,
         mt: 1,
         position: "sticky",
         top: 20,
+        p: 2,
+        backgroundColor: "#f5f5f5",
+        borderRadius: "8px",
+        border: "1px solid #3FA89B",
+        boxShadow: "0 1px 1px rgba(0, 0, 0, 0.2)",
       }}
     >
       <Grid container spacing={1}>
@@ -28,12 +40,14 @@ const Keypad = ({ onKeyPress, onBackspace, onEnter }) => {
               fullWidth
               onClick={() => onKeyPress(key)}
               sx={{
-                backgroundColor: "#e2ece9",
-                border: "1px solid green",
-                color: "#555",
+                backgroundColor: "#f5f5f5",
+                color: "#38a3a5",
                 fontWeight: 500,
                 fontSize: "30px",
-                height: "66px",
+                height: 61.5,
+                "&:hover": {
+                  backgroundColor: "#e2ece9",
+                },
               }}
             >
               {key}
@@ -48,7 +62,6 @@ const Keypad = ({ onKeyPress, onBackspace, onEnter }) => {
             onClick={onBackspace}
             sx={{
               backgroundColor: "#f07167",
-              border: "1px solid #032b43",
               color: "white",
               fontWeight: 700,
               fontSize: "30px",
@@ -65,7 +78,6 @@ const Keypad = ({ onKeyPress, onBackspace, onEnter }) => {
             onClick={onEnter}
             sx={{
               backgroundColor: "#76c893",
-              border: "1px solid #032b43",
               color: "white",
               fontWeight: 1000,
               fontSize: "40px",
@@ -80,6 +92,23 @@ const Keypad = ({ onKeyPress, onBackspace, onEnter }) => {
   );
 };
 
+const soundLabels = {
+  "Alarm1.wav": "Alarm 1",
+  "Alarm2.wav": "Alarm 2",
+  "Alarm3.wav": "Alarm 3",
+  "Alarm4.wav": "Alarm 4",
+  "Alarm5.mp3": "Alarm 5",
+  "Alarm6.wav": "Alarm 6",
+  "Alien1.wav": "Alien 1",
+  "Alien2.wav": "Alien 2",
+  "Alien3.mp3": "Alien 3",
+  "Alien4.wav": "Alien 4",
+  "bird.mp3": "Bird",
+  "sound1.wav": "Sound 1",
+  "sound2.wav": "Sound 2",
+  "sound3.wav": "Sound 3",
+};
+
 // Timer Component
 const Timer = ({
   index,
@@ -90,6 +119,8 @@ const Timer = ({
   onFocus,
   onPause,
   onReset,
+  selectedSound,
+  onSoundChange,
 }) => {
   const inputRef = useRef(null);
   const isPaused = !isRunning && secondsLeft > 0;
@@ -127,7 +158,7 @@ const Timer = ({
         backgroundColor: "#f5f5f5",
         borderRadius: "8px",
         border: "1px solid #3FA89B",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        boxShadow: "0 1px 1px rgba(0, 0, 0, 0.2)",
       }}
     >
       <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
@@ -136,7 +167,8 @@ const Timer = ({
             fontSize: 38,
             fontWeight: 600,
             color: "#3FA89B",
-            mb: 1,
+            mt: 1,
+            textAlign: "center",
           }}
         >
           {index + 1}
@@ -158,7 +190,7 @@ const Timer = ({
             borderRadius: "4px",
             transition: "background-color 0.3s ease",
             animation: isFlashing ? "flashBg 1s infinite" : "none",
-            "& input": { color: "#777", fontSize: 16 },
+            "& input": { color: "#111", fontSize: 28, fontWeight: 400 },
           }}
         />
 
@@ -166,24 +198,87 @@ const Timer = ({
           sx={{
             fontSize: 38,
             fontWeight: 600,
-            color: isActive ? "#f07167" : "#38a3a5", // ← switch color when active
+            color: isActive ? "#f07167" : "#38a3a5",
             textAlign: "center",
-            mb: 2,
+            mt: 1,
           }}
         >
           {formatTime(secondsLeft)}
         </Typography>
       </Box>
 
-      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
-        {/* <Button
-          variant="contained"
-          onClick={() => onStart(index)} 
-          disabled={isRunning || secondsLeft <= 0}
-          sx={{ backgroundColor: "#3FA89B", flex: 1 }}
+      <GlobalStyles
+        styles={{
+          ".MuiPickersPopper-root .MuiPaper-root": {
+            backgroundColor: "#f5f5f5 !important",
+            color: "#577590 !important",
+            fontSize: "1rem",
+            lineHeight: 1.8,
+            borderRadius: "8px",
+          },
+
+          // Day numbers (default state)
+          ".MuiDayCalendar-weekContainer .MuiPickersDay-root": {
+            color: "#577590 !important",
+          },
+
+          // Selected day (override white-on-white)
+          ".MuiDayCalendar-weekContainer .MuiPickersDay-root.Mui-selected": {
+            backgroundColor: "#2a9d8f !important",
+            color: "#577590 !important",
+          },
+
+          // Today’s date
+          ".MuiDayCalendar-weekContainer .MuiPickersDay-root.MuiDayCalendar-dayWithMargin.MuiPickersDay-today":
+            {
+              border: "1px solid #2a9d8f",
+            },
+
+          // ✅ Day-of-week headers (top row: S, M, T, etc.)
+          ".MuiDayCalendar-header .MuiTypography-root": {
+            color: "#577590 !important",
+            fontWeight: 800,
+          },
+          ".MuiPickersCalendarHeader-root .MuiIconButton-root": {
+            color: "#577590 !important", // or any color you prefer
+          },
+          "& .MuiMenu-paper": {
+            backgroundColor: "white !important",
+            color: "#577590 !important",
+          },
+          "& .MuiMenuItem-root:hover": {
+            backgroundColor: "#eff1ed !important",
+          },
+          "& .MuiMenuItem-root:selected": {
+            backgroundColor: "red !important",
+          },
+        }}
+      />
+      {/* Sound Dropdown Selector */}
+      <FormControl fullWidth size="small" sx={{ mb: 2, ...sharedStyles }}>
+        <InputLabel id={`sound-select-label-${index}`}>Alarm Sound</InputLabel>
+        <Select
+          labelId={`sound-select-label-${index}`}
+          value={selectedSound}
+          label="Alarm Sound"
+          onChange={(e) => onSoundChange(index, e.target.value)}
+          sx={{ fontSize: 16, color: "#415a77", fontWeight: 500 }}
         >
-          Start
-        </Button> */}
+          {Object.keys(soundLabels).map((file) => (
+            <MenuItem
+              key={file}
+              value={file}
+              sx={{
+                "&:hover": { ...sharedStyles, backgroundColor: "#f0f0f0" },
+              }}
+            >
+              {soundLabels[file]}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
         <Button
           variant="outlined"
           onClick={() => onPause(index)}
@@ -191,8 +286,11 @@ const Timer = ({
           sx={{
             flex: 1,
             color: "#0081a7",
-            border: "2px solid #0081a7",
+            border: "1px solid #0081a7",
             fontWeight: 700,
+            "&:hover": {
+              backgroundColor: "#e2ece9",
+            },
           }}
         >
           Pause
@@ -203,11 +301,14 @@ const Timer = ({
           sx={{
             flex: 1,
             color: "#e36414",
-            border: "2px solid #e36414",
+            border: "1px solid #e36414",
             fontWeight: 700,
+            "&:hover": {
+              backgroundColor: "#e2ece9",
+            },
           }}
         >
-          {isFlashing ? "Stop" : "Reset"} {/* ✅ Use the prop instead */}
+          {isFlashing ? "Stop" : "Reset"}
         </Button>
       </Box>
     </Box>
@@ -224,6 +325,7 @@ const TimerPage = () => {
       isRunning: false,
       isFlashing: false,
       intervalRef: null,
+      selectedSound: "sound1.wav",
       audio: new Audio("/sounds/sound1.wav"),
     }))
   );
@@ -234,6 +336,14 @@ const TimerPage = () => {
     setTimers((prev) =>
       prev.map((t, i) => (i === index ? { ...t, ...updates } : t))
     );
+  };
+
+  const handleSoundChange = (index, soundFile) => {
+    const audio = new Audio(`/sounds/${soundFile}`);
+    updateTimer(index, {
+      selectedSound: soundFile,
+      audio,
+    });
   };
 
   const handleKeypadInput = (key) => {
@@ -267,7 +377,7 @@ const TimerPage = () => {
     if (timer.secondsLeft <= 0 || timer.isRunning) return;
 
     const audio = timer.audio;
-    audio.loop = true; // Set loop before play
+    audio.loop = true;
 
     const interval = setInterval(() => {
       setTimers((prev) => {
@@ -277,10 +387,8 @@ const TimerPage = () => {
         if (t.secondsLeft <= 1) {
           clearInterval(t.intervalRef);
           t.isRunning = false;
-          t.isFlashing = true; // Timer finished, audio is playing
+          t.isFlashing = true;
           t.secondsLeft = 0;
-
-          // Play looping sound
           t.audio.loop = true;
           t.audio.currentTime = 0;
           t.audio.play().catch(console.error);
@@ -305,34 +413,25 @@ const TimerPage = () => {
 
   const handleReset = (index) => {
     clearInterval(timers[index].intervalRef);
-
     const audio = timers[index].audio;
     audio.pause();
     audio.currentTime = 0;
     audio.loop = false;
-
     updateTimer(index, {
       inputValue: "",
       secondsLeft: 0,
       isRunning: false,
-      isFlashing: false, // Reset state to no flashing
+      isFlashing: false,
     });
   };
 
   return (
     <div className="flex-1 overflow-auto relative z-10 bg-gray-100">
-      <main className="max-w-7xl">
+      <main className="max-w-5xl mx-auto">
         <Box sx={{ px: 1, pt: 3 }}>
-          <Typography
-            variant="h6"
-            sx={{
-              color: "#3FA89B",
-              fontSize: 22,
-              fontWeight: 600,
-            }}
-          >
+          <h3 className="text-base mb-4 ml-1 text-[#3FA89B] font-bold">
             MULTI-TIMER
-          </Typography>
+          </h3>
 
           <Box sx={{ display: "flex", gap: 3 }}>
             <Box className="KeyPad">
@@ -344,7 +443,7 @@ const TimerPage = () => {
             </Box>
 
             <Box className="Timers" sx={{ flex: 1 }}>
-              <motion.div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
+              <motion.div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-2">
                 {timers.map((timer, i) => (
                   <Timer
                     key={i}
@@ -356,7 +455,8 @@ const TimerPage = () => {
                     onFocus={setFocusedIndex}
                     onPause={handlePause}
                     onReset={handleReset}
-                    onStart={handleStart}
+                    selectedSound={timer.selectedSound}
+                    onSoundChange={handleSoundChange}
                   />
                 ))}
               </motion.div>

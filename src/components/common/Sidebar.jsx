@@ -17,7 +17,7 @@ import AlarmOnOutlinedIcon from '@mui/icons-material/AlarmOnOutlined';
 import { Tooltip } from "@mui/material";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { LogOutIcon, Menu } from "lucide-react";
+import { LogOutIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../supabaseClient";
@@ -131,7 +131,7 @@ const Sidebar = () => {
       animate={{ width: isSidebarOpen ? 175 : 65 }}
       className="sidebar-container"
     >
-      <div className="h-full bg-gray-100 bg-opacity-100 px-2.5 flex flex-col border-r border-gray-200 overflow-y-auto scrollbar-hide">
+      <div className="h-full bg-gray-100 bg-opacity-100 px-2.5 flex flex-col border-gray-200 overflow-y-auto scrollbar-hide border-r-2">
         {/* Sidebar Toggle Icon "LOGO" */}
         <div
           className={`flex transition-all duration-1000
