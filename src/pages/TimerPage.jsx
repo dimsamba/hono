@@ -152,6 +152,7 @@ const Timer = ({
 
   return (
     <Box
+      onClick={() => inputRef.current.focus()}
       sx={{
         p: 2,
         my: 1,
@@ -159,6 +160,9 @@ const Timer = ({
         borderRadius: "8px",
         border: "1px solid #3FA89B",
         boxShadow: "0 1px 1px rgba(0, 0, 0, 0.2)",
+        border: isActive ? "1px solid #f07167" : " 1px solid #3FA89B",
+        animation: isFlashing ? "flashBg 1s infinite" : "none",
+        backgroundColor: isRunning ? "#ebf2fa" : "#fff",
       }}
     >
       <Box
@@ -172,7 +176,7 @@ const Timer = ({
           sx={{
             fontSize: 38,
             fontWeight: 600,
-            color: "#3FA89B",
+            color: "#427aa1",
             mt: 1,
             textAlign: "center",
           }}
@@ -182,7 +186,7 @@ const Timer = ({
 
         <TextField
           inputRef={inputRef}
-          label="Set minutes"
+          label="Set Time"
           type="text"
           value={inputValue}
           InputProps={{
@@ -197,7 +201,7 @@ const Timer = ({
             transition: "background-color 0.3s ease",
             animation: isFlashing ? "flashBg 1s infinite" : "none",
             "& input": {
-             // color: "#f07167",
+              color: "#f07167",
               fontSize: 28,
               fontWeight: 400,
               color: isActive ? "#f07167" : "#38a3a5",
@@ -456,7 +460,7 @@ const TimerPage = () => {
 
   return (
     <div className="flex-1 overflow-auto relative z-10 bg-gray-100">
-      <main className="max-w-5xl mx-auto">
+      <main className="max-w-7xl mx-auto">
         <Box sx={{ px: 1, pt: 3 }}>
           <h3 className="text-base mb-4 ml-1 text-[#3FA89B] font-bold">
             MULTI-TIMER

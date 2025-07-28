@@ -12,12 +12,13 @@ import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import HouseOutlinedIcon from "@mui/icons-material/HouseOutlined";
-import AlarmOnOutlinedIcon from '@mui/icons-material/AlarmOnOutlined';
+import AlarmOnOutlinedIcon from "@mui/icons-material/AlarmOnOutlined";
+import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 
 import { Tooltip } from "@mui/material";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, SignalZero } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../supabaseClient";
@@ -49,10 +50,10 @@ const SIDEBAR_ITEMS = [
     href: "/items",
   },
   {
-    name: "Task List",
-    icon: PlaylistAddCheckIcon,
+    name: "Family Finance",
+    icon: HouseOutlinedIcon,
     color: "#3FA89B",
-    href: "/prep",
+    href: "/family-finance",
   },
   {
     name: "Lab",
@@ -75,28 +76,15 @@ const SIDEBAR_ITEMS = [
     ],
   },
   {
-    name: "Agenda",
-    icon: DateRangeOutlinedIcon,
+    name: "Toolbox",
+    icon: WidgetsOutlinedIcon,
     color: "#3FA89B",
-    href: "/calendar",
-  },
-  {
-    name: "Family Finance",
-    icon: HouseOutlinedIcon,
-    color: "#3FA89B",
-    href: "/family-finance",
-  },
-  {
-    name: "Converter",
-    icon: SyncProblemOutlinedIcon,
-    color: "#3FA89B",
-    href: "/converter",
-  },
-    {
-    name: "Timer",
-    icon: AlarmOnOutlinedIcon,
-    color: "#3FA89B",
-    href: "/timer",
+    children: [
+      { name: "Agenda", href: "/calendar", icon: DateRangeOutlinedIcon },
+      { name: "Timer", href: "/timer", icon: AlarmOnOutlinedIcon },
+      { name: "Task List", href: "/prep", icon: PlaylistAddCheckIcon },
+      { name: "Converter", href: "/converter", icon: SyncProblemOutlinedIcon },
+    ],
   },
 ];
 
@@ -125,6 +113,12 @@ const Sidebar = () => {
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Define animation variants
+  const iconVariants = {
+    initial: { scale: 1, rotate: 0, color: "#fb6107" },
+    hover: { scale: 1.2, rotate: 10, color: "#fb6107" },
+  };
 
   return (
     <motion.div
@@ -179,7 +173,7 @@ const Sidebar = () => {
             return (
               <div key={item.name}>
                 <div
-                  className="flex items-center p-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors mb-2 cursor-pointer"
+                  className="flex items-center p-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors mb-1 cursor-pointer"
                   onClick={() => {
                     if (isGroup) {
                       setOpenGroups((prev) => ({
@@ -275,7 +269,7 @@ const Sidebar = () => {
                     {item.children.map((child) => (
                       <Link key={child.href} to={child.href}>
                         <div
-                          className="flex items-center pt-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg mb-2"
+                          className="flex items-center pt-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg mb-"
                           onMouseEnter={() => setHoveredItem(child.name)}
                           onMouseLeave={() => setHoveredItem(null)}
                         >
@@ -333,21 +327,33 @@ const Sidebar = () => {
               </div>
             );
           })}
-
           {/* Logout Button */}
           <button
             onClick={signOut}
-            className="flex items-center p-3 pl-2 text-sm font-medium rounded-lg hover:bg-orange-300 transition-colors mb-2 w-full"
           >
-            <LogOutIcon
-              className="text-[16px] sm:text-[20px]"
-              style={{ color: "#f78154", minWidth: "16px" }}
-            />
-            {isSidebarOpen && (
-              <span className="ml-4 whitespace-nowrap text-gray-700">
-                Log out
-              </span>
-            )}
+            <motion.button
+              onClick={signOut}
+              className="flex items-center p-3 pl-2 text-sm font-medium rounded-lg transition-colors mb-2 ml-1 w-full"
+              whileHover="hover"
+              initial="initial"
+              animate="initial"
+            >
+              <motion.div
+                variants={iconVariants}
+                transition={{ type: "spring", stiffness: 300, damping: 15 }}
+              >
+                <LogOutIcon
+                  className="text-[16px] sm:text-[20px]"
+                  style={{ minWidth: "16px" }}
+                />
+              </motion.div>
+
+              {isSidebarOpen && (
+                <span className="ml-4 whitespace-nowrap text-gray-700">
+                  Log out
+                </span>
+              )}
+            </motion.button>
           </button>
         </nav>
       </div>
