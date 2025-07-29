@@ -99,14 +99,22 @@ const soundLabels = {
   "Alarm4.wav": "Alarm 4",
   "Alarm5.mp3": "Alarm 5",
   "Alarm6.wav": "Alarm 6",
+  "Alarm7.mp3": "Alarm 7",
   "Alien1.wav": "Alien 1",
   "Alien2.wav": "Alien 2",
   "Alien3.mp3": "Alien 3",
   "Alien4.wav": "Alien 4",
-  "bird.mp3": "Bird",
-  "sound1.wav": "Sound 1",
-  "sound2.wav": "Sound 2",
-  "sound3.wav": "Sound 3",
+  "Alien5.mp3": "Alien 5",
+  "Bird.mp3": "Bird",
+  "Morse-code1.mp3": "Morse Code 1",
+  "Morse-code2.mp3": "Morse Code 2",
+  "Morse-code3.mp3": "Morse Code 3",
+  "Music-box1.mp3": "Music Box 1",
+  "Music-box2.mp3": "Music Box 2",
+  "Siren1.mp3": "Siren 1",
+  "Sound1.wav": "Sound 1",
+  "Sound2.wav": "Sound 2",
+  "Sound3.wav": "Sound 3",
 };
 
 // Timer Component
@@ -154,8 +162,9 @@ const Timer = ({
     <Box
       onClick={() => inputRef.current.focus()}
       sx={{
-        p: 2,
         my: 1,
+        mt: 1.5,
+        mr: 2,
         backgroundColor: "#f5f5f5",
         borderRadius: "8px",
         border: "1px solid #3FA89B",
@@ -165,25 +174,33 @@ const Timer = ({
         backgroundColor: isRunning ? "#ebf2fa" : "#fff",
       }}
     >
+      <Typography
+        sx={{
+          height: 35,
+          width: 35,
+          ml: -2,
+          mt: -2,
+          lineHeight: "35px",
+          fontSize: 25,
+          fontWeight: 300,
+          color: "white",
+          textAlign: "center",
+          border: `1px solid #427aa1`,
+          borderRadius: "25px",
+          backgroundColor: "#38a3a5",
+        }}
+      >
+        {index + 1}
+      </Typography>
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           gap: 1,
+          ml: 2,
+          pr: 2,
         }}
       >
-        <Typography
-          sx={{
-            fontSize: 38,
-            fontWeight: 600,
-            color: "#427aa1",
-            mt: 1,
-            textAlign: "center",
-          }}
-        >
-          {index + 1}
-        </Typography>
-
         <TextField
           inputRef={inputRef}
           label="Set Time"
@@ -239,54 +256,28 @@ const Timer = ({
 
       <GlobalStyles
         styles={{
-          ".MuiPickersPopper-root .MuiPaper-root": {
-            backgroundColor: "#f5f5f5 !important",
-            color: "#577590 !important",
-            fontSize: "1rem",
-            lineHeight: 1.8,
-            borderRadius: "8px",
-          },
-
-          // Day numbers (default state)
-          ".MuiDayCalendar-weekContainer .MuiPickersDay-root": {
-            color: "#577590 !important",
-          },
-
-          // Selected day (override white-on-white)
-          ".MuiDayCalendar-weekContainer .MuiPickersDay-root.Mui-selected": {
-            backgroundColor: "#2a9d8f !important",
-            color: "#577590 !important",
-          },
-
-          // Today’s date
-          ".MuiDayCalendar-weekContainer .MuiPickersDay-root.MuiDayCalendar-dayWithMargin.MuiPickersDay-today":
-            {
-              border: "1px solid #2a9d8f",
-            },
-
-          // ✅ Day-of-week headers (top row: S, M, T, etc.)
-          ".MuiDayCalendar-header .MuiTypography-root": {
-            color: "#577590 !important",
-            fontWeight: 800,
-          },
-          ".MuiPickersCalendarHeader-root .MuiIconButton-root": {
-            color: "#577590 !important", // or any color you prefer
-          },
           "& .MuiMenu-paper": {
             backgroundColor: "white !important",
             color: "#577590 !important",
           },
-          "& .MuiMenuItem-root:hover": {
-            backgroundColor: "#eff1ed !important",
-          },
-          "& .MuiMenuItem-root:selected": {
-            backgroundColor: "red !important",
-          },
         }}
       />
       {/* Sound Dropdown Selector */}
-      <FormControl fullWidth size="small" sx={{ mb: 2, ...sharedStyles }}>
-        <InputLabel id={`sound-select-label-${index}`}>Alarm Sound</InputLabel>
+      <FormControl
+        fullWidth
+        size="small"
+        sx={{ mb: 2, ...sharedStyles, px: 2 }}
+      >
+        <InputLabel
+          id={`sound-select-label-${index}`}
+          sx={{
+            color: "#38a3a5",
+            fontSize: 14,
+            ml: 2.5,
+          }}
+        >
+          Alarm Sound
+        </InputLabel>
         <Select
           labelId={`sound-select-label-${index}`}
           value={selectedSound}
@@ -311,7 +302,15 @@ const Timer = ({
         </Select>
       </FormControl>
 
-      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 1,
+          mx: 2,
+          mb: 1.5,
+        }}
+      >
         <Button
           variant="outlined"
           onClick={() => onPause(index)}
