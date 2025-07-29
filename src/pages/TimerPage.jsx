@@ -163,7 +163,7 @@ const Timer = ({
       onClick={() => inputRef.current.focus()}
       sx={{
         my: 1,
-        mt: 1.5,
+        mt: 1.1,
         mr: 2,
         backgroundColor: "#f5f5f5",
         borderRadius: "8px",
