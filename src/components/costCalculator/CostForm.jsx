@@ -27,6 +27,8 @@ const CostForm = () => {
   const [otherExpenses, setOtherExpenses] = useState("");
   const [totalExpenses, setTotalExpenses] = useState("");
   const [amountFromSales, setAmountFromSales] = useState(""); // already exists
+  const [amountFromStockTake, setAmountFromStockTake] = useState(0);
+  const [previousMonthTotal, setPreviousMonthTotal] = useState(0);
   const [otherRevenue, setOtherRevenue] = useState("");
   const [totalRevenue, setTotalRevenue] = useState("");
   const [reportId, setReportId] = useState(null); // Used to track update/delete target
@@ -35,6 +37,7 @@ const CostForm = () => {
   const [financialsData, setFinancialsData] = useState([]);
   const [netProfitFromDates, setNetProfit] = useState(0);
   const [, setCostSelected] = useState(false);
+  const [foodCostPercentage, setFoodCostPercentage] = useState(0);
 
   // Extract the last "NET profit" value
   const netProfit =
@@ -67,25 +70,27 @@ const CostForm = () => {
   // Fetch "Paid "invoices between dates
   useEffect(() => {
     const fetchData = async () => {
-      // Log fromDate and toDate before processing
+      // // Log fromDate and toDate before processing
       console.log("From Date:", fromDate);
       console.log("To Date:", toDate);
 
-      // Ensure fromDate and toDate are not null and fallback to defaults
+      // // Ensure fromDate and toDate are not null and fallback to defaults
       const validFromDate = fromDate
         ? dayjs(fromDate)
         : dayjs().startOf("month"); // Default to current month's start
       const validToDate = toDate ? dayjs(toDate) : dayjs().endOf("month"); // Default to current month's end
 
-      // Log whether the dates are valid
+      // // Log whether the dates are valid
       console.log("Is 'fromDate' valid:", validFromDate.isValid());
       console.log("Is 'toDate' valid:", validToDate.isValid());
 
-      // If either date is invalid, log an error
+      // // If either date is invalid, log an error
       if (!validFromDate.isValid() || !validToDate.isValid()) {
         console.error("Invalid date value detected:", fromDate, toDate);
         return; // Exit if the dates are invalid
       }
+
+      if (!fromDate || !toDate) return;
 
       const start = validFromDate.startOf("day").toISOString();
       const end = validToDate.endOf("day").toISOString();
@@ -94,8 +99,8 @@ const CostForm = () => {
         .from("invoices")
         .select("amount_ttc")
         .gte("invoice_date", start)
-        .lte("invoice_date", end)
-        .eq("paid", true);
+        .lte("invoice_date", end);
+      //.eq("paid", true);
 
       if (error) {
         console.error("Supabase SELECT error:", error.message);
@@ -136,6 +141,84 @@ const CostForm = () => {
         0
       );
       setAmountFromSales(total);
+    };
+
+    fetchData();
+  }, [fromDate, toDate]);
+
+  // Fetch Total StockTake amount between dates and Previous month
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!fromDate || !toDate) return;
+
+      const start = dayjs(fromDate).format("YYYY-MM-DD");
+      const end = dayjs(toDate).format("YYYY-MM-DD");
+
+      // Fix: use the same month for both start and end of previous month
+      const previousMonth = dayjs(fromDate).subtract(1, "month");
+      const prevMonthStart = previousMonth
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      const prevMonthEnd = previousMonth.endOf("month").format("YYYY-MM-DD");
+
+      console.log("📅 Current Range:", start, "to", end);
+      console.log(
+        "📆 Previous Month Range:",
+        prevMonthStart,
+        "to",
+        prevMonthEnd
+      );
+
+      try {
+        // Fetch current month data
+        const { data: currentData, error: currentError } = await supabase
+          .from("stockTake")
+          .select("date, total_value") // fetch date too for debugging
+          .gte("date", start)
+          .lte("date", end);
+
+        if (currentError) {
+          console.error(
+            "❌ Error fetching current month:",
+            currentError.message
+          );
+          return;
+        }
+
+        console.log("✅ Current Month Raw Data:", currentData);
+
+        const currentTotal = currentData.reduce(
+          (acc, curr) => acc + (curr.total_value || 0),
+          0
+        );
+
+        // Fetch previous month data
+        const { data: prevData, error: prevError } = await supabase
+          .from("stockTake")
+          .select("date, total_value") // fetch date too for debugging
+          .gte("date", prevMonthStart)
+          .lte("date", prevMonthEnd);
+
+        if (prevError) {
+          console.error("❌ Error fetching previous month:", prevError.message);
+          return;
+        }
+
+        console.log("📊 Previous Month Raw Data:", prevData);
+
+        const prevTotal = prevData.reduce(
+          (acc, curr) => acc + (curr.total_value || 0),
+          0
+        );
+
+        console.log("💰 Current Total:", currentTotal);
+        console.log("📉 Previous Total:", prevTotal);
+
+        setAmountFromStockTake(currentTotal);
+        setPreviousMonthTotal(prevTotal);
+      } catch (err) {
+        console.error("❗ Unexpected error:", err);
+      }
     };
 
     fetchData();
@@ -193,10 +276,27 @@ const CostForm = () => {
     setOtherRevenue(raw);
   };
 
-  // Get Net Profict between date and show in StatCard
+  // Get Net Profit between date and show in StatCard
   useEffect(() => {
     setNetProfit(totalRevenue - totalExpenses);
   }, [totalRevenue, totalExpenses]);
+
+  // Food Cost Percentage Calculation
+  useEffect(() => {
+    if (
+      totalRevenue > 0 &&
+      amountFromStockTake >= 0 &&
+      previousMonthTotal >= 0 &&
+      totalExpenses >= 0
+    ) {
+      const cost = totalExpenses + previousMonthTotal - amountFromStockTake;
+      const fcPercent = (cost / totalRevenue) * 100;
+      setFoodCostPercentage(fcPercent);
+      console.log("💹 Food Cost %:", fcPercent.toFixed(2));
+    } else {
+      setFoodCostPercentage(0);
+    }
+  }, [totalRevenue, amountFromStockTake, previousMonthTotal, totalExpenses]);
 
   // ✅ Save Function
   const handleSave = async () => {
@@ -216,6 +316,7 @@ const CostForm = () => {
         revenue_from_sales: amountFromSalesVal,
         other_revenues: otherRevenueVal,
         profit_margin: profitMargin,
+        cost_perc: foodCostPercentage,
         comment: comment,
       },
     ]);
@@ -249,6 +350,7 @@ const CostForm = () => {
         revenue_from_sales: parseFloat(amountFromSales) || 0,
         other_revenues: parseFloat(otherRevenue) || 0,
         profit_margin: parseFloat(profitMargin) || 0,
+        cost_perc: parseFloat(foodCostPercentage) || 0,
         comment: comment,
         updated_at: new Date().toISOString(),
       })
@@ -299,6 +401,8 @@ const CostForm = () => {
     setExpensesFromInvoices("");
     setOtherExpenses("");
     setAmountFromSales("");
+    setAmountFromStockTake("");
+    setPreviousMonthTotal("");
     setOtherRevenue("");
     setTotalExpenses("");
     setTotalRevenue("");
@@ -365,12 +469,12 @@ const CostForm = () => {
               sx={{ color: "#38a3a5", fontSize: "26px" }}
             />
           }
-          title={"Sumary between dates"}
-          value={
+          title={
             <span className={netProfitFromDates < 0 ? "text-red-400" : ""}>
               Net Profit: € {formatCurrency(netProfitFromDates)}
             </span>
           }
+          value={`Cost perc. ${formatCurrency(foodCostPercentage)}%`}
           subtitle={`Revenue: € ${formatCurrency(totalRevenue)}`}
           subtitle2={`Expenses: € ${formatCurrency(totalExpenses)}`}
         />
@@ -482,88 +586,105 @@ const CostForm = () => {
                 />
 
                 {/* Cost Date */}
-                <DesktopDatePicker
-                  label="Date From"
-                  value={fromDate}
-                  onChange={(newValue) => {
-                    const selectedDate = dayjs(newValue);
-                    setFromDate(selectedDate);
-                    // If toDate is empty or equal to old fromDate, update it too
-                    if (!toDate || toDate.isSame(fromDate, "day")) {
-                      setToDate(selectedDate);
-                    }
-                  }}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
-                  format="DD-MM-YYYY"
-                  slotProps={{
-                    textField: {
-                      variant: "outlined",
-                      sx: {
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        "& .MuiInputBase-input": {
-                          color: "dimGray !important",
-                          fontSize: "16px",
-                          fontWeight: 500, // semibold
-                        },
-                        "& .MuiInputLabel-root": {
-                          color: "#38a3a5",
-                        },
-                        "& .MuiOutlinedInput-root": {
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#38a3a5", // default border
+                <FormControl
+                  fullWidth
+                  variant="outlined"
+                  sx={{ gridColumn: "span 2", flexGrow: 1 }}
+                >
+                  <DesktopDatePicker
+                    label="Date From"
+                    value={fromDate}
+                    onChange={(newValue) => {
+                      const selectedDate = dayjs(newValue);
+                      setFromDate(selectedDate);
+                      // If toDate is empty or equal to old fromDate, update it too
+                      if (!toDate || toDate.isSame(fromDate, "day")) {
+                        setToDate(selectedDate);
+                      }
+                    }}
+                    renderInput={(params) => (
+                      <TextField {...params} fullWidth />
+                    )}
+                    format="DD-MM-YYYY"
+                    slotProps={{
+                      textField: {
+                        variant: "outlined",
+                        sx: {
+                          width: "100%",
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          "& .MuiInputBase-input": {
+                            color: "dimGray !important",
+                            fontSize: "16px",
+                            fontWeight: 500, // semibold
                           },
-                          "&:hover .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "darkGreen", // hover border
+                          "& .MuiInputLabel-root": {
+                            color: "#38a3a5",
                           },
-                        },
-                        "& .MuiSvgIcon-root": {
-                          color: "#38a3a5",
+                          "& .MuiOutlinedInput-root": {
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#38a3a5", // default border
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "darkGreen", // hover border
+                            },
+                          },
+                          "& .MuiSvgIcon-root": {
+                            color: "#38a3a5",
+                          },
                         },
                       },
-                    },
-                  }}
-                />
-                <DesktopDatePicker
-                  label="Date To"
-                  value={toDate}
-                  onChange={(newValue) => setToDate(dayjs(newValue))}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
-                  format="DD-MM-YYYY"
-                  slotProps={{
-                    textField: {
-                      variant: "outlined",
-                      sx: {
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        "& .MuiInputBase-input": {
-                          color: "dimGray !important",
-                          fontSize: "16px",
-                          fontWeight: 500, // semibold
-                        },
-                        "& .MuiInputLabel-root": {
-                          color: "#38a3a5",
-                        },
-                        "& .MuiOutlinedInput-root": {
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#38a3a5", // default border
+                    }}
+                  />
+                </FormControl>
+                <FormControl
+                  fullWidth
+                  variant="outlined"
+                  sx={{ gridColumn: "span 2", flexGrow: 1 }}
+                >
+                  <DesktopDatePicker
+                    label="Date To"
+                    value={toDate}
+                    onChange={(newValue) => setToDate(dayjs(newValue))}
+                    renderInput={(params) => (
+                      <TextField {...params} fullWidth />
+                    )}
+                    format="DD-MM-YYYY"
+                    slotProps={{
+                      textField: {
+                        variant: "outlined",
+                        sx: {
+                          width: "100%",
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          "& .MuiInputBase-input": {
+                            color: "dimGray !important",
+                            fontSize: "16px",
+                            fontWeight: 500, // semibold
                           },
-                          "&:hover .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "darkGreen", // hover border
+                          "& .MuiInputLabel-root": {
+                            color: "#38a3a5",
                           },
-                        },
-                        "& .MuiSvgIcon-root": {
-                          color: "#38a3a5",
+                          "& .MuiOutlinedInput-root": {
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#38a3a5", // default border
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "darkGreen", // hover border
+                            },
+                          },
+                          "& .MuiSvgIcon-root": {
+                            color: "#38a3a5",
+                          },
                         },
                       },
-                    },
-                  }}
-                />
-
+                    }}
+                  />
+                </FormControl>
                 <FormControl
                   fullWidth
                   variant="outlined"
@@ -607,7 +728,11 @@ const CostForm = () => {
                     fullWidth
                     label="Revenue from Sales"
                     variant="outlined"
-                    value={`€ ${formatCurrency(amountFromSales)}`}
+                    value={
+                      amountFromSales
+                        ? `€ ${formatCurrency(amountFromSales)}`
+                        : "€ 0.00"
+                    }
                     slotProps={{ readOnly: true }}
                     sx={{
                       ...sharedStyles,
@@ -637,6 +762,40 @@ const CostForm = () => {
                   fullWidth
                   variant="outlined"
                   sx={{ gridColumn: "span 2", flexGrow: 1 }}
+                >
+                  <TextField
+                    fullWidth
+                    label="Prev. Stock Take"
+                    variant="outlined"
+                    value={`€ ${formatCurrency(previousMonthTotal)}`}
+                    InputProps={{ readOnly: true }}
+                    sx={{
+                      ...sharedStyles,
+                      input: { color: "#333", fontSize: 16 },
+                    }}
+                  />
+                </FormControl>
+                <FormControl
+                  fullWidth
+                  variant="outlined"
+                  sx={{ gridColumn: "span 2", flexGrow: 1 }}
+                >
+                  <TextField
+                    fullWidth
+                    label="Last Stock Take"
+                    variant="outlined"
+                    value={`€ ${formatCurrency(amountFromStockTake)}`}
+                    InputProps={{ readOnly: true }}
+                    sx={{
+                      ...sharedStyles,
+                      input: { color: "#333", fontSize: 16 },
+                    }}
+                  />
+                </FormControl>
+                <FormControl
+                  fullWidth
+                  variant="outlined"
+                  sx={{ gridColumn: "span 4", flexGrow: 1 }}
                 >
                   <TextField
                     fullWidth
@@ -815,16 +974,16 @@ const CostForm = () => {
                             {dayjs(item.date_to).format("DD-MM-YYYY")}
                           </td>
                           <td className="p-2 text-right">
-                            {item.total_expenses.toFixed(2)}€
+                            € {item.total_expenses.toFixed(2)}
                           </td>
                           <td className="p-2 text-right">
-                            {item.total_revenue.toFixed(2)}€
+                            € {item.total_revenue.toFixed(2)}
                           </td>
                           <td className="p-2 text-right">
+                            €{" "}
                             {(item.total_revenue - item.total_expenses).toFixed(
                               2
                             )}
-                            €
                           </td>
                           <td className="p-2 text-left">
                             {item.comment || "No comment"}

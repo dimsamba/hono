@@ -17,7 +17,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import supabase from "../supabaseClient"; // Import Supabase client
-import StatCard from "../common/StatCard";
 import { format } from "date-fns";
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 
@@ -966,7 +965,7 @@ const StockTakeForm = ({
                               {stockTake.total_items}
                             </td>
                             <td className="p-2 text-right">
-                              €{stockTake.total_value?.toFixed(2)}
+                              € {stockTake.total_value?.toFixed(2)}
                             </td>
                             <td className="p-2">{stockTake.note}</td>
                           </tr>
