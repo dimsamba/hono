@@ -1145,13 +1145,13 @@ const RecipeForm = ({
                           Type
                         </th>
                         <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                          Cost (€)
+                          Cost
                         </th>
                         <th className="p-2 text-Center text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                          # Portions
+                          N. Ports
                         </th>
                         <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                          Price (€)
+                          Price
                         </th>
                         <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
                           Food Cost %
@@ -1177,16 +1177,16 @@ const RecipeForm = ({
                               {recipe.recipe_type}
                             </td>
                             <td className="p-2 text-right">
-                              €{recipe.total_cost?.toFixed(2)}
+                              € {formatCurrency(recipe.total_cost)}
                             </td>
                             <td className="p-2 text-center">
                               {recipe.number_of_portions}
                             </td>
                             <td className="p-2 text-right">
-                              €{recipe.actual_sale_price?.toFixed(2)}
+                              € {formatCurrency(recipe.actual_sale_price)}
                             </td>
                             <td className="p-2 text-right">
-                              {recipe.actual_food_cost_pct?.toFixed(1)}%
+                              {recipe.actual_food_cost_pct?.toFixed(2)}%
                             </td>
                           </tr>
                         ))}

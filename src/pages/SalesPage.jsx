@@ -24,7 +24,7 @@ const SalesPage = () => {
     filteredItemCount: 0,
     filteredRows: [],
   });
-  const [itemCounts, setItemCounts] = useState([]);
+  const [, setItemCounts] = useState([]);
 
   // Fetch sales data from Supabase (Sales table)
   useEffect(() => {
@@ -47,13 +47,6 @@ const SalesPage = () => {
     setItemCounts(counts);
   };
 
-  const filteredItemCount = itemCounts.reduce((sum, item) => {
-    // Apply filter for selectedItem here (if applicable)
-    if (selectedItem && item.name === selectedItem) {
-      return sum + item.value;
-    }
-    return sum;
-  }, 0);
 
   // Filter sales from the last 30 days
   const now = new Date();

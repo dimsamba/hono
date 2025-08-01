@@ -474,7 +474,7 @@ const CostForm = () => {
               Net Profit: € {formatCurrency(netProfitFromDates)}
             </span>
           }
-          value={`Cost perc. ${formatCurrency(foodCostPercentage)}%`}
+          value={`Cost: ${formatCurrency(foodCostPercentage)}%`}
           subtitle={`Revenue: € ${formatCurrency(totalRevenue)}`}
           subtitle2={`Expenses: € ${formatCurrency(totalExpenses)}`}
         />
@@ -943,13 +943,16 @@ const CostForm = () => {
                         To
                       </th>
                       <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                        Expenses (€)
+                        Expenses
                       </th>
                       <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                        Revenue (€)
+                        Revenue
                       </th>
                       <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                        Profit (€)
+                        Profit
+                      </th>
+                        <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                        Cost %
                       </th>
                       <th className="p-2 text-left text-[#007f5f] bg-[#ebf1fa] font-semibold">
                         Comment
@@ -974,16 +977,16 @@ const CostForm = () => {
                             {dayjs(item.date_to).format("DD-MM-YYYY")}
                           </td>
                           <td className="p-2 text-right">
-                            € {item.total_expenses.toFixed(2)}
+                           € {formatCurrency(item.total_expenses)}
                           </td>
                           <td className="p-2 text-right">
-                            € {item.total_revenue.toFixed(2)}
+                            € {formatCurrency(item.total_revenue)}
                           </td>
                           <td className="p-2 text-right">
-                            €{" "}
-                            {(item.total_revenue - item.total_expenses).toFixed(
-                              2
-                            )}
+                            € {formatCurrency(item.total_revenue - item.total_expenses)}
+                          </td>
+                          <td className="p-2 text-right">
+                            {formatCurrency(item.cost_perc)}%
                           </td>
                           <td className="p-2 text-left">
                             {item.comment || "No comment"}

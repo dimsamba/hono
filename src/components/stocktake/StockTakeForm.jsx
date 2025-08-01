@@ -941,7 +941,7 @@ const StockTakeForm = ({
                           Item Qty
                         </th>
                         <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
-                          Total (€)
+                          Total
                         </th>
                         <th className="p-2 text-left text-[#007f5f] bg-[#ebf1fa] font-semibold">
                           Note
@@ -965,7 +965,7 @@ const StockTakeForm = ({
                               {stockTake.total_items}
                             </td>
                             <td className="p-2 text-right">
-                              € {stockTake.total_value?.toFixed(2)}
+                              € {formatCurrency(stockTake.total_value)}
                             </td>
                             <td className="p-2">{stockTake.note}</td>
                           </tr>

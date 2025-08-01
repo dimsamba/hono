@@ -615,6 +615,15 @@ export default function FullFeaturedCrudGrid({
     }));
   };
 
+   // Customization for decimals and thousands separators
+  const formatCurrency = (value) => {
+    const validNumber = !isNaN(parseFloat(value)) && isFinite(value);
+    return new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(validNumber ? parseFloat(value) : 0);
+  };
+
   const columns = [
     {
       field: "actions",
@@ -664,7 +673,7 @@ export default function FullFeaturedCrudGrid({
       ),
       renderCell: (params) =>
         params.value && !isNaN(params.value)
-          ? `€ ${parseFloat(params.value).toFixed(2)}`
+          ? `€ ${formatCurrency(parseFloat(params.value))}`
           : "",
     },
     {

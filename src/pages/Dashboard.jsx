@@ -1,4 +1,4 @@
-// Version: 1.2.21 28/07/2025
+// Version: 1.2.22 02/08/2025
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { useState } from "react";

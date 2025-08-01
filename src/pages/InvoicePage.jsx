@@ -103,7 +103,7 @@ const invoicePaga = () => {
                   return sum + amount;
                 }, 0);
 
-                return `${dueInvoices.length} (7 days) • € ${formatCurrency(
+                return `${dueInvoices.length} (7 days) € ${formatCurrency(
                   totalAmount
                 )}`;
               })()}
@@ -125,7 +125,6 @@ const invoicePaga = () => {
                     return !inv.paid && invDate < today;
                   })
                   .reduce((acc, curr) => acc + (curr.amount_ttc || 0), 0)
-                  .toFixed(2)
               )})`}
             />
 
@@ -139,7 +138,7 @@ const invoicePaga = () => {
                   const amount = parseFloat(inv.amount_ttc) || 0;
                   return sum + amount;
                 }, 0);
-                return `${paidInvoices.length} Paid • € ${formatCurrency(
+                return `${paidInvoices.length} Paid € ${formatCurrency(
                   totalPaid
                 )}`;
               })()}`}

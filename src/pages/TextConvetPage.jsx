@@ -142,7 +142,6 @@ const TestPage = () => {
                   <IconButton
                     onClick={() => {
                       handleCopyClick();
-                      alert("Text copied successfully!");
                       handleResetText();
                     }}
                     sx={{
