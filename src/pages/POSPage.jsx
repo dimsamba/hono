@@ -570,7 +570,7 @@ const POSPage = () => {
   };
 
   const disableActionButtons =
-    order.length === 0 || !receivedAmount || receivedAmount <= 0;
+    order.length === 0 || !receivedAmount || receivedAmount < calculateTotal();
 
   return (
     <div className="flex-1 overflow-hidden relative z-10 bg-[#fcfeff] border-t-2">

@@ -11,14 +11,15 @@ import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
-import HouseOutlinedIcon from "@mui/icons-material/HouseOutlined";
 import AlarmOnOutlinedIcon from "@mui/icons-material/AlarmOnOutlined";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
+import BiotechOutlinedIcon from '@mui/icons-material/BiotechOutlined';
+import EuroOutlinedIcon from '@mui/icons-material/EuroOutlined';
 
 import { Tooltip } from "@mui/material";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { LogOutIcon, SignalZero } from "lucide-react";
+import { LogOutIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../supabaseClient";
@@ -51,13 +52,13 @@ const SIDEBAR_ITEMS = [
   },
   {
     name: "Family Finance",
-    icon: HouseOutlinedIcon,
+    icon: SavingsOutlinedIcon,
     color: "#3FA89B",
     href: "/family-finance",
   },
   {
     name: "Lab",
-    icon: Inventory2OutlinedIcon,
+    icon: BiotechOutlinedIcon,
     color: "#3FA89B",
     children: [
       { name: "Inventory", href: "/inventory", icon: Inventory2OutlinedIcon },
@@ -67,7 +68,7 @@ const SIDEBAR_ITEMS = [
   },
   {
     name: "Finances",
-    icon: ReceiptLongOutlinedIcon,
+    icon: EuroOutlinedIcon,
     color: "#3FA89B",
     children: [
       { name: "Expenses", href: "/invoice", icon: ReceiptLongOutlinedIcon },

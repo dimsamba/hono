@@ -128,7 +128,7 @@ const RecipeForm = ({
           ...updated[index],
           item_id: item.item_name,
           item_name: item.item_name, // Ensure item_name is updated
-          price_per_unit: item.price_per_unit,
+          price_per_unit: item.effective_price_per_unit,
           unit_type: item.unit_type,
           quantity_used: "",
           cost: item.price_per_unit,
@@ -228,14 +228,11 @@ const RecipeForm = ({
       alert("Error saving recipe");
       setLoading(false);
       return;
-    } else {
-      //  alert("Recipe and Ingredients saved successfully!");
-      // ✅ Continue with item saving
     }
 
     const recipeId = data.id;
 
-    // 🔐 Get the logged-in user's ID
+    // 🔐 Get the logged-in user's ID (must come before inventory insert)
     const { data: userData, error: userError } = await supabase.auth.getUser();
 
     if (userError || !userData?.user) {
@@ -247,19 +244,51 @@ const RecipeForm = ({
 
     const userId = userData.user.id;
 
-    // ✅ Now build the ingredients array with user_id and recipe_id
+    // ✅ Save to inventory if category is "ingrédients"
+    if (recipeType.toLowerCase() === "ingrédients") {
+      const inventoryItem = {
+        user_id: userId,
+        item_name: recipeName,
+        category: "Ingrédients",
+        pack_type: "n/a",
+        qnty_item_pack: 1,
+        unit_type: "unit",
+        unit_per_itm: 1,
+        total_units_per_pack: numberOfPortions,
+        price_per_pack: cpp,
+        price_per_item: cpp,
+        price_per_unit: cpp,
+        yield_pct: 100,
+        effective_price_per_unit: cpp,
+        supplier: "Kitchen",
+        note: null,
+      };
+
+      const { error: inventoryError } = await supabase
+        .from("inventory")
+        .insert([inventoryItem]);
+
+      if (inventoryError) {
+        console.error("Error saving to inventory:", inventoryError.message);
+        alert("Error saving to inventory.");
+      } else {
+        console.log("Recipe also saved to inventory.");
+      }
+    }
+
+    // ✅ Insert ingredients
     const ingredientsToInsert = ingredients.map((item) => ({
       user_id: userId,
       recipe_id: parseInt(recipeId),
       ingredient_id: item.id,
-      item_name: item.item_name, // Use item_name if that's your field
+      item_name: item.item_name,
       quantity_used: item.quantity_used,
       unit_type: item.unit_type,
       price_per_unit: item.price_per_unit,
       ingredient_cost: item.cost,
       created_at: new Date().toISOString(),
     }));
-    // Insert ingredients
+
     const { error: insertError } = await supabase
       .from("recipe_ingredients")
       .insert(ingredientsToInsert);
@@ -268,10 +297,9 @@ const RecipeForm = ({
       console.error("Error saving ingredients:", insertError.message);
     } else {
       console.log("Ingredients saved successfully.");
-      // alert("Ingredients saved successfully");
     }
 
-    // Reset state
+    // ✅ Reset state
     setRecipeName("");
     setRecipeType("");
     setNumberOfPortions("");
@@ -280,9 +308,7 @@ const RecipeForm = ({
     setIngredients([]);
     setRecipeSelected(false);
 
-    // ✅ Refresh the table
     fetchRecipes();
-
     onRecipeSaved && onRecipeSaved();
     setLoading(false);
   };
@@ -347,6 +373,38 @@ const RecipeForm = ({
       return;
     }
 
+    if (recipeType.toLowerCase() === "ingrédients") {
+      const inventoryItem = {
+        user_id: userId,
+        item_name: recipeName,
+        category: "Ingrédients",
+        pack_type: "n/a",
+        qnty_item_pack: 1,
+        unit_type: "unit",
+        unit_per_itm: 1,
+        total_units_per_pack: numberOfPortions,
+        price_per_pack: cpp,
+        price_per_item: cpp,
+        price_per_unit: cpp,
+        yield_pct: 100,
+        effective_price_per_unit: cpp,
+        supplier: "Kitchen",
+        note: null,
+      };
+
+      // Upsert (insert if not exists, update if exists)
+      const { error: upsertError } = await supabase
+        .from("inventory")
+        .upsert([inventoryItem], { onConflict: ["user_id", "item_name"] });
+
+      if (upsertError) {
+        console.error("Error upserting inventory item:", upsertError.message);
+        alert("Error saving to inventory.");
+      } else {
+        console.log("Recipe also updated in inventory.");
+      }
+    }
+
     // ✅ Step 2: Delete old ingredients
     const { error: deleteError } = await supabase
       .from("recipe_ingredients")
@@ -403,6 +461,7 @@ const RecipeForm = ({
 
   // Recipe Type
   const recipeTypes = [
+    { value: "ingrédients", label: "Ingrédients" },
     { value: "amuse-bouche", label: "Amuse-bouche" },
     { value: "appetizer", label: "Appetizer" },
     { value: "bakery", label: "Bakery" },
@@ -510,17 +569,66 @@ const RecipeForm = ({
     );
     if (!confirmDelete) return;
 
+    // ✅ Step 1: Get the logged-in user ID
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData?.user) {
+      console.error("User not authenticated:", userError?.message);
+      alert("Authentication error. Please log in again.");
+      return;
+    }
+    const userId = userData.user.id;
+
+    // ✅ Step 2: Fetch the recipe to get the name and type
+    const { data: recipeData, error: fetchError } = await supabase
+      .from("recipes")
+      .select("recipe_name, recipe_type")
+      .eq("id", recipeId)
+      .single();
+
+    if (fetchError || !recipeData) {
+      console.error(
+        "Error fetching recipe before delete:",
+        fetchError?.message
+      );
+      alert("Failed to retrieve recipe details.");
+      return;
+    }
+
+    const { recipe_name, recipe_type } = recipeData;
+
+    // ✅ Step 3: If recipe is "ingrédients", delete it from inventory first
+    if (recipe_type.toLowerCase() === "ingrédients") {
+      const { error: inventoryDeleteError } = await supabase
+        .from("inventory")
+        .delete()
+        .eq("user_id", userId)
+        .eq("item_name", recipe_name);
+
+      if (inventoryDeleteError) {
+        console.error(
+          "Error deleting from inventory:",
+          inventoryDeleteError.message
+        );
+        alert("Failed to delete item from inventory.");
+        return;
+      } else {
+        console.log("Inventory item deleted.");
+      }
+    }
+
+    // ✅ Step 4: Delete the recipe
     const { error } = await supabase
       .from("recipes")
       .delete()
-      .eq("id", recipeId); // Use the actual column for identifying the recipe
+      .eq("id", recipeId);
 
     if (error) {
       console.error("Error deleting recipe:", error.message);
       alert("Failed to delete recipe.");
     } else {
       alert("Recipe deleted successfully.");
-      // Optionally, reset form or refresh the recipe list
+
+      // ✅ Clear form state
       setRecipeName("");
       setRecipeType("");
       setNumberOfPortions("");
@@ -529,7 +637,7 @@ const RecipeForm = ({
       setIngredients([]);
       setRecipeSelected(false);
 
-      // ✅ Refresh the table
+      // ✅ Refresh the recipe list
       fetchRecipes();
     }
   };
@@ -1129,7 +1237,7 @@ const RecipeForm = ({
                 <p>No recipes saved yet.</p>
               ) : (
                 <div className="overflow-x-auto max-h-[500px] overflow-y-auto hide-scrollbar">
-                  <table className="table-auto w-full text-sm">
+                  <table className="table-auto w-full text-sm min-w-0">
                     <thead
                       className="bg-[#2a303a] sticky top-0 z-10"
                       style={{ borderBottom: "1px solid #60d394" }}
@@ -1166,7 +1274,7 @@ const RecipeForm = ({
                         .map((recipe) => (
                           <tr
                             key={recipe.id}
-                            className="border-b hover:bg-gray-200"
+                            className="border-b hover:bg-gray-200 w-full min-w-0"
                             onClick={() => handleRecipeSelect(recipe.id)} // 👈 Add this line
                           >
                             <td className="p-2">{recipe.recipe_name}</td>
