@@ -1,4 +1,4 @@
-// Version: 1.2.22 02/08/2025
+// Version: 1.2.23 11/08/2025
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { useState } from "react";
@@ -21,6 +21,11 @@ import StockTackPage from "./StockTakePage";
 import PrepPage from "./PrepPage.";
 import FamilyFinancePage from "./FamilyFinancePage";
 import TimerPage from "./TimerPage";
+import TraceabilityPage from "./TraceabilityPage";
+import TempControlPage from "../components/traceability/TempControlPage";
+import FoodLabelsPage from "../components/traceability/FoodLabelsPage";
+import CleaningPage from "../components/traceability/CleaningPage";
+import { matchPath } from "react-router-dom";
 
 function Dashboard() {
   const [theme] = useMode();
@@ -28,22 +33,39 @@ function Dashboard() {
   const location = useLocation(); // Get the current route
 
   // Define titles based on routes
-  const pageTitles = {
-    "/overview": "OVERVIEW",
-    "/sales": "SALES",
-    "/converter": "CONVERTER",
-    "/inventory": "INVENTORY",
-    "/supplier": "SUPPLIERS",
-    "/invoice": "EXPENSES",
-    "/recipe": "RECIPE",
-    "/calendar": "AGENDA",
-    "/stockTake": "STOCK TAKE",
-    "/cost": "COST CALCULATOR",
-    "/vendor": "HONO VENDOR",
-    "/items": "ITEMS LIST",
-    "/prep": "PREP LIST",
-    "/family-finance": "FAMILY FINANCE",
-    "/timer": "TIMER",
+  // inside Dashboard component
+  const routeTitleMap = [
+    { pattern: "/overview", title: "OVERVIEW" },
+    { pattern: "/sales", title: "SALES" },
+    { pattern: "/converter", title: "CONVERTER" },
+    { pattern: "/inventory", title: "INVENTORY" },
+    { pattern: "/supplier", title: "SUPPLIERS" },
+    { pattern: "/invoice", title: "EXPENSES" },
+    { pattern: "/recipe", title: "RECIPE" },
+    { pattern: "/calendar", title: "AGENDA" },
+    { pattern: "/stockTake", title: "STOCK TAKE" },
+    { pattern: "/cost", title: "COST CALCULATOR" },
+    { pattern: "/vendor", title: "HONO VENDOR" },
+    { pattern: "/items", title: "ITEMS LIST" },
+    { pattern: "/prep", title: "PREP LIST" },
+    { pattern: "/family-finance", title: "FAMILY FINANCE" },
+    { pattern: "/timer", title: "TIMER" },
+    { pattern: "/traceability", title: "TRACEABILITY" },
+    {
+      pattern: "/traceability/temperature-control",
+      title: "TEMPERATURE CONTROL",
+    },
+    { pattern: "/traceability/food-labels", title: "FOOD LABELS" },
+    { pattern: "/traceability/cleaning", title: "CLEANING" },
+  ];
+
+  const getPageTitle = (pathname) => {
+    for (let route of routeTitleMap) {
+      if (matchPath(route.pattern, pathname)) {
+        return route.title;
+      }
+    }
+    return "Dashboard"; // default
   };
 
   return (
@@ -58,7 +80,7 @@ function Dashboard() {
           {/* Topbar */}
           <Topbar
             setIsSidebar={setIsSidebar}
-            title={pageTitles[location.pathname] || "Dashboard"}
+            title={getPageTitle(location.pathname)}
           />
           {/* Page content */}
           <div className="flex-1 overflow-y-scroll p-0 scrollbar-hide">
@@ -78,6 +100,18 @@ function Dashboard() {
               <Route path="prep" element={<PrepPage />} />
               <Route path="family-finance" element={<FamilyFinancePage />} />
               <Route path="timer" element={<TimerPage />} />
+
+              {/* Traceability section */}
+              <Route path="traceability" element={<TraceabilityPage />} />
+              <Route
+                path="traceability/temperature-control"
+                element={<TempControlPage />}
+              />
+              <Route
+                path="traceability/food-labels"
+                element={<FoodLabelsPage />}
+              />
+              <Route path="traceability/cleaning" element={<CleaningPage />} />
             </Routes>
           </div>{" "}
         </div>

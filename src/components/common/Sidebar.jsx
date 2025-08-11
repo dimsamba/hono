@@ -15,6 +15,7 @@ import AlarmOnOutlinedIcon from "@mui/icons-material/AlarmOnOutlined";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import BiotechOutlinedIcon from '@mui/icons-material/BiotechOutlined';
 import EuroOutlinedIcon from '@mui/icons-material/EuroOutlined';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
 
 import { Tooltip } from "@mui/material";
 
@@ -86,6 +87,12 @@ const SIDEBAR_ITEMS = [
       { name: "Task List", href: "/prep", icon: PlaylistAddCheckIcon },
       { name: "Converter", href: "/converter", icon: SyncProblemOutlinedIcon },
     ],
+  },
+    {
+    name: "Traceability",
+    icon: QueryStatsIcon,
+    color: "#3FA89B",
+    href: "/traceability",
   },
 ];
 

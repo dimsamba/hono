@@ -22,7 +22,6 @@ import { useNavigate } from "react-router-dom";
 import AgendaNotification from "../common/AgendaNotification";
 import Notification from "../common/Notification";
 import { tokens } from "../theme";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 const Topbar = ({ title }) => {
   const theme = useTheme();
