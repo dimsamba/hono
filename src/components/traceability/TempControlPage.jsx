@@ -27,7 +27,7 @@ import {
   GridRowModes,
 } from "@mui/x-data-grid";
 import dayjs from "dayjs";
-import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { DesktopDatePicker } from "@mui/x-date-pickers";
 import { useNavigate } from "react-router-dom";
 import AcUnitOutlinedIcon from "@mui/icons-material/AcUnitOutlined";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -375,7 +375,7 @@ const TempControlPage = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/traceability")}
             sx={{
               backgroundColor: "#778da9",
               color: "#fff",

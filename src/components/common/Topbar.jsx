@@ -1,6 +1,9 @@
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+import KeyboardReturnOutlinedIcon from "@mui/icons-material/KeyboardReturnOutlined";
+import icon from "../../../public/icons/icon-192x192.png";
+import { motion } from "framer-motion";
 import {
   Badge,
   Box,
@@ -36,22 +39,22 @@ const Topbar = ({ title }) => {
   const [currentTime, setCurrentTime] = useState(dayjs().format("HH:mm:ss"));
 
   // Clock function Date and Time
- useEffect(() => {
-  const updateClock = () => {
-    const now = new Date();
-    const day = String(now.getDate()).padStart(2, "0");
-    const month = now.toLocaleString("default", { month: "short" }); // e.g. Jul
-    const year = now.getFullYear();
-    const time = now.toLocaleTimeString("en-GB"); // HH:MM:SS format
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = now.toLocaleString("default", { month: "short" }); // e.g. Jul
+      const year = now.getFullYear();
+      const time = now.toLocaleTimeString("en-GB"); // HH:MM:SS format
 
-    setCurrentTime(`${day} ${month} ${year} - ${time}`);
-  };
+      setCurrentTime(`${day} ${month} ${year} - ${time}`);
+    };
 
-  updateClock(); // set initial time
-  const intervalId = setInterval(updateClock, 1000); // update every second
+    updateClock(); // set initial time
+    const intervalId = setInterval(updateClock, 1000); // update every second
 
-  return () => clearInterval(intervalId);
-}, []);
+    return () => clearInterval(intervalId);
+  }, []);
 
   // Fetch agend Notifications
   useEffect(() => {
@@ -87,21 +90,49 @@ const Topbar = ({ title }) => {
     <Box
       display="flex"
       justifyContent="space-between"
-      pt={1}
-      pl={1}
-      pr={1}
+      alignItems="center"
       sx={{
         backgroundColor: "#f3f4f6", // Tailwind's bg-gray-100
         borderBottom: "2px solid #e5e7eb", // Tailwind's border-gray-200
+        p: 0.5,
+        height: 60,
       }}
     >
-      <Typography variant="h4" color="#3FA89B">
-        {title}
-      </Typography>
+      {/* LEFT GROUP: Return Button + Title */}
+      <Box display="flex" alignItems="center" gap={1}>
+        {/* Return Button */}
+        <Box sx={{ cursor: "pointer", width: 80 }}>
+        <motion.img
+          whileHover={{ scale: 0.8 }}
+          onClick={() => navigate("/iconsgrid")}
+          className="rounded-full transition-colors cursor-pointer"
+          src={icon}
+          alt="icon"
+          animate={{ opacity: 0.8, scale: 0.7 }}
+          exit={{ opacity: 1, scale: 0.7 }}
+          sx={{
+            width: 20,
+            height: 20,
+          }}
+        />
+        </Box>
+        {/* Title */}
+        <Typography variant="h4" color="#3FA89B">
+          {title}
+        </Typography>
+      </Box>
 
-      <Box display="flex" backgroundColor="#f3f4f6" borderRadius="3px">
+      {/* RIGHT BOX */}
+      <Box
+        display="flex"
+        alignItems="center"
+        sx={{
+          backgroundColor: "#f3f4f6",
+          borderRadius: "3px",
+          p: 1,
+        }}
+      >
         {/* Clock */}
-
         <Box
           sx={{
             display: "flex",
@@ -183,7 +214,7 @@ const Topbar = ({ title }) => {
             invoiceAlerts.map((invoice) => (
               <MenuItem
                 key={invoice.id}
-                  onClick={() => {
+                onClick={() => {
                   navigate("/invoice");
                   handleOpenDialog(invoice);
                 }}
@@ -387,7 +418,8 @@ const Topbar = ({ title }) => {
                     fontSize: 14,
                   }}
                 >
-                  {dayjs(item.date).format("DD-MM-YYYY HH:mm")} - {item.entry_name}
+                  {dayjs(item.date).format("DD-MM-YYYY HH:mm")} -{" "}
+                  {item.entry_name}
                 </Typography>
               </MenuItem>
             ))

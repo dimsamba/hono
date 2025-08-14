@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Grid,
-  Typography,
-  Paper,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
-import { tokens } from "../components/theme";
+import { Grid, Typography, Paper, useTheme } from "@mui/material";
 import AcUnitOutlinedIcon from "@mui/icons-material/AcUnitOutlined";
 import MoreOutlinedIcon from "@mui/icons-material/MoreOutlined";
 import CleaningServicesOutlinedIcon from "@mui/icons-material/CleaningServicesOutlined";
@@ -21,19 +14,19 @@ const TraceabilityPage = () => {
     {
       name: "Temperature Control",
       icon: <AcUnitOutlinedIcon sx={{ fontSize: 80, color: "#3FA89B" }} />,
-      path: "temperature-control", // no slash → relative navigation
+      path: "/temperature-control",
     },
     {
       name: "Food Labels",
       icon: <MoreOutlinedIcon sx={{ fontSize: 80, color: "#3FA89B" }} />,
-      path: "food-labels",
+      path: "/food-labels",
     },
     {
       name: "Cleaning",
       icon: (
         <CleaningServicesOutlinedIcon sx={{ fontSize: 80, color: "#3FA89B" }} />
       ),
-      path: "cleaning",
+      path: "/cleaning",
     },
   ]);
 

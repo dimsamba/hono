@@ -31,7 +31,7 @@ function Login() {
     }
 
     if (data) {
-      navigate("/overview");
+      navigate("/iconsgrid");
     }
   };
 

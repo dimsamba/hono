@@ -12,95 +12,40 @@ import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import AlarmOnOutlinedIcon from "@mui/icons-material/AlarmOnOutlined";
-import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
-import BiotechOutlinedIcon from '@mui/icons-material/BiotechOutlined';
-import EuroOutlinedIcon from '@mui/icons-material/EuroOutlined';
-import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import QueryStatsIcon from "@mui/icons-material/QueryStats";
 
 import { Tooltip } from "@mui/material";
-
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { LogOutIcon } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../supabaseClient";
 import icon from "../../../public/icons/icon-192x192.png";
 
 const SIDEBAR_ITEMS = [
-  {
-    name: "Overview",
-    icon: InsertChartOutlinedIcon,
-    color: "#3FA89B",
-    href: "/overview",
-  },
-  {
-    name: "Vendor",
-    icon: StorefrontOutlinedIcon,
-    color: "#3FA89B",
-    href: "/vendor",
-  },
-  {
-    name: "Sales",
-    icon: LocalAtmOutlinedIcon,
-    color: "#3FA89B",
-    href: "/sales",
-  },
-  {
-    name: "Item's List",
-    icon: PlaylistAddOutlinedIcon,
-    color: "#3FA89B",
-    href: "/items",
-  },
+  { name: "Overview", icon: InsertChartOutlinedIcon, href: "/overview" },
+  { name: "Vendor", icon: StorefrontOutlinedIcon, href: "/vendor" },
+  { name: "Sales", icon: LocalAtmOutlinedIcon, href: "/sales" },
+  { name: "Item's List", icon: PlaylistAddOutlinedIcon, href: "/items" },
   {
     name: "Family Finance",
     icon: SavingsOutlinedIcon,
-    color: "#3FA89B",
     href: "/family-finance",
   },
-  {
-    name: "Lab",
-    icon: BiotechOutlinedIcon,
-    color: "#3FA89B",
-    children: [
-      { name: "Inventory", href: "/inventory", icon: Inventory2OutlinedIcon },
-      { name: "Recipe", href: "/recipe", icon: RamenDiningOutlinedIcon },
-      { name: "Suppliers", href: "/supplier", icon: ContactPhoneOutlinedIcon },
-    ],
-  },
-  {
-    name: "Finances",
-    icon: EuroOutlinedIcon,
-    color: "#3FA89B",
-    children: [
-      { name: "Expenses", href: "/invoice", icon: ReceiptLongOutlinedIcon },
-      { name: "Stock Take", href: "/stockTake", icon: InventoryOutlinedIcon },
-      { name: "Cost Calculator", href: "/cost", icon: SavingsOutlinedIcon },
-    ],
-  },
-  {
-    name: "Toolbox",
-    icon: WidgetsOutlinedIcon,
-    color: "#3FA89B",
-    children: [
-      { name: "Agenda", href: "/calendar", icon: DateRangeOutlinedIcon },
-      { name: "Timer", href: "/timer", icon: AlarmOnOutlinedIcon },
-      { name: "Task List", href: "/prep", icon: PlaylistAddCheckIcon },
-      { name: "Converter", href: "/converter", icon: SyncProblemOutlinedIcon },
-    ],
-  },
-    {
-    name: "Traceability",
-    icon: QueryStatsIcon,
-    color: "#3FA89B",
-    href: "/traceability",
-  },
+  { name: "Inventory", href: "/inventory", icon: Inventory2OutlinedIcon },
+  { name: "Recipe", href: "/recipe", icon: RamenDiningOutlinedIcon },
+  { name: "Suppliers", href: "/supplier", icon: ContactPhoneOutlinedIcon },
+  { name: "Expenses", href: "/invoice", icon: ReceiptLongOutlinedIcon },
+  { name: "Stock Take", href: "/stockTake", icon: InventoryOutlinedIcon },
+  { name: "Cost Calculator", href: "/cost", icon: SavingsOutlinedIcon },
+  { name: "Agenda", href: "/calendar", icon: DateRangeOutlinedIcon },
+  { name: "Timer", href: "/timer", icon: AlarmOnOutlinedIcon },
+  { name: "Task List", href: "/prep", icon: PlaylistAddCheckIcon },
+  { name: "Converter", href: "/converter", icon: SyncProblemOutlinedIcon },
+  { name: "Traceability", icon: QueryStatsIcon, href: "/traceability" },
 ];
 
-const Sidebar = () => {
+export default function IconGridMenu() {
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [hoveredItem, setHoveredItem] = useState(null);
-  const [openGroups, setOpenGroups] = useState({});
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -108,265 +53,91 @@ const Sidebar = () => {
     navigate("/login");
   };
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setIsSidebarOpen(false);
-      } else {
-        setIsSidebarOpen(true);
-      }
-    };
+  // Flatten parent + children into a single array
+  const flatItems = SIDEBAR_ITEMS.flatMap((item) => {
+    if (item.children) {
+      return [
+        { name: item.name, icon: item.icon, href: "#" },
+        ...item.children,
+      ];
+    }
+    return [item];
+  });
 
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Define animation variants
   const iconVariants = {
-    initial: { scale: 1, rotate: 0, color: "#fb6107" },
-    hover: { scale: 1.2, rotate: 10, color: "#fb6107" },
+    initial: { scale: 1 },
+    hover: { scale: 1.2, rotate: 5 },
   };
 
   return (
-    <motion.div
-      animate={{ width: isSidebarOpen ? 175 : 65 }}
-      className="sidebar-container"
-    >
-      <div className="h-full bg-gray-100 bg-opacity-100 px-2.5 flex flex-col border-gray-200 overflow-y-auto scrollbar-hide border-r-2">
-        {/* Sidebar Toggle Icon "LOGO" */}
-        <div
-          className={`flex transition-all duration-1000
-    ${
-      isSidebarOpen
-        ? "items-center justify-start"
-        : "items-center justify-center mb-3 mt-5"
-    }
-  `}
-        >
-          <AnimatePresence>
-            {isSidebarOpen && (
-              <motion.img
-                whileHover={{ rotate: 12, scale: 0.8 }}
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="rounded-full transition-colors cursor-pointer"
-                src={icon}
-                alt="icon"
-                animate={{ opacity: 0.8, scale: 0.7 }}
-                exit={{ opacity: 1, scale: 0.7 }}
-              />
-            )}
-          </AnimatePresence>
+    <div className="p-6">
+      {/* Logo */}
+      <div className="flex justify-center mb-6">
+        <motion.img
+          whileHover={{ rotate: 12, scale: 0.9 }}
+          src={icon}
+          alt="logo"
+          className="h-20 w-20 rounded-full cursor-pointer"
+        />
+      </div>
 
-          {!isSidebarOpen && (
-            <motion.div
-              whileHover={{ rotate: 12, scale: 1.6 }}
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1.3 }}
-              exit={{ opacity: 0, scale: 1.3 }}
-              className="flex items-center justify-center w-full cursor-pointer"
-            >
-              <img src={icon} alt="icon" className="h-6 w-auto" />
-            </motion.div>
-          )}
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-grow">
-          {SIDEBAR_ITEMS.map((item, index) => {
-            const isGroup = !!item.children;
-            const isOpen = openGroups[item.name] || false;
-
-            return (
-              <div key={item.name}>
-                <div
-                  className="flex items-center p-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors mb-1 cursor-pointer"
-                  onClick={() => {
-                    if (isGroup) {
-                      setOpenGroups((prev) => ({
-                        ...prev,
-                        [item.name]: !prev[item.name],
-                      }));
-                    } else {
-                      navigate(item.href);
-                    }
-                  }}
-                  onMouseEnter={() => setHoveredItem(item.name)} // moved here
-                  onMouseLeave={() => setHoveredItem(null)} // moved here
-                >
-                  <Tooltip
-                    title={!isSidebarOpen ? item.name : ""}
-                    placement="right"
-                    arrow
-                    slotProps={{
-                      tooltip: {
-                        sx: {
-                          fontSize: 14,
-                          fontWeight: 600,
-                          backgroundColor: "#3FA89B",
-                          color: "white",
-                          borderRadius: 1,
-                        },
-                      },
-                      arrow: { sx: { color: "#3FA89B" } },
-                    }}
-                  >
-                    <motion.div
-                      animate={
-                        hoveredItem === item.name
-                          ? { scale: 1.5, rotate: 10 }
-                          : { scale: 1, rotate: 0 }
-                      }
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 15,
-                      }}
-                      style={{
-                        borderRadius: "6px",
-                        padding: "4px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <item.icon
-                        className="text-[16px] sm:text-[20px]"
-                        style={{
-                          color:
-                            item.color?.match(
-                              /#(?:[0-9a-fA-F]{3}){1,2}/
-                            )?.[0] ?? "#333",
-                          minWidth: "16px",
-                        }}
-                      />
-                    </motion.div>
-                  </Tooltip>
-
-                  {/* Text */}
-                  <AnimatePresence>
-                    {isSidebarOpen && (
-                      <motion.span
-                        className="ml-4 whitespace-nowrap text-gray-700"
-                        initial={{ opacity: 0, width: 0 }}
-                        animate={{ opacity: 1, width: "auto" }}
-                        exit={{ opacity: 0, width: 0 }}
-                        transition={{ duration: 0.2, delay: 0.3 }}
-                      >
-                        {item.name}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Chevron for group */}
-                  {isGroup && isSidebarOpen && (
-                    <motion.span className="ml-auto text-xs text-gray-500">
-                      {isOpen ? "▲" : "▼"}
-                    </motion.span>
-                  )}
-                </div>
-
-                {isGroup && isOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="ml-6"
-                  >
-                    {item.children.map((child) => (
-                      <Link key={child.href} to={child.href}>
-                        <div
-                          className="flex items-center pt-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg mb-"
-                          onMouseEnter={() => setHoveredItem(child.name)}
-                          onMouseLeave={() => setHoveredItem(null)}
-                        >
-                          <Tooltip
-                            title={!isSidebarOpen ? child.name : ""}
-                            placement="right"
-                            arrow
-                            slotProps={{
-                              tooltip: {
-                                sx: {
-                                  fontSize: 14,
-                                  fontWeight: 600,
-                                  backgroundColor: "#3FA89B",
-                                  color: "white",
-                                  borderRadius: 1,
-                                },
-                              },
-                              arrow: { sx: { color: "#3FA89B" } },
-                            }}
-                          >
-                            <motion.div
-                              animate={
-                                hoveredItem === child.name
-                                  ? { scale: 1.5, rotate: 10 }
-                                  : { scale: 1, rotate: 0 }
-                              }
-                              transition={{
-                                type: "spring",
-                                stiffness: 300,
-                                damping: 15,
-                              }}
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                paddingTop: "5px",
-                                borderRadius: "6px",
-                              }}
-                            >
-                              <child.icon
-                                className="text-[16px] sm:text-[18px]"
-                                style={{ color: "#f78154" }}
-                              />
-                            </motion.div>
-                          </Tooltip>
-
-                          {isSidebarOpen && (
-                            <span className="ml-3">{child.name}</span>
-                          )}
-                        </div>
-                      </Link>
-                    ))}
-                  </motion.div>
-                )}
-              </div>
-            );
-          })}
-          {/* Logout Button */}
-          <button
-            onClick={signOut}
+      {/* Icon grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+        {flatItems.map((item, idx) => (
+          <Tooltip
+            key={idx}
+            title={item.name}
+            placement="top"
+            arrow
+            slotProps={{
+              tooltip: {
+                sx: {
+                  fontSize: 14,
+                  fontWeight: 600,
+                  backgroundColor: "#3FA89B",
+                  color: "white",
+                  borderRadius: 1,
+                },
+              },
+              arrow: { sx: { color: "#3FA89B" } },
+            }}
           >
-            <motion.button
-              onClick={signOut}
-              className="flex items-center p-3 pl-2 text-sm font-medium rounded-lg transition-colors mb-2 ml-1 w-full"
-              whileHover="hover"
-              initial="initial"
-              animate="initial"
-            >
+            <Link to={item.href} className="flex flex-col items-center">
               <motion.div
                 variants={iconVariants}
+                initial="initial"
+                whileHover="hover"
                 transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                className="p-4 rounded-xl shadow-md bg-white hover:bg-gray-50"
               >
-                <LogOutIcon
-                  className="text-[16px] sm:text-[20px]"
-                  style={{ minWidth: "16px" }}
-                />
+                <item.icon style={{ fontSize: 40, color: "#3FA89B" }} />
               </motion.div>
+              <span className="mt-2 text-sm font-medium text-gray-700">
+                {item.name}
+              </span>
+            </Link>
+          </Tooltip>
+        ))}
 
-              {isSidebarOpen && (
-                <span className="ml-4 whitespace-nowrap text-gray-700">
-                  Log out
-                </span>
-              )}
-            </motion.button>
-          </button>
-        </nav>
+        {/* Logout button */}
+        <div
+          onClick={signOut}
+          className="flex flex-col items-center cursor-pointer"
+        >
+          <motion.div
+            variants={iconVariants}
+            initial="initial"
+            whileHover="hover"
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            className="p-4 rounded-xl shadow-md bg-white hover:bg-gray-50"
+          >
+            <LogOutIcon size={40} color="#fb6107" />
+          </motion.div>
+          <span className="mt-2 text-sm font-medium text-gray-700">
+            Log out
+          </span>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
-};
-
-export default Sidebar;
+}
