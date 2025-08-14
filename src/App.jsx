@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import IconGridMenu from "./components/common/IconGridMenu";
 import MainLayout from "./components/common/MainLayout";
+import { Navigate } from "react-router-dom";
 
 import FamilyFinance from "./pages/FamilyFinancePage";
 import OverviewPage from "./pages/OverviewPage";
@@ -19,7 +20,7 @@ import StockTakePage from "./pages/StockTakePage";
 import CostCalculatorPage from "./pages/CostCalculatorPage";
 import CalendarPage from "./pages/CalendarPage";
 import TimerPage from "./pages/TimerPage";
-import PrepPage from "./pages/PrepPage.";
+import PrepPage from "./pages/PrepPage";
 import TextConvetPage from "./pages/TextConvetPage";
 import TraceabilityPage from "./pages/TraceabilityPage";
 import TempControlPage from "./components/traceability/TempControlPage";
@@ -33,6 +34,7 @@ export default function App() {
         <Routes>
           {/* No topbar here */}
           <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login to="/login" replace />} />
 
           {/* All main pages wrapped with topbar */}
           <Route element={<MainLayout />}>
@@ -53,10 +55,7 @@ export default function App() {
             <Route path="/prep" element={<PrepPage />} />
             <Route path="/converter" element={<TextConvetPage />} />
             <Route path="/traceability" element={<TraceabilityPage />} />
-            <Route
-              path="/temperature-control"
-              element={<TempControlPage />}
-            />
+            <Route path="/temperature-control" element={<TempControlPage />} />
             <Route path="/food-labels" element={<FoodLabelsPage />} />
             <Route path="/cleaning" element={<CleaningPage />} />
           </Route>
