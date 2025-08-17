@@ -28,7 +28,7 @@ const MENU_ITEMS = [
   { name: "Vendor", icon: StorefrontOutlinedIcon, href: "/vendor" },
   { name: "Sales Table", icon: LocalAtmOutlinedIcon, href: "/sales" },
   { name: "Item's List", icon: PlaylistAddOutlinedIcon, href: "/items" },
- 
+
   { name: "Inventory", icon: Inventory2OutlinedIcon, href: "/inventory" },
   { name: "Recipe", icon: RamenDiningOutlinedIcon, href: "/recipe" },
   { name: "Suppliers", icon: ContactPhoneOutlinedIcon, href: "/supplier" },
@@ -40,7 +40,7 @@ const MENU_ITEMS = [
   { name: "Task List", icon: PlaylistAddCheckIcon, href: "/prep" },
   { name: "Converter", icon: SyncProblemOutlinedIcon, href: "/converter" },
   { name: "Traceability", icon: QueryStatsIcon, href: "/traceability" },
-   {
+  {
     name: "Family Finance",
     icon: SavingsOutlinedIcon,
     href: "/family-finance",
@@ -77,7 +77,14 @@ export default function IconGridMenu() {
               <item.icon
                 style={{
                   fontSize: 50,
-                  color: item.name === "Overview" ? "#0466c8" : "#3FA89B",
+                  color:
+                    item.name === "Overview"
+                      ? "#0466c8"
+                      : item.name === "Vendor"
+                      ? "#ff006e"
+                       : item.name === "Family Finance"
+                      ? "#7678ed"
+                      : "#3FA89B",
                 }}
               />
             </motion.div>

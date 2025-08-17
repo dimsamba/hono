@@ -5,7 +5,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import IconGridMenu from "./components/common/IconGridMenu";
 import MainLayout from "./components/common/MainLayout";
-import { Navigate } from "react-router-dom";
 
 import FamilyFinance from "./pages/FamilyFinancePage";
 import OverviewPage from "./pages/OverviewPage";
@@ -27,40 +26,47 @@ import TempControlPage from "./components/traceability/TempControlPage";
 import FoodLabelsPage from "./components/traceability/FoodLabelsPage";
 import CleaningPage from "./components/traceability/CleaningPage";
 
+import { TimerProvider } from "./components/TimerContext";
+
 export default function App() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <BrowserRouter>
-        <Routes>
-          {/* No topbar here */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Login to="/login" replace />} />
+      <TimerProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* No topbar here */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Login to="/login" replace />} />
 
-          {/* All main pages wrapped with topbar */}
-          <Route element={<MainLayout />}>
-            <Route path="/iconsgrid" element={<IconGridMenu />} />
-            <Route path="/overview" element={<OverviewPage />} />
-            <Route path="/vendor" element={<POSPage />} />
-            <Route path="/sales" element={<SalesPage />} />
-            <Route path="/items" element={<ItemsListPage />} />
-            <Route path="/family-finance" element={<FamilyFinance />} />
-            <Route path="/inventory" element={<InventoryPage />} />
-            <Route path="/recipe" element={<RecipePage />} />
-            <Route path="/supplier" element={<SupplierPage />} />
-            <Route path="/invoice" element={<InvoicePage />} />
-            <Route path="/stockTake" element={<StockTakePage />} />
-            <Route path="/cost" element={<CostCalculatorPage />} />
-            <Route path="/calendar" element={<CalendarPage />} />
-            <Route path="/timer" element={<TimerPage />} />
-            <Route path="/prep" element={<PrepPage />} />
-            <Route path="/converter" element={<TextConvetPage />} />
-            <Route path="/traceability" element={<TraceabilityPage />} />
-            <Route path="/temperature-control" element={<TempControlPage />} />
-            <Route path="/food-labels" element={<FoodLabelsPage />} />
-            <Route path="/cleaning" element={<CleaningPage />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+            {/* All main pages wrapped with topbar */}
+            <Route element={<MainLayout />}>
+              <Route path="/iconsgrid" element={<IconGridMenu />} />
+              <Route path="/overview" element={<OverviewPage />} />
+              <Route path="/vendor" element={<POSPage />} />
+              <Route path="/sales" element={<SalesPage />} />
+              <Route path="/items" element={<ItemsListPage />} />
+              <Route path="/family-finance" element={<FamilyFinance />} />
+              <Route path="/inventory" element={<InventoryPage />} />
+              <Route path="/recipe" element={<RecipePage />} />
+              <Route path="/supplier" element={<SupplierPage />} />
+              <Route path="/invoice" element={<InvoicePage />} />
+              <Route path="/stockTake" element={<StockTakePage />} />
+              <Route path="/cost" element={<CostCalculatorPage />} />
+              <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/timer" element={<TimerPage />} />
+              <Route path="/prep" element={<PrepPage />} />
+              <Route path="/converter" element={<TextConvetPage />} />
+              <Route path="/traceability" element={<TraceabilityPage />} />
+              <Route
+                path="/temperature-control"
+                element={<TempControlPage />}
+              />
+              <Route path="/food-labels" element={<FoodLabelsPage />} />
+              <Route path="/cleaning" element={<CleaningPage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </TimerProvider>
     </LocalizationProvider>
   );
 }

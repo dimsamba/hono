@@ -12,6 +12,7 @@ import {
   GlobalStyles,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import { useTimers } from "../components/TimerContext";
 
 // Keypad Component
 const Keypad = ({ onKeyPress, onBackspace, onEnter }) => {
@@ -349,26 +350,8 @@ const Timer = ({
 
 // Main Page
 const TimerPage = () => {
-  const timersCount = 6;
-  const [timers, setTimers] = useState(
-    Array.from({ length: timersCount }, () => ({
-      inputValue: "",
-      secondsLeft: 0,
-      isRunning: false,
-      isFlashing: false,
-      intervalRef: null,
-      selectedSound: "sound1.wav",
-      audio: new Audio("/sounds/sound1.wav"),
-    }))
-  );
-
+  const { timers, setTimers, updateTimer } = useTimers(); // ⬅ from context
   const [focusedIndex, setFocusedIndex] = useState(null);
-
-  const updateTimer = (index, updates) => {
-    setTimers((prev) =>
-      prev.map((t, i) => (i === index ? { ...t, ...updates } : t))
-    );
-  };
 
   const handleSoundChange = (index, soundFile) => {
     const audio = new Audio(`/sounds/${soundFile}`);
@@ -475,7 +458,7 @@ const TimerPage = () => {
             </Box>
 
             <Box className="Timers" sx={{ flex: 1 }}>
-              <motion.div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-2">
+              <motion.div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 {timers.map((timer, i) => (
                   <Timer
                     key={i}

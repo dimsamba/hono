@@ -1,7 +1,6 @@
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import KeyboardReturnOutlinedIcon from "@mui/icons-material/KeyboardReturnOutlined";
 import icon from "../../../public/icons/icon-192x192.png";
 import { motion } from "framer-motion";
 import {
@@ -26,6 +25,11 @@ import AgendaNotification from "../common/AgendaNotification";
 import Notification from "../common/Notification";
 import { tokens } from "../theme";
 
+// Imports for timmer Icon set up
+import { useTimers } from "../TimerContext";
+import AccessAlarmsOutlinedIcon from "@mui/icons-material/AccessAlarmsOutlined";
+import NotificationsActiveOutlinedIcon from "@mui/icons-material/NotificationsActiveOutlined";
+
 const Topbar = ({ title }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -37,6 +41,9 @@ const Topbar = ({ title }) => {
   const [agendaTasks, setAgendaTasks] = useState([]);
   const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(dayjs().format("HH:mm:ss"));
+  // const { activeTimers } = useTimers();
+  const { timers, activeTimers, stopRingingTimers } = useTimers();
+  //  const activeTimers = timers.filter((t) => t.isRunning).length;
 
   // Clock function Date and Time
   useEffect(() => {
@@ -86,6 +93,11 @@ const Topbar = ({ title }) => {
     setSelectedInvoice(null);
   };
 
+  const iconVariants = {
+    initial: { scale: 1 },
+    hover: { scale: 1.15 },
+  };
+
   return (
     <Box
       display="flex"
@@ -102,24 +114,57 @@ const Topbar = ({ title }) => {
       <Box display="flex" alignItems="center" gap={1}>
         {/* Return Button */}
         <Box sx={{ cursor: "pointer", width: 80 }}>
-        <motion.img
-          whileHover={{ scale: 0.8 }}
-          onClick={() => navigate("/iconsgrid")}
-          className="rounded-full transition-colors cursor-pointer"
-          src={icon}
-          alt="icon"
-          animate={{ opacity: 0.8, scale: 0.7 }}
-          exit={{ opacity: 1, scale: 0.7 }}
-          sx={{
-            width: 20,
-            height: 20,
-          }}
-        />
+          <motion.img
+            whileHover={{ scale: 0.8 }}
+            onClick={() => navigate("/iconsgrid")}
+            className="rounded-full transition-colors cursor-pointer"
+            src={icon}
+            alt="icon"
+            animate={{ opacity: 0.8, scale: 0.7 }}
+            exit={{ opacity: 1, scale: 0.7 }}
+            sx={{
+              width: 20,
+              height: 20,
+            }}
+          />
         </Box>
         {/* Title */}
-        <Typography variant="h4" color="#3FA89B">
+        <Typography variant="h4" color="#3FA89B" mr="25px">
           {title}
         </Typography>
+
+        {/* Timer Icon */}
+        <div
+          className="relative cursor-pointer"
+          onClick={() => navigate("/timer")}
+        >
+          <motion.div
+            variants={iconVariants}
+            initial="initial"
+            whileHover="hover"
+            transition={{ type: "spring", stiffness: 200, damping: 25 }}
+          >
+            <AccessAlarmsOutlinedIcon
+              sx={{
+                color: "#3FA89B",
+                fontSize: "30px",
+                mr: 1,
+              }}
+            />
+            {activeTimers > 0 && (
+              <span className="absolute -top-1 -right-1 bg-[#eb6424] text-white text-lg rounded-full w-7 h-5 flex items-center justify-center">
+                {activeTimers}
+              </span>
+            )}
+          </motion.div>
+        </div>
+        {/* Second icon for stop alarm */}
+        {timers.some((t) => t.isFlashing) && (
+          <NotificationsActiveOutlinedIcon
+            onClick={stopRingingTimers}
+            sx={{ color: "red", fontSize: 30, cursor: "pointer" }}
+          />
+        )}
       </Box>
 
       {/* RIGHT BOX */}
@@ -138,8 +183,8 @@ const Topbar = ({ title }) => {
             display: "flex",
             alignItems: "center",
             pr: 1,
-            fontSize: "1.1rem",
-            fontWeight: 600,
+            fontSize: "1.3rem",
+            fontWeight: 500,
             color: "#3FA899",
             fontFamily: "monospace",
             borderRadius: "6px",
@@ -160,14 +205,19 @@ const Topbar = ({ title }) => {
               color: "#3FA89B",
               "& .MuiBadge-badge": {
                 fontSize: "1rem", // ✅ Increase font size here
-                minWidth: 20, // optional: widen the badge if needed
+                minWidth: 30, // optional: widen the badge if needed
                 height: 20, // optional: adjust height
                 backgroundColor: "#eb6424",
               },
             }}
             color="error"
           >
-            <NotificationsOutlinedIcon />
+            <NotificationsOutlinedIcon
+              sx={{
+                color: "#3FA89B",
+                fontSize: "27px",
+              }}
+            />
           </Badge>
         </IconButton>
         {/* Notification Dropdown */}
@@ -338,13 +388,18 @@ const Topbar = ({ title }) => {
               color: "#3FA89B",
               "& .MuiBadge-badge": {
                 fontSize: "1rem", // ✅ Increase font size here
-                minWidth: 20, // optional: widen the badge if needed
+                minWidth: 30, // optional: widen the badge if needed
                 height: 20, // optional: adjust height
                 backgroundColor: "#eb6424",
               },
             }}
           >
-            <EventAvailableOutlinedIcon />
+            <EventAvailableOutlinedIcon
+              sx={{
+                color: "#3FA89B",
+                fontSize: "27px",
+              }}
+            />
           </Badge>
         </IconButton>
 
