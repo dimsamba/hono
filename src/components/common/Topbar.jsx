@@ -159,12 +159,23 @@ const Topbar = ({ title }) => {
           </motion.div>
         </div>
         {/* Second icon for stop alarm */}
-        {timers.some((t) => t.isFlashing) && (
-          <NotificationsActiveOutlinedIcon
-            onClick={stopRingingTimers}
-            sx={{ color: "red", fontSize: 30, cursor: "pointer" }}
-          />
-        )}
+        <div className="relative cursor-pointer ml-3">
+          {timers.some((t) => t.isFlashing) && (
+            <motion.div
+              animate={{ scale: [1, 1.3, 1] }} // 👈 grows then shrinks
+              transition={{
+                duration: 0.8,
+                repeat: Infinity, // 👈 loop forever
+                ease: "easeInOut",
+              }}
+            >
+              <NotificationsActiveOutlinedIcon
+                onClick={stopRingingTimers}
+                sx={{ color: "#eb6424", fontSize: 30, cursor: "pointer" }}
+              />
+            </motion.div>
+          )}
+        </div>
       </Box>
 
       {/* RIGHT BOX */}
