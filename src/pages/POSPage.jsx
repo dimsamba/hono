@@ -575,7 +575,7 @@ const POSPage = () => {
   return (
     <div className="flex-1 overflow-hidden relative z-10 bg-[#fcfeff] border-t-2">
       <main
-        className="max-w-8xl mx-auto scrollbar-hide h-[640px] bg-[#e7ecef]"
+        className="max-w-7xl mx-auto scrollbar-hide h-[640px] bg-[#fcfeff]"
         style={{
           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
           border: "1px solid #3FA89B",
