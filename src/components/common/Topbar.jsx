@@ -1,6 +1,14 @@
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
+import CurrencyExchangeOutlinedIcon from "@mui/icons-material/CurrencyExchangeOutlined";
+import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
+import AppsOutlinedIcon from "@mui/icons-material/AppsOutlined";
+import PlaylistAddOutlinedIcon from "@mui/icons-material/PlaylistAddOutlined";
+import FormatListNumberedTwoToneIcon from '@mui/icons-material/FormatListNumberedTwoTone';
+import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
+
 import icon from "../../../public/icons/icon-192x192.png";
 import { motion } from "framer-motion";
 import {
@@ -24,6 +32,7 @@ import { useNavigate } from "react-router-dom";
 import AgendaNotification from "../common/AgendaNotification";
 import Notification from "../common/Notification";
 import { tokens } from "../theme";
+import { Tooltip } from "@mui/material";
 
 // Imports for timmer Icon set up
 import { useTimers } from "../TimerContext";
@@ -40,6 +49,9 @@ const Topbar = ({ title }) => {
   const [agendaAnchorEl, setAgendaAnchorEl] = useState(null);
   const [agendaTasks, setAgendaTasks] = useState([]);
   const navigate = useNavigate();
+  const [shortcutAnchorEl, setShortcutAnchorEl] = useState(null);
+  const [openShortcut, setOpenShortcut] = useState(false);
+  let hoverTimeout = null;
   const [currentTime, setCurrentTime] = useState(dayjs().format("HH:mm:ss"));
   // const { activeTimers } = useTimers();
   const { timers, activeTimers, stopRingingTimers } = useTimers();
@@ -98,6 +110,20 @@ const Topbar = ({ title }) => {
     hover: { scale: 1.15 },
   };
 
+  // ShortCut Mouse hover
+  const handleOpen = (event) => {
+    clearTimeout(hoverTimeout);
+    setShortcutAnchorEl(event.currentTarget);
+    setOpenShortcut(true);
+  };
+
+  const handleClose = () => {
+    hoverTimeout = setTimeout(() => {
+      setOpenShortcut(false);
+      setShortcutAnchorEl(null);
+    }, 20); // small delay so user can move mouse into popup
+  };
+
   return (
     <Box
       display="flex"
@@ -133,6 +159,363 @@ const Topbar = ({ title }) => {
           {title}
         </Typography>
 
+        {/* Shortcut Icon */}
+        <div
+          className="relative cursor-pointer"
+          onMouseEnter={handleOpen}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <motion.div
+            variants={iconVariants}
+            initial="initial"
+            whileHover="hover"
+            transition={{ type: "spring", stiffness: 200, damping: 25 }}
+          >
+            <AppsOutlinedIcon sx={{ color: "#3FA89B", fontSize: "35px" }} />
+          </motion.div>
+        </div>
+
+        <Menu
+          anchorEl={shortcutAnchorEl}
+          open={openShortcut}
+          onClose={() => setOpenShortcut(false)}
+          MenuListProps={{
+            onMouseEnter: () => clearTimeout(hoverTimeout), // cancel close
+            onMouseLeave: handleClose, // close only when leaving menu
+          }}
+          PaperProps={{
+            sx: {
+              backgroundColor: "#f3f4f6",
+              borderRadius: "12px",
+              px: 0.5,
+            },
+          }}
+        >
+          <Box display="flex" gap={0} justifyContent="center">
+            {/* Overview */}
+            <Tooltip
+              title="Overview"
+              placement="top"
+              arrow
+              slotProps={{
+                popper: {
+                  sx: {
+                    "& .MuiTooltip-tooltip": {
+                      backgroundColor: "#f3f4f6",
+                      color: "#3FA89B",
+                      fontSize: "14px",
+                      fontWeight: "700",
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.30)",
+                    },
+                    "& .MuiTooltip-arrow": {
+                      color: "white", // arrow color matches bg
+                    },
+                  },
+                },
+              }}
+            >
+              <motion.div
+                variants={iconVariants}
+                initial="initial"
+                whileHover="hover"
+                onClick={() => {
+                  navigate("/overview");
+                  setShortcutAnchorEl(null);
+                }}
+                style={{
+                  cursor: "pointer",
+                  width: "40px", // 👈 fixed width
+                  height: "40px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: "5px",
+                }}
+              >
+                <InsertChartOutlinedIcon
+                  sx={{ color: "#0466c8", fontSize: "35px" }}
+                />
+              </motion.div>
+            </Tooltip>
+
+            {/* Vendor */}
+            <Tooltip
+              title="Vendor"
+              placement="top"
+              arrow
+              slotProps={{
+                popper: {
+                  sx: {
+                    "& .MuiTooltip-tooltip": {
+                      backgroundColor: "#f3f4f6",
+                      color: "#3FA89B",
+                      fontSize: "14px",
+                      fontWeight: "700",
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.30)",
+                    },
+                    "& .MuiTooltip-arrow": {
+                      color: "white", // arrow color matches bg
+                    },
+                  },
+                },
+              }}
+            >
+              <motion.div
+                variants={iconVariants}
+                initial="initial"
+                whileHover="hover"
+                onClick={() => {
+                  navigate("/vendor");
+                  setShortcutAnchorEl(null);
+                }}
+                style={{
+                  cursor: "pointer",
+                  width: "40px", // 👈 fixed width
+                  height: "40px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: "5px",
+                }}
+              >
+                <StorefrontOutlinedIcon
+                  sx={{ color: "#ff006e", fontSize: "35px" }}
+                />
+              </motion.div>
+            </Tooltip>
+
+            {/* Sales */}
+            <Tooltip
+              title="Sales"
+              placement="top"
+              arrow
+              slotProps={{
+                popper: {
+                  sx: {
+                    "& .MuiTooltip-tooltip": {
+                      backgroundColor: "#f3f4f6",
+                      color: "#3FA89B",
+                      fontSize: "14px",
+                      fontWeight: "700",
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.30)",
+                    },
+                    "& .MuiTooltip-arrow": {
+                      color: "white", // arrow color matches bg
+                    },
+                  },
+                },
+              }}
+            >
+              <motion.div
+                variants={iconVariants}
+                initial="initial"
+                whileHover="hover"
+                onClick={() => {
+                  navigate("/sales");
+                  setShortcutAnchorEl(null);
+                }}
+                style={{
+                  cursor: "pointer",
+                  width: "40px", // 👈 fixed width
+                  height: "40px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: "5px",
+                }}
+              >
+                <CurrencyExchangeOutlinedIcon
+                  sx={{ color: "#3FA89B", fontSize: "30px" }}
+                />
+              </motion.div>
+            </Tooltip>
+
+            {/* Items List */}
+            <Tooltip
+              title="Item's List"
+              placement="top"
+              arrow
+              slotProps={{
+                popper: {
+                  sx: {
+                    "& .MuiTooltip-tooltip": {
+                      backgroundColor: "#f3f4f6",
+                      color: "#3FA89B",
+                      fontSize: "14px",
+                      fontWeight: "700",
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.30)",
+                    },
+                    "& .MuiTooltip-arrow": {
+                      color: "white", // arrow color matches bg
+                    },
+                  },
+                },
+              }}
+            >
+              <motion.div
+                variants={iconVariants}
+                initial="initial"
+                whileHover="hover"
+                onClick={() => {
+                  navigate("/items");
+                  setShortcutAnchorEl(null);
+                }}
+                style={{
+                  cursor: "pointer",
+                  width: "40px", // 👈 fixed width
+                  height: "40px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: "5px",
+                }}
+              >
+                <PlaylistAddOutlinedIcon
+                  sx={{ color: "#3FA89B", fontSize: "35px" }}
+                />
+              </motion.div>
+            </Tooltip>
+
+             {/* Task List */}
+            <Tooltip
+              title="Task List"
+              placement="top"
+              arrow
+              slotProps={{
+                popper: {
+                  sx: {
+                    "& .MuiTooltip-tooltip": {
+                      backgroundColor: "#f3f4f6",
+                      color: "#3FA89B",
+                      fontSize: "14px",
+                      fontWeight: "700",
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.30)",
+                    },
+                    "& .MuiTooltip-arrow": {
+                      color: "white", // arrow color matches bg
+                    },
+                  },
+                },
+              }}
+            >
+              <motion.div
+                variants={iconVariants}
+                initial="initial"
+                whileHover="hover"
+                onClick={() => {
+                  navigate("/prep");
+                  setShortcutAnchorEl(null);
+                }}
+                style={{
+                  cursor: "pointer",
+                  width: "40px", // 👈 fixed width
+                  height: "40px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: "5px",
+                }}
+              >
+                <FormatListNumberedTwoToneIcon
+                  sx={{ color: "#3FA89B", fontSize: "35px" }}
+                />
+              </motion.div>
+            </Tooltip>
+
+             {/* Family Finances */}
+            <Tooltip
+              title="Family Finances"
+              placement="top"
+              arrow
+              slotProps={{
+                popper: {
+                  sx: {
+                    "& .MuiTooltip-tooltip": {
+                      backgroundColor: "#f3f4f6",
+                      color: "#3FA89B",
+                      fontSize: "14px",
+                      fontWeight: "700",
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.30)",
+                    },
+                    "& .MuiTooltip-arrow": {
+                      color: "white", // arrow color matches bg
+                    },
+                  },
+                },
+              }}
+            >
+              <motion.div
+                variants={iconVariants}
+                initial="initial"
+                whileHover="hover"
+                onClick={() => {
+                  navigate("/family-finance");
+                  setShortcutAnchorEl(null);
+                }}
+                style={{
+                  cursor: "pointer",
+                  width: "40px", // 👈 fixed width
+                  height: "40px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: "5px",
+                }}
+              >
+                <SavingsOutlinedIcon
+                  sx={{ color: "#7678ed", fontSize: "35px" }}
+                />
+              </motion.div>
+            </Tooltip>
+          </Box>
+        </Menu>
+      </Box>
+
+      {/* RIGHT BOX */}
+      <Box
+        display="flex"
+        alignItems="center"
+        sx={{
+          backgroundColor: "#f3f4f6",
+          borderRadius: "3px",
+          p: 1,
+        }}
+      >
+        {/* Icon Stop alarm */}
+        <div className="relative cursor-pointer ml-3">
+          {timers.some((t) => t.isFlashing) && (
+            <motion.div
+              animate={{ scale: [1, 1.3, 1] }} // 👈 grows then shrinks
+              transition={{
+                duration: 0.8,
+                repeat: Infinity, // 👈 loop forever
+                ease: "easeInOut",
+              }}
+            >
+              <NotificationsActiveOutlinedIcon
+                onClick={stopRingingTimers}
+                sx={{ color: "#eb6424", fontSize: 30, cursor: "pointer", mr: 1 }}
+              />
+            </motion.div>
+          )}
+        </div>
+
         {/* Timer Icon */}
         <div
           className="relative cursor-pointer"
@@ -158,36 +541,7 @@ const Topbar = ({ title }) => {
             )}
           </motion.div>
         </div>
-        {/* Second icon for stop alarm */}
-        <div className="relative cursor-pointer ml-3">
-          {timers.some((t) => t.isFlashing) && (
-            <motion.div
-              animate={{ scale: [1, 1.3, 1] }} // 👈 grows then shrinks
-              transition={{
-                duration: 0.8,
-                repeat: Infinity, // 👈 loop forever
-                ease: "easeInOut",
-              }}
-            >
-              <NotificationsActiveOutlinedIcon
-                onClick={stopRingingTimers}
-                sx={{ color: "#eb6424", fontSize: 30, cursor: "pointer" }}
-              />
-            </motion.div>
-          )}
-        </div>
-      </Box>
 
-      {/* RIGHT BOX */}
-      <Box
-        display="flex"
-        alignItems="center"
-        sx={{
-          backgroundColor: "#f3f4f6",
-          borderRadius: "3px",
-          p: 1,
-        }}
-      >
         {/* Clock */}
         <Box
           sx={{

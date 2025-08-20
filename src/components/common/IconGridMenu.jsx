@@ -10,25 +10,24 @@ import DateRangeOutlinedIcon from "@mui/icons-material/DateRangeOutlined";
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
-import LocalAtmOutlinedIcon from "@mui/icons-material/LocalAtmOutlined";
 import RamenDiningOutlinedIcon from "@mui/icons-material/RamenDiningOutlined";
 import PlaylistAddOutlinedIcon from "@mui/icons-material/PlaylistAddOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
-import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
+import FormatListNumberedTwoToneIcon from "@mui/icons-material/FormatListNumberedTwoTone";
 import AlarmOnOutlinedIcon from "@mui/icons-material/AlarmOnOutlined";
 import EuroOutlinedIcon from "@mui/icons-material/EuroOutlined";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
+import CurrencyExchangeOutlinedIcon from "@mui/icons-material/CurrencyExchangeOutlined";
 
 // Your items
 const MENU_ITEMS = [
   { name: "Overview", icon: InsertChartOutlinedIcon, href: "/overview" },
   { name: "Vendor", icon: StorefrontOutlinedIcon, href: "/vendor" },
-  { name: "Sales Table", icon: LocalAtmOutlinedIcon, href: "/sales" },
+  { name: "Sales Table", icon: CurrencyExchangeOutlinedIcon, href: "/sales" },
   { name: "Item's List", icon: PlaylistAddOutlinedIcon, href: "/items" },
-
   { name: "Inventory", icon: Inventory2OutlinedIcon, href: "/inventory" },
   { name: "Recipe", icon: RamenDiningOutlinedIcon, href: "/recipe" },
   { name: "Suppliers", icon: ContactPhoneOutlinedIcon, href: "/supplier" },
@@ -37,11 +36,11 @@ const MENU_ITEMS = [
   { name: "Cost Calculator", icon: EuroOutlinedIcon, href: "/cost" },
   { name: "Agenda", icon: DateRangeOutlinedIcon, href: "/calendar" },
   { name: "Timer", icon: AlarmOnOutlinedIcon, href: "/timer" },
-  { name: "Task List", icon: PlaylistAddCheckIcon, href: "/prep" },
+  { name: "Task List", icon: FormatListNumberedTwoToneIcon, href: "/prep" },
   { name: "Converter", icon: SyncProblemOutlinedIcon, href: "/converter" },
   { name: "Traceability", icon: QueryStatsIcon, href: "/traceability" },
   {
-    name: "Family Finance",
+    name: "Family Finances",
     icon: SavingsOutlinedIcon,
     href: "/family-finance",
   },
@@ -82,7 +81,7 @@ export default function IconGridMenu() {
                       ? "#0466c8"
                       : item.name === "Vendor"
                       ? "#ff006e"
-                       : item.name === "Family Finance"
+                      : item.name === "Family Finances"
                       ? "#7678ed"
                       : "#3FA89B",
                 }}
