@@ -168,6 +168,14 @@ export default function FullFeaturedCrudGrid({
     ...new Set(rows.map((row) => row.frequency).filter(Boolean)),
   ];
   const uniqueFrom = [...new Set(rows.map((row) => row.from).filter(Boolean))];
+  const [filterAmount, setFilterAmount] = useState(null);
+
+  // ✅ Reset filter automatically after rows change
+  useEffect(() => {
+    if (filterAmount !== null) {
+      setFilterAmount(null);
+    }
+  }, [rows]);
 
   // Active Filters
   const filtersAreActive =
@@ -244,15 +252,33 @@ export default function FullFeaturedCrudGrid({
     onFFChange();
   };
 
+  // handleSaveClick
   const handleSaveClick = (id) => async () => {
     setRowModesModel((prev) => ({
       ...prev,
       [id]: { mode: GridRowModes.View },
     }));
 
-    await repeatRecurringExpenses(); // safe to call again
+    const rowToSave = rows.find((r) => r.id === id);
+    if (!rowToSave) return;
 
-    onFFChange();
+    try {
+      const { data, error } = await supabase
+        .from("familyexpenses")
+        .upsert([rowToSave])
+        .select();
+
+      if (error) throw error;
+
+      setRows((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, ...data[0] } : r))
+      );
+
+      // ❌ Do not rely on NewAmountEditCell to change filter
+    } catch (err) {
+      console.error("Save failed", err);
+    }
+    setFilterAmount(null); // reset
   };
 
   const handleDeleteClick = (id) => async () => {
@@ -282,10 +308,14 @@ export default function FullFeaturedCrudGrid({
       [id]: { mode: GridRowModes.View, ignoreModifications: true },
     }));
 
-    const row = rows.find((r) => r.id === id);
-    if (row?.isNew) {
-      setRows((prev) => prev.filter((r) => r.id !== id));
-    }
+    // setRows((prev) => prev.filter((r) => r.id !== id));
+    setRows((prev) =>
+      prev.map((r) =>
+        r.id === id ? FamilyFinanceTable.find((row) => row.id === id) || r : r
+      )
+    );
+
+    setFilterAmount(null); // reset
   };
 
   const processRowUpdate = async (newRow) => {
@@ -330,6 +360,7 @@ export default function FullFeaturedCrudGrid({
 
         const [inserted] = data;
         setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
+
         return inserted;
       } else {
         // ✏️ Update existing row
@@ -342,6 +373,7 @@ export default function FullFeaturedCrudGrid({
 
         const updated = { ...cleanRow, id };
         setRows((prev) => prev.map((row) => (row.id === id ? updated : row)));
+
         return updated;
       }
     } catch (error) {
@@ -496,41 +528,41 @@ export default function FullFeaturedCrudGrid({
   }, []);
 
   // Filter between dates
-  // Get value between dates
-  // 1. Filter rows by date
   const { filteredRows, filteredTotalValue } = useMemo(() => {
-    let filtered = rows;
+    let filtered = [...rows]; // start with all rows
 
-    // Date filter
-    filtered = filtered.filter((row) => {
-      const rowDate = dayjs(row.date);
-      if (!rowDate.isValid()) return false;
-
-      if (fromDate && toDate) {
+    // Apply date/category/frequency/from filters first...
+    if (fromDate && toDate) {
+      filtered = filtered.filter((row) => {
+        const rowDate = dayjs(row.date);
         return (
           rowDate.isSameOrAfter(fromDate, "day") &&
           rowDate.isSameOrBefore(toDate, "day")
         );
-      }
-      if (fromDate) return rowDate.isSameOrAfter(fromDate, "day");
-      if (toDate) return rowDate.isSameOrBefore(toDate, "day");
-
-      return true;
-    });
-
-    // Category filter
-    if (selectedCategory) {
-      filtered = filtered.filter((row) => row.category === selectedCategory);
+      });
     }
+    if (selectedCategory)
+      filtered = filtered.filter((r) => r.category === selectedCategory);
+    if (selectedFrequency)
+      filtered = filtered.filter((r) => r.frequency === selectedFrequency);
+    if (selectedFrom)
+      filtered = filtered.filter((r) => r.from === selectedFrom);
 
-    // Frequency filter
-    if (selectedFrequency) {
-      filtered = filtered.filter((row) => row.frequency === selectedFrequency);
-    }
+    // filteredRows
+    // inside useMemo
+    if (
+      filterAmount !== null &&
+      filterAmount !== "" &&
+      !Number.isNaN(Number(filterAmount))
+    ) {
+      const target = Number(filterAmount);
+      const EPS = 0.001;
 
-    // From filter
-    if (selectedFrom) {
-      filtered = filtered.filter((row) => row.from === selectedFrom);
+      filtered = filtered.filter((row) => {
+        if (row.isNew) return true; // always include new rows
+        const amt = Number(row.amount);
+        return !Number.isNaN(amt) && Math.abs(amt - target) < EPS;
+      });
     }
 
     const total = filtered.reduce(
@@ -546,6 +578,7 @@ export default function FullFeaturedCrudGrid({
     selectedCategory,
     selectedFrequency,
     selectedFrom,
+    filterAmount,
   ]);
 
   // ⬇️ Send filtered results to parent
@@ -615,7 +648,7 @@ export default function FullFeaturedCrudGrid({
     }));
   };
 
-   // Customization for decimals and thousands separators
+  // Customization for decimals and thousands separators
   const formatCurrency = (value) => {
     const validNumber = !isNaN(parseFloat(value)) && isFinite(value);
     return new Intl.NumberFormat("en-US", {
@@ -669,7 +702,11 @@ export default function FullFeaturedCrudGrid({
       align: "right",
       headerAlign: "right",
       renderEditCell: (params) => (
-        <NewAmountEditCell {...params} setRows={setRows} />
+        <NewAmountEditCell
+          {...params}
+          setRows={setRows}
+          setFilterAmount={setFilterAmount}
+        />
       ),
       renderCell: (params) =>
         params.value && !isNaN(params.value)
@@ -692,7 +729,7 @@ export default function FullFeaturedCrudGrid({
     {
       field: "category",
       headerName: "Category",
-      width: 250,
+      width: 200,
       editable: true,
       type: "singleSelect",
       valueOptions: expenseCategories,
@@ -772,7 +809,7 @@ export default function FullFeaturedCrudGrid({
     {
       field: "from",
       headerName: "From",
-      width: 200,
+      width: 180,
       editable: true,
     },
     {

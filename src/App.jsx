@@ -1,4 +1,4 @@
-// Version: 1.2.25 14/08/2025
+// Version: 1.2.26 23/08/2025
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { BrowserRouter, Route, Routes } from "react-router-dom";

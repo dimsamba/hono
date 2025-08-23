@@ -21,7 +21,7 @@ const CustomTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-const NewAmountEditCell = ({ id, field, value, inputRef }) => {
+const NewAmountEditCell = ({ id, field, value, inputRef, setFilterAmount }) => {
   const apiRef = useGridApiContext();
   const [inputValue, setInputValue] = useState(value || "");
   const [error, setError] = useState("");
@@ -56,7 +56,12 @@ const NewAmountEditCell = ({ id, field, value, inputRef }) => {
       return item.id !== id && !isNaN(dbAmount) && dbAmount === parsedAmount;
     });
 
-    setError(isDuplicate ? "⚠️ AMOUNT ALREADY EXISTS" : "");
+    if (isDuplicate) {
+      setError("⚠️ AMOUNT ALREADY EXISTS");
+      setFilterAmount(parsedAmount); // 👈 trigger filtering
+    } else {
+      setError("");
+    }
   };
 
   useEffect(() => {
@@ -78,15 +83,17 @@ const NewAmountEditCell = ({ id, field, value, inputRef }) => {
 
   return (
     <CustomTooltip title={error} open={!!error} placement="top-start">
-      <TextField
-        inputRef={inputRef || localRef} // ✅ Attach ref
-        value={inputValue}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        error={!!error}
-        size="fullheight"
-        fullWidth
-      />
+      <span>
+        <TextField
+          inputRef={inputRef || localRef} // ✅ Attach ref
+          value={inputValue}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={!!error}
+          size="fullheight"
+          fullWidth
+        />
+      </span>
     </CustomTooltip>
   );
 };

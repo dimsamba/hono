@@ -362,7 +362,7 @@ const TempControlPage = () => {
     {
       field: "comment",
       headerName: "Comment",
-      width: 750,
+      width: 670,
       editable: true,
     },
   ];

@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import StatCard from "../components/common/StatCard";
 import FullFeaturedCrudGrid from "../components/familyFinance/FamilyFinanceTable";
 import supabase from "../components/supabaseClient";
-import { useMemo } from "react";
 
 // ✅ Import Supabase
 const FamilyFinancePage = () => {
@@ -27,17 +26,6 @@ const FamilyFinancePage = () => {
   };
 
   // total amount between dates
-  const totalBetweenDates = useMemo(() => {
-    if (!fromDate || !toDate) return 0;
-
-    return FamilyFinanceTable.reduce((sum, row) => {
-      const date = new Date(row.date);
-      if (date >= fromDate && date <= toDate) {
-        return sum + (parseFloat(row.amount) || 0);
-      }
-      return sum;
-    }, 0);
-  }, [FamilyFinanceTable, fromDate, toDate]);
 
   useEffect(() => {
     fetchData(); // ✅ Fetch Family Finances data when the page loads
