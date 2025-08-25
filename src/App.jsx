@@ -1,7 +1,8 @@
-// Version: 1.2.26 23/08/2025
+// Version: 1.2.27 24/08/2025
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+
 import Login from "./pages/Login";
 import IconGridMenu from "./components/common/IconGridMenu";
 import MainLayout from "./components/common/MainLayout";
@@ -34,11 +35,13 @@ export default function App() {
       <TimerProvider>
         <BrowserRouter>
           <Routes>
-            {/* No topbar here */}
+            {/* Public route */}
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Login to="/login" replace />} />
 
-            {/* All main pages wrapped with topbar */}
+            {/* Redirect root to login */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+
+            {/* Protected / main layout routes */}
             <Route element={<MainLayout />}>
               <Route path="/iconsgrid" element={<IconGridMenu />} />
               <Route path="/overview" element={<OverviewPage />} />
@@ -57,10 +60,7 @@ export default function App() {
               <Route path="/prep" element={<PrepPage />} />
               <Route path="/converter" element={<TextConvetPage />} />
               <Route path="/traceability" element={<TraceabilityPage />} />
-              <Route
-                path="/temperature-control"
-                element={<TempControlPage />}
-              />
+              <Route path="/temperature-control" element={<TempControlPage />} />
               <Route path="/food-labels" element={<FoodLabelsPage />} />
               <Route path="/cleaning" element={<CleaningPage />} />
             </Route>

@@ -139,7 +139,7 @@ const Topbar = ({ title }) => {
       {/* LEFT GROUP: Return Button + Title */}
       <Box display="flex" alignItems="center" gap={1}>
         {/* Return Button */}
-        <Box sx={{ cursor: "pointer", width: 80 }}>
+        <Box sx={{ cursor: "pointer", width: 70 }}>
           <motion.img
             whileHover={{ scale: 0.8 }}
             onClick={() => navigate("/iconsgrid")}
@@ -149,8 +149,8 @@ const Topbar = ({ title }) => {
             animate={{ opacity: 0.8, scale: 0.7 }}
             exit={{ opacity: 1, scale: 0.7 }}
             sx={{
-              width: 20,
-              height: 20,
+              width: 18,
+              height: 18,
             }}
           />
         </Box>
@@ -160,7 +160,7 @@ const Topbar = ({ title }) => {
         </Typography>
 
         {/* Shortcut Icon */}
-        <div
+        {/* <div
           className="relative cursor-pointer"
           onMouseEnter={handleOpen}
           style={{
@@ -177,7 +177,7 @@ const Topbar = ({ title }) => {
           >
             <AppsOutlinedIcon sx={{ color: "#3FA89B", fontSize: "35px" }} />
           </motion.div>
-        </div>
+        </div> */}
 
         <Menu
           anchorEl={shortcutAnchorEl}
@@ -562,7 +562,8 @@ const Topbar = ({ title }) => {
         {/* Notification Icon */}
         <IconButton
           sx={{ color: colors.grey[700] }}
-          onClick={(event) => setAnchorEl(event.currentTarget)}
+          onMouseEnter={(event) => setAnchorEl(event.currentTarget)}
+
         >
           <Badge
             badgeContent={invoiceAlerts.length}
@@ -596,6 +597,7 @@ const Topbar = ({ title }) => {
               maxHeight: 300,
               width: "300px",
             },
+            onMouseLeave: () => handleCloseMenu(null), // 👈 closes when mouse leaves
           }}
           MenuListProps={{
             sx: {
@@ -674,6 +676,7 @@ const Topbar = ({ title }) => {
             ))
           )}
         </Menu>
+
         {/* Invoice Detail Dialog */}
         <Dialog
           open={dialogOpen}
@@ -744,7 +747,7 @@ const Topbar = ({ title }) => {
         {/* Agenda Notifications Icon */}
         <IconButton
           sx={{ color: colors.grey[700] }}
-          onClick={(event) => setAgendaAnchorEl(event.currentTarget)}
+          onMouseEnter={(event) => setAgendaAnchorEl(event.currentTarget)}
         >
           <Badge
             badgeContent={agendaTasks.length}
@@ -779,6 +782,7 @@ const Topbar = ({ title }) => {
               maxHeight: 300,
               width: "300px",
             },
+            onMouseLeave: () => setAgendaAnchorEl(null), // 👈 closes when mouse leaves
           }}
           MenuListProps={{
             sx: {

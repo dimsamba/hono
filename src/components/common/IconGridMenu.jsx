@@ -23,7 +23,7 @@ import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import CurrencyExchangeOutlinedIcon from "@mui/icons-material/CurrencyExchangeOutlined";
 
 // Your items
-const MENU_ITEMS = [
+export const MENU_ITEMS = [
   { name: "Overview", icon: InsertChartOutlinedIcon, href: "/overview" },
   { name: "Vendor", icon: StorefrontOutlinedIcon, href: "/vendor" },
   { name: "Sales Table", icon: CurrencyExchangeOutlinedIcon, href: "/sales" },
@@ -65,7 +65,11 @@ export default function IconGridMenu() {
       {/* Icon grid */}
       <div className="max-w-4xl mx-auto grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-2">
         {MENU_ITEMS.map((item) => (
-          <Link to={item.href} className="flex flex-col items-center">
+          <Link
+            key={item.name}
+            to={item.href}
+            className="flex flex-col items-center"
+          >
             <motion.div
               variants={iconVariants}
               initial="initial"

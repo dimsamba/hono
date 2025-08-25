@@ -3,6 +3,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { Outlet, useLocation, matchPath } from "react-router-dom";
 import { useMode } from "../theme";
 import Topbar from "./Topbar";
+import Sidebar from "../common/Sidebar"; // your sidebar component
 
 export default function MainLayout() {
   const [theme] = useMode();
@@ -43,10 +44,16 @@ export default function MainLayout() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div className="flex flex-col h-screen bg-gray-100 text-[#311] overflow-hidden">
-        <Topbar title={getPageTitle(location.pathname)} />
-        <div className="flex-1 overflow-y-scroll px-4 scrollbar-hide">
-          <Outlet />
+      <div className="flex h-screen bg-gray-100 text-[#311] overflow-hidden">
+        {/* Sidebar always visible */}
+        <Sidebar />
+
+        {/* Main content area */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Topbar title={getPageTitle(location.pathname)} />
+          <div className="flex-1 overflow-y-scroll px-4 scrollbar-hide">
+            <Outlet />
+          </div>
         </div>
       </div>
     </ThemeProvider>

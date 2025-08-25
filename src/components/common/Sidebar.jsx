@@ -1,143 +1,182 @@
-import ContactPhoneOutlinedIcon from "@mui/icons-material/ContactPhoneOutlined";
-import DateRangeOutlinedIcon from "@mui/icons-material/DateRangeOutlined";
-import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
-import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
-import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
-import LocalAtmOutlinedIcon from "@mui/icons-material/LocalAtmOutlined";
-import RamenDiningOutlinedIcon from "@mui/icons-material/RamenDiningOutlined";
-import PlaylistAddOutlinedIcon from "@mui/icons-material/PlaylistAddOutlined";
-import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
-import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
-import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined";
-import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
-import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
-import AlarmOnOutlinedIcon from "@mui/icons-material/AlarmOnOutlined";
-import QueryStatsIcon from "@mui/icons-material/QueryStats";
-
-import { Tooltip } from "@mui/material";
+// src/components/common/Sidebar.jsx
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { LogOutIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import supabase from "../supabaseClient";
-import icon from "../../../public/icons/icon-192x192.png";
 
-const SIDEBAR_ITEMS = [
+// MUI Icons
+import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined"; // Overview
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined"; // Vendor
+import CurrencyExchangeOutlinedIcon from "@mui/icons-material/CurrencyExchangeOutlined"; // Sales
+import PlaylistAddOutlinedIcon from "@mui/icons-material/PlaylistAddOutlined"; // Items
+import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined"; // Family Finance
+import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined"; // Inventory
+import RamenDiningOutlinedIcon from "@mui/icons-material/RamenDiningOutlined"; // Recipe
+import ContactPhoneOutlinedIcon from "@mui/icons-material/ContactPhoneOutlined"; // Supplier
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined"; // Invoice
+import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined"; // StockTake
+import EuroOutlinedIcon from "@mui/icons-material/EuroOutlined"; // Cost Calculator
+import DateRangeOutlinedIcon from "@mui/icons-material/DateRangeOutlined"; // Calendar
+import AlarmOnOutlinedIcon from "@mui/icons-material/AlarmOnOutlined"; // Timer
+import FormatListNumberedTwoToneIcon from "@mui/icons-material/FormatListNumberedTwoTone"; // Prep
+import SyncProblemOutlinedIcon from "@mui/icons-material/SyncProblemOutlined"; // Converter
+import QueryStatsIcon from "@mui/icons-material/QueryStats"; // Traceability
+import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined"; // Lab
+import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined"; // Finances
+import BuildCircleOutlinedIcon from "@mui/icons-material/BuildCircleOutlined"; // Tools
+import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
+
+const MENU_ITEMS = [
   { name: "Overview", icon: InsertChartOutlinedIcon, href: "/overview" },
   { name: "Vendor", icon: StorefrontOutlinedIcon, href: "/vendor" },
-  { name: "Sales", icon: LocalAtmOutlinedIcon, href: "/sales" },
-  { name: "Item's List", icon: PlaylistAddOutlinedIcon, href: "/items" },
+  { name: "Sales Table", icon: CurrencyExchangeOutlinedIcon, href: "/sales" },
+  { name: "Items List", icon: PlaylistAddOutlinedIcon, href: "/items" },
   {
     name: "Family Finance",
     icon: SavingsOutlinedIcon,
     href: "/family-finance",
   },
-  { name: "Inventory", href: "/inventory", icon: Inventory2OutlinedIcon },
-  { name: "Recipe", href: "/recipe", icon: RamenDiningOutlinedIcon },
-  { name: "Suppliers", href: "/supplier", icon: ContactPhoneOutlinedIcon },
-  { name: "Expenses", href: "/invoice", icon: ReceiptLongOutlinedIcon },
-  { name: "Stock Take", href: "/stockTake", icon: InventoryOutlinedIcon },
-  { name: "Cost Calculator", href: "/cost", icon: SavingsOutlinedIcon },
-  { name: "Agenda", href: "/calendar", icon: DateRangeOutlinedIcon },
-  { name: "Timer", href: "/timer", icon: AlarmOnOutlinedIcon },
-  { name: "Task List", href: "/prep", icon: PlaylistAddCheckIcon },
-  { name: "Converter", href: "/converter", icon: SyncProblemOutlinedIcon },
-  { name: "Traceability", icon: QueryStatsIcon, href: "/traceability" },
+
+  {
+    name: "Lab",
+    icon: ScienceOutlinedIcon,
+    children: [
+      { name: "Inventory", icon: Inventory2OutlinedIcon, href: "/inventory" },
+      { name: "Recipe", icon: RamenDiningOutlinedIcon, href: "/recipe" },
+      { name: "Suppliers", icon: ContactPhoneOutlinedIcon, href: "/supplier" },
+      { name: "Traceability", icon: QueryStatsIcon, href: "/traceability" },
+    ],
+  },
+
+  {
+    name: "Finances",
+    icon: AccountBalanceWalletOutlinedIcon,
+    children: [
+      { name: "Expenses", icon: ReceiptLongOutlinedIcon, href: "/invoice" },
+      { name: "Stock Take", icon: InventoryOutlinedIcon, href: "/stockTake" },
+      { name: "Cost Calculator", icon: EuroOutlinedIcon, href: "/cost" },
+    ],
+  },
+
+  {
+    name: "Tools",
+    icon: BuildCircleOutlinedIcon,
+    children: [
+      { name: "Agenda", icon: DateRangeOutlinedIcon, href: "/calendar" },
+      { name: "Task List", icon: FormatListNumberedTwoToneIcon, href: "/prep" },
+      { name: "Converter", icon: SyncProblemOutlinedIcon, href: "/converter" },
+      { name: "Timer", icon: AlarmOnOutlinedIcon, href: "/timer" },
+    ],
+  },
 ];
 
-export default function IconGridMenu() {
+export default function Sidebar() {
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const [openSubmenus, setOpenSubmenus] = useState([]);
 
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    navigate("/login");
+  const toggleSubmenu = (name) => {
+    if (openSubmenus.includes(name)) {
+      setOpenSubmenus(openSubmenus.filter((n) => n !== name)); // close
+    } else {
+      setOpenSubmenus([...openSubmenus, name]); // open
+    }
   };
 
-  // Flatten parent + children into a single array
-  const flatItems = SIDEBAR_ITEMS.flatMap((item) => {
-    if (item.children) {
-      return [
-        { name: item.name, icon: item.icon, href: "#" },
-        ...item.children,
-      ];
-    }
-    return [item];
-  });
-
-  const iconVariants = {
-    initial: { scale: 1 },
-    hover: { scale: 1.2, rotate: 5 },
+  const signOut = async () => {
+    navigate("/login"); // simplified
   };
 
   return (
-    <div className="p-6">
-      {/* Logo */}
-      <div className="flex justify-center mb-6">
-        <motion.img
-          whileHover={{ rotate: 12, scale: 0.9 }}
-          src={icon}
-          alt="logo"
-          className="h-20 w-20 rounded-full cursor-pointer"
-        />
+    <div className="relative h-screen">
+      {/* Small clickable tab */}
+      <div
+        className="absolute top-1/3 -left-6 bg-[#3FA89B] w-10 h-24 rounded-r-md flex flex-col items-center justify-center cursor-pointer z-50"
+        onClick={() => setIsOpen(!isOpen)}
+        onMouseEnter={() => setIsOpen(true)} // hover only opens
+      >
+        {["M", "E", "N", "U"].map((letter, idx) => (
+          <span key={idx} className="text-white font-medium text-sm ml-5">
+            {letter}
+          </span>
+        ))}
       </div>
 
-      {/* Icon grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-        {flatItems.map((item, idx) => (
-          <Tooltip
-            key={idx}
-            title={item.name}
-            placement="top"
-            arrow
-            slotProps={{
-              tooltip: {
-                sx: {
-                  fontSize: 14,
-                  fontWeight: 600,
-                  backgroundColor: "#3FA89B",
-                  color: "white",
-                  borderRadius: 1,
-                },
-              },
-              arrow: { sx: { color: "#3FA89B" } },
-            }}
-          >
-            <Link to={item.href} className="flex flex-col items-center">
-              <motion.div
-                variants={iconVariants}
-                initial="initial"
-                whileHover="hover"
-                transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                className="p-4 rounded-xl shadow-md bg-white hover:bg-gray-50"
-              >
-                <item.icon style={{ fontSize: 40, color: "#3FA89B" }} />
-              </motion.div>
-              <span className="mt-2 text-sm font-medium text-gray-700">
-                {item.name}
-              </span>
-            </Link>
-          </Tooltip>
-        ))}
+      {/* Sidebar drawer */}
+      <motion.div
+        initial={{ x: -250 }}
+        animate={{ x: isOpen ? 0 : -250 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="w-52 max-h-screen overflow-y-auto bg-gray-50 shadow-2xl flex flex-col pl-3 pb-8 mt-16 absolute top-1/5 -translate-y-1/2 z-30 rounded-tr-[15px] rounded-br-[15px]"
+        onMouseLeave={() => setIsOpen(false)}
+      >
+        {/* Menu items */}
+        <nav className="flex-1 space-y-2 mt-8">
+          {MENU_ITEMS.map((item) => (
+            <div key={item.name}>
+              {item.children ? (
+                <div>
+                  {/* Parent item with arrow */}
+                  <div
+                    onClick={() => toggleSubmenu(item.name)}
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-200 cursor-pointer mr-2"
+                  >
+                    <item.icon style={{ fontSize: 25, color: "#3FA89B" }} />
+                    <span className="text-gray-700 font-medium flex items-center justify-between w-full">
+                      {item.name}
+                      <ExpandMoreOutlinedIcon
+                        className={`ml-2 transition-transform duration-200 ${
+                          openSubmenus.includes(item.name)
+                            ? "rotate-180"
+                            : "rotate-0"
+                        }`}
+                        style={{ fontSize: 18 }}
+                      />
+                    </span>
+                  </div>
 
-        {/* Logout button */}
+                  {/* Submenu items */}
+                  {openSubmenus.includes(item.name) && (
+                    <div className="ml-6 mt-1 flex flex-col space-y-1">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.name}
+                          to={child.href}
+                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-200 mr-2"
+                        >
+                          <child.icon
+                            style={{ fontSize: 20, color: "#3FA89B" }}
+                          />
+                          <span className="text-gray-700 text-medium">
+                            {child.name}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-200 mr-2"
+                >
+                  <item.icon style={{ fontSize: 25, color: "#3FA89B" }} />
+                  <span className="text-gray-700 font-medium">{item.name}</span>
+                </Link>
+              )}
+            </div>
+          ))}
+        </nav>
+
+        {/* Logout */}
         <div
           onClick={signOut}
-          className="flex flex-col items-center cursor-pointer"
+          className="flex items-center gap-0 px-3 py-2 cursor-pointer rounded-lg hover:bg-gray-200 mr-2"
         >
-          <motion.div
-            variants={iconVariants}
-            initial="initial"
-            whileHover="hover"
-            transition={{ type: "spring", stiffness: 300, damping: 15 }}
-            className="p-4 rounded-xl shadow-md bg-white hover:bg-gray-50"
-          >
-            <LogOutIcon size={40} color="#fb6107" />
-          </motion.div>
-          <span className="mt-2 text-sm font-medium text-gray-700">
-            Log out
-          </span>
+          <LogOutIcon size={28} color="#fb6107" />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
