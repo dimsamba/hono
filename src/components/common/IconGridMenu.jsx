@@ -21,6 +21,7 @@ import AlarmOnOutlinedIcon from "@mui/icons-material/AlarmOnOutlined";
 import EuroOutlinedIcon from "@mui/icons-material/EuroOutlined";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import CurrencyExchangeOutlinedIcon from "@mui/icons-material/CurrencyExchangeOutlined";
+import DocumentScannerOutlinedIcon from '@mui/icons-material/DocumentScannerOutlined';
 
 // Your items
 export const MENU_ITEMS = [
@@ -39,6 +40,7 @@ export const MENU_ITEMS = [
   { name: "Task List", icon: FormatListNumberedTwoToneIcon, href: "/prep" },
   { name: "Converter", icon: SyncProblemOutlinedIcon, href: "/converter" },
   { name: "Traceability", icon: QueryStatsIcon, href: "/traceability" },
+  { name: "Documents", icon: DocumentScannerOutlinedIcon, href: "/documents" },
   {
     name: "Family Finances",
     icon: SavingsOutlinedIcon,

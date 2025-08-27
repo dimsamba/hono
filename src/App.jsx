@@ -26,6 +26,7 @@ import TraceabilityPage from "./pages/TraceabilityPage";
 import TempControlPage from "./components/traceability/TempControlPage";
 import FoodLabelsPage from "./components/traceability/FoodLabelsPage";
 import CleaningPage from "./components/traceability/CleaningPage";
+import FilesPage from "./pages/FilesPage";
 
 import { TimerProvider } from "./components/TimerContext";
 
@@ -63,6 +64,7 @@ export default function App() {
               <Route path="/temperature-control" element={<TempControlPage />} />
               <Route path="/food-labels" element={<FoodLabelsPage />} />
               <Route path="/cleaning" element={<CleaningPage />} />
+              <Route path="/documents" element={<FilesPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

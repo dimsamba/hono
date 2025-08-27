@@ -30,6 +30,7 @@ export default function MainLayout() {
     { pattern: "/temperature-control", title: "TEMPERATURE CONTROL SYSTEM" },
     { pattern: "/food-labels", title: "FOOD LABEL SYSTEM" },
     { pattern: "/cleaning", title: "CLEANING CONTROL" },
+    { pattern: "/documents", title: "DOCUMENTS" },
   ];
 
   const getPageTitle = (pathname) => {

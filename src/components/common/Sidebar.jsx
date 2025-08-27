@@ -25,6 +25,7 @@ import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined"; // Lab
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined"; // Finances
 import BuildCircleOutlinedIcon from "@mui/icons-material/BuildCircleOutlined"; // Tools
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
+import DocumentScannerOutlinedIcon from '@mui/icons-material/DocumentScannerOutlined';
 
 const MENU_ITEMS = [
   { name: "Overview", icon: InsertChartOutlinedIcon, href: "/overview" },
@@ -68,6 +69,7 @@ const MENU_ITEMS = [
       { name: "Timer", icon: AlarmOnOutlinedIcon, href: "/timer" },
     ],
   },
+   { name: "documents", icon: DocumentScannerOutlinedIcon, href: "/documents" },
 ];
 
 export default function Sidebar() {
