@@ -199,8 +199,8 @@ const FilesPage = () => {
 
   // ---------- UI ----------
   return (
-    <div className="flex-1 overflow-hidden relative z-10 bg-100 border-t-2">
-      <main className="max-w-8xl mx-auto scrollbar-hide h-[640px] p-4">
+    <div className="flex-1 overflow-auto relative z-10">
+      <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         <GlobalStyles
           styles={{
             "& .MuiMenu-paper": {
@@ -374,7 +374,7 @@ const FilesPage = () => {
                 </IconButton>
 
                 {isImage(file) ? (
-                  <img
+                  <img className="fileBox"
                     src={getFileUrl(file.file_path, 150, 120)}
                     alt={file.name}
                     style={{
@@ -390,13 +390,19 @@ const FilesPage = () => {
                     }}
                   />
                 ) : (
-                  getFileIcon(file)
+                  <div className="fileBox">{getFileIcon(file)}</div>
                 )}
 
                 <Typography
                   variant="body1"
                   align="center"
-                  sx={{ mt: 0.5, color: "#3FA89B", fontWeight: 500 }}
+                  sx={{
+                    mt: 0.5,
+                    color: "#3FA89B",
+                    fontWeight: 500,
+                    fontSize: "1rem",
+                    position: "inherit",
+                  }}
                 >
                   {file.name}
                 </Typography>
