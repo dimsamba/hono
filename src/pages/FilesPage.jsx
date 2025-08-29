@@ -1,11 +1,28 @@
 import { useState, useEffect } from "react";
-import { Grid, Typography, Paper, Button, TextField } from "@mui/material";
+import {
+  Grid,
+  Typography,
+  Paper,
+  Button,
+  TextField,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  GlobalStyles,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import supabase from "../components/supabaseClient"; // adjust path
+import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined"; // for txt/doc
+import supabase from "../components/supabaseClient";
 import React from "react";
+
+const FILE_CATEGORIES = ["All", "Documents", "Invoices", "Pictures"];
+const STORAGE_BASE =
+  "https://ivisqrqipcjqwdoqefpx.supabase.co/storage/v1/object/public";
 
 const FilesPage = () => {
   const [files, setFiles] = useState([]);
@@ -13,119 +30,164 @@ const FilesPage = () => {
   const [customName, setCustomName] = useState("");
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const [previewFile, setPreviewFile] = React.useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Handle file preview
+  // Get the appropriate icon for a file based on its type or extension
+  const getFileIcon = (file) => {
+    if (/\.(pdf)$/i.test(file.file_path)) {
+      return <PictureAsPdfOutlinedIcon sx={{ fontSize: 80, color: "red" }} />;
+    }
+    if (/\.(txt|docx?|rtf)$/i.test(file.file_path)) {
+      return (
+        <DescriptionOutlinedIcon sx={{ fontSize: 80, color: "#3FA89B" }} />
+      );
+    }
+    return (
+      <InsertDriveFileOutlinedIcon sx={{ fontSize: 80, color: "#3FA89B" }} />
+    );
+  };
+
+  // ---------- helpers ----------
+  const isImageByPath = (path) =>
+    typeof path === "string" &&
+    /\.(jpg|jpeg|png|gif|webp|avif|svg)$/i.test(path);
+
+  const isImage = (file) =>
+    (file?.file_type && file.file_type.startsWith("image/")) ||
+    isImageByPath(file?.file_path);
+
+  // Build a public URL from a storage path like "pictures/123.jpg"
+  const getFileUrl = (filePath, width = null, height = null) => {
+    if (!filePath) return "";
+    let url = `${STORAGE_BASE}/files/${filePath}`;
+    if (isImageByPath(filePath) && width && height) {
+      url += `?width=${width}&height=${height}&resize=contain`;
+    }
+    return url;
+  };
+
+  // ---------- data ----------
+  const fetchFiles = async () => {
+    const { data, error } = await supabase
+      .from("files") // <-- your metadata table name
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching files:", error);
+      setFiles([]);
+      return;
+    }
+
+    // Client-side filter to be resilient to schema differences
+    let filtered = data || [];
+    if (selectedCategory !== "All") {
+      const folder = selectedCategory.toLowerCase(); // "pictures" | "documents" | "invoices"
+      filtered = filtered.filter((row) => {
+        // Prefer an explicit 'category' column if you have it
+        if (row.category) return row.category === folder;
+
+        // Fallbacks if 'category' doesn't exist:
+        // 1) derive from file_path prefix
+        if (row.file_path?.startsWith(`${folder}/`)) return true;
+
+        // 2) some older rows may have file_type incorrectly set to folder
+        if (row.file_type === folder) return true;
+
+        return false;
+      });
+    }
+
+    setFiles(filtered);
+  };
+
+  useEffect(() => {
+    fetchFiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory]);
+
+  // ---------- actions ----------
   const handleOpenPreview = (file) => {
+    // Helpful debug while testing
+    // console.log("Preview:", { type: file?.file_type, path: file?.file_path });
     setPreviewFile(file);
     setPreviewOpen(true);
   };
+
   const handleClosePreview = () => {
     setPreviewOpen(false);
     setPreviewFile(null);
   };
 
-  // Fetch files from Supabase table
-  const fetchFiles = async () => {
-    const { data, error } = await supabase
-      .from("documents")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) console.error("Error fetching documents:", error);
-    else setFiles(data);
-  };
-
-  useEffect(() => {
-    fetchFiles();
-  }, []);
-
-  // Get file URL (thumbnail for images)
-  const getFileUrl = (filePath) => {
-    if (!filePath) return "";
-
-    const isImage = filePath.match(/\.(jpg|jpeg|png|gif)$/i);
-
-    if (isImage) {
-      // Use the render endpoint for images
-      return `https://ivisqrqipcjqwdoqefpx.supabase.co/storage/v1/object/public/documents/${filePath}?width=150&height=120&resize=contain`;
-    }
-
-    // Other file types
-    return `https://ivisqrqipcjqwdoqefpx.supabase.co/storage/v1/object/public/documents/${filePath}`;
-  };
-
-  // Handle file upload
+  // Upload file to storage, then insert metadata row
   const handleUpload = async () => {
-    if (!selectedFile || !customName) {
-      alert("Please select a file and enter a name.");
+    if (!selectedFile || !customName || selectedCategory === "All") {
+      alert("Please select a file, enter a name, and choose a Type (not All).");
       return;
     }
 
     const fileExt = selectedFile.name.split(".").pop();
-    const filePath = `documents/${Date.now()}.${fileExt}`;
+    const fileName = `${Date.now()}.${fileExt}`;
+    const folder = selectedCategory.toLowerCase(); // "pictures" | "documents" | "invoices"
+    const filePath = `${folder}/${fileName}`;
 
-    // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("documents")
+    // 1) upload to storage
+    const { error: uploadError } = await supabase.storage
+      .from("files") // <-- storage bucket name
       .upload(filePath, selectedFile);
 
-    console.log("Upload result:", uploadData, "Upload error:", uploadError);
-    if (uploadError) return alert("File upload failed!");
+    if (uploadError) {
+      console.error(uploadError);
+      alert("File upload failed!");
+      return;
+    }
 
-    // Insert metadata into table
-    const { data: insertData, error: insertError } = await supabase
-      .from("documents")
-      .insert([
-        {
-          name: customName,
-          file_path: filePath,
-          file_type: selectedFile.type,
-        },
-      ])
-      .select();
+    // 2) insert metadata
+    const payload = {
+      name: customName,
+      file_path: filePath,
+      file_type: selectedFile.type || null, // e.g. "image/jpeg"
+    };
 
-    console.log("Insert result:", insertData, "Insert error:", insertError);
-    if (insertError) return alert("Metadata insert failed!");
+    const { error: insertError } = await supabase
+      .from("files")
+      .insert([payload]);
 
-    // Clear fields
-    setSelectedFile(null);
+    if (insertError) {
+      console.error(insertError);
+      alert("Metadata insert failed!");
+      return;
+    }
     setCustomName("");
-
-    // Refresh grid
-    await fetchFiles();
+    setSelectedFile(null);
+    setSelectedCategory("All"); // 👈 this resets dropdown to "All"
+    fetchFiles();
   };
 
-  // Handle file deletion
   const handleDeleteFile = async (file) => {
-    const confirmDelete = window.confirm(
-      `Do you really want to delete the file "${file.name}"?`
-    );
+    const confirmDelete = window.confirm(`Delete "${file.name}"?`);
     if (!confirmDelete) return;
 
     try {
-      // 1. Delete from storage
       const { error: storageError } = await supabase.storage
-        .from("documents")
+        .from("files")
         .remove([file.file_path]);
-
       if (storageError) throw storageError;
 
-      // 2. Delete from database
       const { error: dbError } = await supabase
-        .from("documents")
+        .from("files")
         .delete()
         .eq("id", file.id);
-
       if (dbError) throw dbError;
 
-      // 3. Refresh the grid
       fetchFiles();
-      // alert("File deleted successfully!");
-    } catch (error) {
-      console.error("Error deleting file:", error);
-      alert("Failed to delete file. Check console for details.");
+    } catch (err) {
+      console.error("Error deleting file:", err);
+      alert("Failed to delete file.");
     }
   };
 
+  // ---------- styles ----------
   const sharedStyles = {
     "& .MuiInputLabel-root": { color: "#38a3a5", fontSize: 14 },
     "& .MuiOutlinedInput-root": {
@@ -135,10 +197,26 @@ const FilesPage = () => {
     },
   };
 
+  // ---------- UI ----------
   return (
     <div className="flex-1 overflow-hidden relative z-10 bg-100 border-t-2">
       <main className="max-w-8xl mx-auto scrollbar-hide h-[640px] p-4">
-        <Typography variant="h4" sx={{ mb: 3, color: "#3FA89B" }}>
+        <GlobalStyles
+          styles={{
+            "& .MuiMenu-paper": {
+              backgroundColor: "white !important",
+              color: "#577590 !important",
+            },
+            "& .MuiMenuItem-root:hover": {
+              backgroundColor: "#eff1ed !important",
+            },
+          }}
+        />
+
+        <Typography
+          variant="h4"
+          sx={{ ...sharedStyles, mb: 3, color: "#3FA89B" }}
+        >
           Document Manager
         </Typography>
 
@@ -149,7 +227,28 @@ const FilesPage = () => {
             handleUpload();
           }}
         >
-          <Grid container spacing={2} alignItems="center" sx={{ mb: 4 }}>
+          <Grid
+            container
+            spacing={2}
+            alignItems="center"
+            justifyContent="left"
+            sx={{ mb: 1, pb: 1 }}
+          >
+            <Grid item>
+              <Button
+                variant="contained"
+                component="label"
+                sx={{ bgcolor: "#669bbc", mb: 0.2 }}
+              >
+                Select File
+                <input
+                  type="file"
+                  hidden
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
+                />
+              </Button>
+            </Grid>
+
             <Grid item>
               <TextField
                 label="Enter File Name"
@@ -158,45 +257,63 @@ const FilesPage = () => {
                 size="small"
                 sx={{
                   ...sharedStyles,
-                  color: "#333",
-                  input: { color: "#333", fontSize: 16 },
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleUpload();
-                  }
+                  input: {
+                    color: "dimGray !important",
+                    fontSize: "16px",
+                    fontWeight: 500,
+                  },
                 }}
               />
             </Grid>
+
             <Grid item>
-              <Button
-                variant="contained"
-                component="label"
-                sx={{ bgcolor: "#669bbc" }}
+              <FormControl
+                sx={{
+                  ...sharedStyles,
+                  width: "222px",
+                  "& .MuiSelect-select": {
+                    color: "dimGray !important",
+                    fontSize: "16px",
+                    fontWeight: 500,
+                  },
+                  "& .MuiSvgIcon-root": {
+                    fontSize: "2.2rem",
+                    color: "#38a3a5",
+                  },
+                  "& .MuiFormLabel-root": { color: "#38a3a5 !important" },
+                }}
               >
-                Select File
-                <input
-                  type="file"
-                  hidden
-                  onChange={(e) => setSelectedFile(e.target.files[0])}
-                />
-              </Button>
+                <InputLabel>File Type</InputLabel>
+                <Select
+                  value={selectedCategory}
+                  label="File Type"
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  size="small"
+                >
+                  {FILE_CATEGORIES.map((cat) => (
+                    <MenuItem key={cat} value={cat}>
+                      {cat}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
+
             <Grid item>
               <Button
                 type="submit"
                 variant="contained"
-                sx={{ color: "white", bgcolor: "#3FA89B" }}
+                sx={{ color: "white", bgcolor: "#3FA89B", mb: 0.2 }}
               >
                 Upload
               </Button>
             </Grid>
+
             {selectedFile && (
               <Grid item>
                 <Typography
                   variant="body2"
-                  sx={{ ...sharedStyles, color: "#777", fontSize: 14 }}
+                  sx={{ color: "#777", fontSize: 14 }}
                 >
                   SELECTED: {selectedFile.name}
                 </Typography>
@@ -212,193 +329,164 @@ const FilesPage = () => {
           justifyContent="flex-start"
           alignItems="center"
         >
-          {files.map((file) => {
-            const isImage = file.file_type?.startsWith("image/");
-            return (
-              <Grid item key={file.id}>
-                <Paper
-                  elevation={2}
+          {files.map((file) => (
+            <Grid item key={file.id}>
+              <Paper
+                elevation={2}
+                sx={{
+                  position: "relative", // needed for the delete button
+                  width: 150,
+                  height: 170,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#F5F5F5",
+                  border: "1px solid #3FA89B",
+                  borderRadius: "8px",
+                  px: 1,
+                  cursor: "pointer",
+                  pt: 3.5,
+                  pb: 1,
+                }}
+                onClick={() => handleOpenPreview(file)}
+              >
+                {/* Delete */}
+                <IconButton
+                  size="small"
                   sx={{
-                    position: "relative", // needed for the delete button
-                    width: 150,
-                    height: 170,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#F5F5F5",
-                    border: "1px solid #3FA89B",
-                    borderRadius: "8px",
-                    p: 2,
-                    cursor: "pointer",
+                    position: "absolute", // 👈 place absolutely inside Paper
+                    top: 0, // 👈 distance from top
+                    right: 0, // 👈 distance from right
                   }}
-                  onClick={() => handleOpenPreview(file)}
-                >
-                  {/* Delete Button */}
-                  <IconButton
-                    size="small"
-                    sx={{
-                      position: "absolute",
-                      top: 0,
-                      right: 0,
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation(); // prevent opening preview
-                      handleDeleteFile(file);
-                    }}
-                  >
-                    <DeleteOutlineIcon
-                      fontSize="medium"
-                      sx={{
-                        color: "#fb6107",
-                        "&:hover": {
-                          fontSize: 20,
-                          rotate: "45deg",
-                        },
-                      }}
-                    />
-                  </IconButton>
-
-                  {isImage ? (
-                    <img
-                      src={getFileUrl(file.file_path)}
-                      alt={file.name}
-                      style={{
-                        width: "100%",
-                        height: 120,
-                        objectFit: "cover",
-                        borderRadius: 6,
-                        backgroundColor: "lightGray",
-                      }}
-                    />
-                  ) : (
-                    <InsertDriveFileOutlinedIcon
-                      sx={{ fontSize: 80, color: "#3FA89B" }}
-                    />
-                  )}
-                  <Typography
-                    variant="body1"
-                    align="center"
-                    sx={{ mt: 0.5, color: "#3FA89B", fontWeight: 500 }}
-                  >
-                    {file.name}
-                  </Typography>
-                </Paper>
-
-                {/* Preview Dialog */}
-                <Dialog
-                  open={previewOpen}
-                  onClose={handleClosePreview}
-                  fullScreen
-                  sx={{
-                    p: 0,
-                    mx: 0,
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteFile(file);
                   }}
                 >
-                  <DialogTitle
+                  <DeleteOutlineIcon
+                    fontSize="medium"
                     sx={{
-                      p: 0,
-                      px: 3,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      color: "#fff",
+                      color: "#fb6107",
+                      "&:hover": { fontSize: 20, rotate: "45deg" },
                     }}
-                  >
-                    {previewFile?.name}
-                    <IconButton
-                      edge="end"
-                      color="inherit"
-                      onClick={handleClosePreview}
-                      aria-label="close"
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                  </DialogTitle>
+                  />
+                </IconButton>
 
-                  {/* Dialog Content */}
-                  <DialogContent
-                    open={previewOpen}
-                    onClose={handleClosePreview}
-                    dividers
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      pt: 2,
-                      height: "100%",
+                {isImage(file) ? (
+                  <img
+                    src={getFileUrl(file.file_path, 150, 120)}
+                    alt={file.name}
+                    style={{
+                      width: "100%",
+                      height: 120,
+                      objectFit: "cover",
+                      borderRadius: "0px 0px 0px 0px",
+                      backgroundColor: "lightGray",
                     }}
-                  >
-                    {previewFile?.file_type?.startsWith("image/") ? (
-                      // IMAGE PREVIEW
-                      <img
-                        src={getFileUrl(previewFile.file_path)}
-                        alt={previewFile.name}
-                        style={{
-                          maxWidth: "100%",
-                          maxHeight: "100%",
-                          borderRadius: 0,
-                        }}
-                      />
-                    ) : previewFile?.file_type === "application/pdf" ? (
-                      // PDF PREVIEW
-                      <iframe
-                        src={getFileUrl(previewFile.file_path)}
-                        title={previewFile.name}
-                        style={{
-                          width: "100%",
-                          maxHeight: "100%",
-                          border: "none",
-                          borderRadius: 0,
-                        }}
-                      />
-                   ) : previewFile?.file_type?.startsWith("text/") ? (
-                      // TXT PREVIEW
-                      <iframe
-                        src={getFileUrl(previewFile.file_path)}
-                        title={previewFile.name}
-                        style={{
-                          width: "100%",
-                          maxHeight: "100%",
-                          border: "none",
-                          backgroundColor: "#fafafa",
-                          borderRadius: 0,
-                          fontFamily: "monospace",
-                        }}
-                      />
-                    ) : previewFile?.file_type ===
-                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? (
-                      // DOCX PREVIEW (Google Docs Viewer)
-                      <iframe
-                        src={`https://docs.google.com/gview?url=${encodeURIComponent(
-                          getFileUrl(previewFile.file_path)
-                        )}&embedded=true`}
-                        title={previewFile.name}
-                        style={{
-                          width: "100%",
-                          maxHeight: "100%",
-                          border: "none",
-                          borderRadius: 0,
-                        }}
-                      />
-                    ) : (
-                      // FALLBACK
-                      <Typography variant="body1">
-                        File preview not available.
-                        <a
-                          href={getFileUrl(previewFile?.file_path)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Open file
-                        </a>
-                      </Typography>
-                    )}
-                  </DialogContent>
-                </Dialog>
-              </Grid>
-            );
-          })}
+                    onError={(e) => {
+                      // If transform params fail for any reason, fall back to original image
+                      e.currentTarget.src = getFileUrl(file.file_path);
+                    }}
+                  />
+                ) : (
+                  getFileIcon(file)
+                )}
+
+                <Typography
+                  variant="body1"
+                  align="center"
+                  sx={{ mt: 0.5, color: "#3FA89B", fontWeight: 500 }}
+                >
+                  {file.name}
+                </Typography>
+              </Paper>
+            </Grid>
+          ))}
         </Grid>
+
+        {/* Preview Dialog */}
+        <Dialog
+          open={previewOpen}
+          onClose={handleClosePreview}
+          fullScreen
+          sx={{ p: 0, mx: 0 }}
+        >
+          <DialogTitle
+            sx={{
+              p: 0,
+              px: 3,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              color: "#fff",
+            }}
+          >
+            {previewFile?.name}
+            <IconButton
+              edge="end"
+              color="inherit"
+              onClick={handleClosePreview}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+
+          <DialogContent
+            dividers
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              pt: 2,
+              height: "100%",
+            }}
+          >
+            {previewFile && isImage(previewFile) ? (
+              <img
+                src={getFileUrl(previewFile.file_path)}
+                alt={previewFile.name}
+                style={{ maxWidth: "100%", maxHeight: "100%" }}
+              />
+            ) : previewFile?.file_type === "application/pdf" ? (
+              <iframe
+                src={getFileUrl(previewFile.file_path)}
+                title={previewFile.name}
+                style={{ width: "100%", height: "100%", border: "none" }}
+              />
+            ) : previewFile?.file_type?.startsWith("text/") ? (
+              <iframe
+                src={getFileUrl(previewFile.file_path)}
+                title={previewFile.name}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  border: "none",
+                  backgroundColor: "#fafafa",
+                }}
+              />
+            ) : previewFile?.file_type?.includes("wordprocessingml") ? (
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                  getFileUrl(previewFile.file_path)
+                )}&embedded=true`}
+                title={previewFile.name}
+                style={{ width: "100%", height: "100%", border: "none" }}
+              />
+            ) : (
+              <Typography variant="body1">
+                File preview not available.{" "}
+                <a
+                  href={getFileUrl(previewFile?.file_path)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open file
+                </a>
+              </Typography>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
