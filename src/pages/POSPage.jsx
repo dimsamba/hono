@@ -632,6 +632,7 @@ const POSPage = () => {
                   m: 0, // cancel the default negative margins Grid adds
                   /* keep items packed to the top, so empty space is below them */
                   alignContent: "flex-start",
+                  backgroundColor: "Black",
                 }}
               >
                 {sampleMenu.map((item) => (
@@ -641,17 +642,16 @@ const POSPage = () => {
                     sm={6}
                     md={4}
                     lg={3}
-                    key={item.id} 
-                    sx={{ flexGrow: 1 }}
+                    key={item.id}
+                    sx={{ flexGrow: 1, backgroundColor: "Black"}}
                   >
                     <Paper
                       sx={{
                         backgroundColor: getCategoryColor(item.category),
-                        mb: 0.5,
-                        mr: 0,
-                        border: "2px solid #277da1",
+                        m: 0.2,
+                        border: "1px solid #277da1",
                         borderRadius: 0,
-                        padding: "5px 5px 5px 5px",
+                     //   padding: "5px 5px 5px 5px",
                       }}
                     >
                       <IconButton

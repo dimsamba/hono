@@ -452,7 +452,6 @@ export default function FullFeaturedCrudGrid({
               height: 60,
               objectFit: "cover",
               borderRadius: 4,
-              backgroundColor: "white",
             }}
           />
         ) : (
