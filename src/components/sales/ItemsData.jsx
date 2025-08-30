@@ -45,6 +45,8 @@ function EditToolbar({
       item_name: "",
       item_price: "",
       details: "",
+      category: "",
+      image: "",
       isNew: true,
     };
 
@@ -335,6 +337,35 @@ export default function FullFeaturedCrudGrid({
     },
   };
 
+  // Handle file upload
+  const handleFileUpload = async (file, params) => {
+    try {
+      // Create a unique filename
+      const fileName = `${Date.now()}-${file.name}`;
+
+      // Upload to "images" bucket
+      const { data, error } = await supabase.storage
+        .from("images")
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      // Get public URL
+      const { data: publicUrl } = supabase.storage
+        .from("images")
+        .getPublicUrl(fileName);
+
+      // Update row with permanent URL
+      params.api.setEditCellValue({
+        id: params.id,
+        field: params.field,
+        value: publicUrl.publicUrl,
+      });
+    } catch (err) {
+      console.error("Upload failed:", err.message);
+    }
+  };
+
   const columns = [
     {
       field: "actions",
@@ -405,6 +436,41 @@ export default function FullFeaturedCrudGrid({
               maximumFractionDigits: 2,
             }).format(params.value)}`
           : "",
+    },
+    {
+      field: "image",
+      headerName: "Image",
+      width: 300,
+      editable: true,
+      renderCell: (params) =>
+        params.value ? (
+          <img
+            src={params.value}
+            alt={params.row.item_name}
+            style={{
+              width: 80,
+              height: 60,
+              objectFit: "cover",
+              borderRadius: 4,
+              backgroundColor: "white",
+            }}
+          />
+        ) : (
+          <span style={{ color: "#888" }}>No image</span>
+        ),
+      renderEditCell: (params) => (
+        <input
+          type="file"
+          accept="image/*"
+          style={{ width: "100%" }}
+          onChange={async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+              await handleFileUpload(file, params);
+            }
+          }}
+        />
+      ),
     },
     {
       field: "details",

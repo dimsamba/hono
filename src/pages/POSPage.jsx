@@ -77,7 +77,12 @@ const POSPage = () => {
           price: item.item_price,
           originalPrice: item.item_price,
           originalName: item.item_name,
-          category: item.category, // ✅ Add this line
+          category: item.category,
+          imageUrl: item.image
+            ? item.image.startsWith("http")
+              ? item.image
+              : `/images/${item.image}`
+            : null,
         }));
 
         setSampleMenu(formatted);
@@ -636,7 +641,7 @@ const POSPage = () => {
                     sm={6}
                     md={4}
                     lg={3}
-                    key={item.id}
+                    key={item.id} 
                     sx={{ flexGrow: 1 }}
                   >
                     <Paper
@@ -658,27 +663,39 @@ const POSPage = () => {
                           alignItems: "center",
                           justifyContent: "center",
                           color: "white",
-                          backgroundColor: getCategoryColor(item.category),
                           width: "100%",
                           height: 100,
                           borderRadius: 0,
                           flexDirection: "column",
                           textAlign: "center",
+                          backgroundImage: item.imageUrl
+                            ? `url(${item.imageUrl})`
+                            : "none",
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          position: "relative",
                           "&:hover": {
-                            backgroundColor: "#e2eafc",
+                            filter: "brightness(0.75)", // darken on hover
                           },
                           opacity: !item.price || item.price === "" ? 0.5 : 1,
-                          padding: 1,
                         }}
                       >
                         <Typography
                           sx={{
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: 700,
-                            color: "#1b4965",
+                            color: "#fff",
+                            textShadow: "1px 1px 3px rgba(0,0,0,1)",
                             textAlign: "center",
-                            wordBreak: "break-word",
                             width: "100%",
+
+                            // Cross-browser fallback
+                            lineHeight: 1.2,
+                            maxHeight: "2.4em", // 2 lines × lineHeight
+                            overflow: "hidden",
+
+                            whiteSpace: "normal",
+                            overflowWrap: "anywhere",
                           }}
                         >
                           {item.name}
