@@ -661,7 +661,7 @@ const POSPage = () => {
                           justifyContent: "center",
                           color: "white",
                           width: "100%",
-                          height: 100,
+                          height: "120px",
                           borderRadius: 0,
                           flexDirection: "column",
                           textAlign: "center",

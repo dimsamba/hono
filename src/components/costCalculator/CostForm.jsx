@@ -36,7 +36,8 @@ const CostForm = () => {
   const [userId, setUserId] = useState(null); // Should be set from Supabase auth
   const [financialsData, setFinancialsData] = useState([]);
   const [netProfitFromDates, setNetProfit] = useState(0);
-  const [, setCostSelected] = useState(false);
+  const [loading] = useState(false);
+  const [costSelected, setCostSelected] = useState(false);
   const [foodCostPercentage, setFoodCostPercentage] = useState(0);
 
   // Extract the last "NET profit" value
@@ -119,10 +120,30 @@ const CostForm = () => {
   // Fetch Total sales Sales amount between dates
   useEffect(() => {
     const fetchData = async () => {
+      // // Log fromDate and toDate before processing
+      console.log("From Date:", fromDate);
+      console.log("To Date:", toDate);
+
+      // // Ensure fromDate and toDate are not null and fallback to defaults
+      const validFromDate = fromDate
+        ? dayjs(fromDate)
+        : dayjs().startOf("month"); // Default to current month's start
+      const validToDate = toDate ? dayjs(toDate) : dayjs().endOf("month"); // Default to current month's end
+
+      // // Log whether the dates are valid
+      console.log("Is 'fromDate' valid:", validFromDate.isValid());
+      console.log("Is 'toDate' valid:", validToDate.isValid());
+
+      // // If either date is invalid, log an error
+      if (!validFromDate.isValid() || !validToDate.isValid()) {
+        console.error("Invalid date value detected:", fromDate, toDate);
+        return; // Exit if the dates are invalid
+      }
+
       if (!fromDate || !toDate) return;
 
-      const start = dayjs(fromDate).format("YYYY-MM-DD");
-      const end = dayjs(toDate).format("YYYY-MM-DD");
+      const start = validFromDate.startOf("day").toISOString();
+      const end = validToDate.endOf("day").toISOString();
 
       const { data, error } = await supabase
         .from("sales")
@@ -409,6 +430,9 @@ const CostForm = () => {
     setComment("");
     setReportId(null);
     fetchFinancials();
+    // reset flags so Save button becomes active again
+    setCostSelected(false);
+    setLoading(false);
   };
 
   // Fetch financials
@@ -835,6 +859,7 @@ const CostForm = () => {
               variant="contained"
               type="submit"
               onClick={handleSave}
+              disabled={loading || costSelected} // <- add this
               sx={{
                 gridColumn: isMobile ? "span 1" : "span 1",
                 backgroundColor: "#26A889",
@@ -847,7 +872,7 @@ const CostForm = () => {
                 height: 40,
               }}
             >
-              Save
+              {loading ? "Saving..." : "Save"}
             </Button>
 
             <Button
@@ -951,7 +976,7 @@ const CostForm = () => {
                       <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
                         Profit
                       </th>
-                        <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
+                      <th className="p-2 text-right text-[#007f5f] bg-[#ebf1fa] font-semibold">
                         Cost %
                       </th>
                       <th className="p-2 text-left text-[#007f5f] bg-[#ebf1fa] font-semibold">
@@ -977,13 +1002,16 @@ const CostForm = () => {
                             {dayjs(item.date_to).format("DD-MM-YYYY")}
                           </td>
                           <td className="p-2 text-right">
-                           € {formatCurrency(item.total_expenses)}
+                            € {formatCurrency(item.total_expenses)}
                           </td>
                           <td className="p-2 text-right">
                             € {formatCurrency(item.total_revenue)}
                           </td>
                           <td className="p-2 text-right">
-                            € {formatCurrency(item.total_revenue - item.total_expenses)}
+                            €{" "}
+                            {formatCurrency(
+                              item.total_revenue - item.total_expenses
+                            )}
                           </td>
                           <td className="p-2 text-right">
                             {formatCurrency(item.cost_perc)}%
