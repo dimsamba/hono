@@ -613,7 +613,7 @@ const POSPage = () => {
                 border: "1px solid #45a29e",
                 /* the important bits ↓ */
                 height: 630, // or "200px" — fixed box height
-                //  backgroundColor: "orange",
+                backgroundColor: "black !important",
 
                 overflowY: "auto", // allow vertical scrolling
                 overflowX: "hidden", // no horizontal scrollbars
@@ -626,10 +626,10 @@ const POSPage = () => {
             >
               <Grid2
                 container
-                spacing={0.5}
+                spacing={1}
                 sx={{
                   width: "100%",
-                  m: 0, // cancel the default negative margins Grid adds
+                  p: 0.5, // cancel the default negative margins Grid adds
                   /* keep items packed to the top, so empty space is below them */
                   alignContent: "flex-start",
                   backgroundColor: "Black",
@@ -643,15 +643,12 @@ const POSPage = () => {
                     md={4}
                     lg={3}
                     key={item.id}
-                    sx={{ flexGrow: 1, backgroundColor: "Black"}}
+                    sx={{ flexGrow: 1 }}
                   >
                     <Paper
                       sx={{
                         backgroundColor: getCategoryColor(item.category),
-                        m: 0.2,
-                        border: "1px solid #277da1",
                         borderRadius: 0,
-                     //   padding: "5px 5px 5px 5px",
                       }}
                     >
                       <IconButton
@@ -673,6 +670,7 @@ const POSPage = () => {
                             : "none",
                           backgroundSize: "cover",
                           backgroundPosition: "center",
+                          backgroundRepeat: "no-repeat",
                           position: "relative",
                           "&:hover": {
                             filter: "brightness(0.75)", // darken on hover
@@ -682,20 +680,16 @@ const POSPage = () => {
                       >
                         <Typography
                           sx={{
+                            position: "absolute",
+                            top: 1,
+                            left: 3,
                             fontSize: 20,
-                            fontWeight: 700,
+                            fontWeight: 900,
                             color: "#fff",
-                            textShadow: "1px 1px 3px rgba(0,0,0,1)",
-                            textAlign: "center",
+                            textShadow: "0px 0px 5px #000814",
+                            textAlign: "left",
                             width: "100%",
-
-                            // Cross-browser fallback
-                            lineHeight: 1.2,
-                            maxHeight: "2.4em", // 2 lines × lineHeight
-                            overflow: "hidden",
-
-                            whiteSpace: "normal",
-                            overflowWrap: "anywhere",
+                            height: "3em", // Fixed height to accommodate 2 lines
                           }}
                         >
                           {item.name}
@@ -725,8 +719,8 @@ const POSPage = () => {
                           sx={{
                             flexGrow: 1,
                             width: "100px",
-                            backgroundColor: "#5c677d",
-                            border: "2px solid white",
+                            height: "43px",
+                            backgroundColor: "#073b4c",
                             color: "white",
                             "& .MuiInputBase-input": {
                               fontSize: 18,
@@ -738,17 +732,13 @@ const POSPage = () => {
                         />
                         <IconButton
                           onClick={() => resetMenuPrices()}
+                          variant="contained"
                           sx={{
                             color: "white",
-                            backgroundColor: "#ff6392",
-                            borderRadius: 0,
-                            borderTop: "2px solid white",
-                            borderRight: "2px solid white",
-                            borderBottom: "2px solid white",
-                            borderLeft: "0px solid white",
+                            backgroundColor: "#ef476f",
                             borderRadius: 0,
                             width: "40px",
-                            height: "46px",
+                            height: "43px",
                             "&:hover": {
                               backgroundColor: "#ea7317", // Optional hover color
                             },

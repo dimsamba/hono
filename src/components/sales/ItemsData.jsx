@@ -188,16 +188,63 @@ export default function FullFeaturedCrudGrid({
     );
     if (!confirmDelete) return;
 
-    const { error } = await supabase.from("itemsList").delete().eq("id", id);
-    if (error) {
-      console.error("Supabase DELETE error:", error.message);
-      return;
-    }
+    try {
+      // 1. Get the row to know which image to delete
+      const { data: rowData, error: fetchError } = await supabase
+        .from("itemsList")
+        .select("image")
+        .eq("id", id)
+        .single();
 
-    setRows((prevRows) => prevRows.filter((row) => row.id !== id));
-    // Notify parent
-    onItemsChange();
+      if (fetchError) throw fetchError;
+
+      if (rowData?.image) {
+        // 2. Extract the file name from the stored URL
+        // Example: https://project.supabase.co/storage/v1/object/public/images/1714484400000-test.png
+        // filePath should be: "1714484400000-test.png"
+        const filePath = rowData.image.split("/").pop();
+
+        if (filePath) {
+          // 3. Delete from storage
+          const { error: storageError } = await supabase.storage
+            .from("images")
+            .remove([filePath]);
+
+          if (storageError) {
+            console.error("Storage delete error:", storageError.message);
+          } else {
+            console.log("Deleted image from bucket:", filePath);
+          }
+        }
+      }
+
+      // 4. Delete DB row
+      const { error } = await supabase.from("itemsList").delete().eq("id", id);
+      if (error) throw error;
+
+      setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+      onItemsChange();
+    } catch (err) {
+      console.error("Delete error:", err.message);
+    }
   };
+
+  // const handleDeleteClick = (id) => async () => {
+  //   const confirmDelete = window.confirm(
+  //     "Are you sure you want to delete this row?"
+  //   );
+  //   if (!confirmDelete) return;
+
+  //   const { error } = await supabase.from("itemsList").delete().eq("id", id);
+  //   if (error) {
+  //     console.error("Supabase DELETE error:", error.message);
+  //     return;
+  //   }
+
+  //   setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+  //   // Notify parent
+  //   onItemsChange();
+  // };
 
   const handleCancelClick = (id) => () => {
     setRowModesModel((prev) => ({
@@ -211,13 +258,14 @@ export default function FullFeaturedCrudGrid({
     }
   };
 
-  const processRowUpdate = async (newRow) => {
+  const processRowUpdate = async (newRow, oldRow) => {
     const { isNew, id, ...cleanRow } = newRow;
     cleanRow.item_name = cleanRow.item_name.trim();
     const normalizedInput = normalizeText(cleanRow.item_name);
 
     try {
       if (isNew) {
+        // ---- INSERT ----
         const { data, error: fetchError } = await supabase
           .from("itemsList")
           .select("id, item_name");
@@ -231,7 +279,7 @@ export default function FullFeaturedCrudGrid({
 
         if (isDuplicate) {
           alert(`Item "${cleanRow.item_name}" already exists.`);
-          return { ...newRow, _error: true }; // Tag for later use if needed
+          return { ...newRow, _error: true };
         }
 
         const { data: insertData, error } = await supabase
@@ -245,6 +293,22 @@ export default function FullFeaturedCrudGrid({
         setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
         return inserted;
       } else {
+        // ---- UPDATE ----
+
+        // 1. If image changed, delete old one from storage
+        if (newRow.image && oldRow?.image && newRow.image !== oldRow.image) {
+          const oldFilePath = oldRow.image.split("/").pop(); // extract file name
+          if (oldFilePath) {
+            const { error: storageError } = await supabase.storage
+              .from("images")
+              .remove([oldFilePath]);
+            if (storageError) {
+              console.error("Storage delete error:", storageError.message);
+            }
+          }
+        }
+
+        // 2. Update DB row
         const { error } = await supabase
           .from("itemsList")
           .update(cleanRow)
@@ -260,9 +324,62 @@ export default function FullFeaturedCrudGrid({
       }
     } catch (err) {
       console.error(`${isNew ? "Insert" : "Update"} error:`, err.message);
-      return newRow;
+      return newRow; // fallback so grid doesn't break
     }
   };
+
+  // const processRowUpdate = async (newRow) => {
+  //   const { isNew, id, ...cleanRow } = newRow;
+  //   cleanRow.item_name = cleanRow.item_name.trim();
+  //   const normalizedInput = normalizeText(cleanRow.item_name);
+
+  //   try {
+  //     if (isNew) {
+  //       const { data, error: fetchError } = await supabase
+  //         .from("itemsList")
+  //         .select("id, item_name");
+
+  //       if (fetchError) throw fetchError;
+
+  //       const isDuplicate = data.some((item) => {
+  //         const dbNormalized = normalizeText(item.item_name);
+  //         return dbNormalized === normalizedInput;
+  //       });
+
+  //       if (isDuplicate) {
+  //         alert(`Item "${cleanRow.item_name}" already exists.`);
+  //         return { ...newRow, _error: true }; // Tag for later use if needed
+  //       }
+
+  //       const { data: insertData, error } = await supabase
+  //         .from("itemsList")
+  //         .insert([cleanRow])
+  //         .select();
+
+  //       if (error) throw error;
+
+  //       const [inserted] = insertData;
+  //       setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
+  //       return inserted;
+  //     } else {
+  //       const { error } = await supabase
+  //         .from("itemsList")
+  //         .update(cleanRow)
+  //         .eq("id", id);
+
+  //       if (error) throw error;
+
+  //       const updatedRow = { ...cleanRow, id };
+  //       setRows((prev) =>
+  //         prev.map((row) => (row.id === id ? updatedRow : row))
+  //       );
+  //       return updatedRow;
+  //     }
+  //   } catch (err) {
+  //     console.error(`${isNew ? "Insert" : "Update"} error:`, err.message);
+  //     return newRow;
+  //   }
+  // };
 
   const handleRowModesModelChange = (newModel) => {
     setRowModesModel(newModel);
@@ -465,6 +582,23 @@ export default function FullFeaturedCrudGrid({
           onChange={async (e) => {
             const file = e.target.files[0];
             if (file) {
+              // If row already has an image, delete it first
+              if (params.row.image) {
+                const oldFilePath = params.row.image.split("/").pop();
+                if (oldFilePath) {
+                  const { error: storageError } = await supabase.storage
+                    .from("images")
+                    .remove([oldFilePath]);
+                  if (storageError) {
+                    console.error(
+                      "Failed to remove old image:",
+                      storageError.message
+                    );
+                  }
+                }
+              }
+
+              // Upload the new file
               await handleFileUpload(file, params);
             }
           }}
