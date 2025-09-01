@@ -66,7 +66,8 @@ const POSPage = () => {
       const { data, error } = await supabase
         .from("itemsList")
         .select("*")
-        .eq("category", currentCategory); // Only fetch active items
+        .eq("category", currentCategory) // Only fetch active items
+        .eq("active", true); // ✅ Only fetch active items
 
       if (error) {
         console.error("Error fetching itemsList:", error.message);

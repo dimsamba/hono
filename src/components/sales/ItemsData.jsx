@@ -14,6 +14,7 @@ import {
   useMediaQuery,
   IconButton,
   GlobalStyles,
+  Chip,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -47,6 +48,7 @@ function EditToolbar({
       details: "",
       category: "",
       image: "",
+      active: true,
       isNew: true,
     };
 
@@ -229,23 +231,6 @@ export default function FullFeaturedCrudGrid({
     }
   };
 
-  // const handleDeleteClick = (id) => async () => {
-  //   const confirmDelete = window.confirm(
-  //     "Are you sure you want to delete this row?"
-  //   );
-  //   if (!confirmDelete) return;
-
-  //   const { error } = await supabase.from("itemsList").delete().eq("id", id);
-  //   if (error) {
-  //     console.error("Supabase DELETE error:", error.message);
-  //     return;
-  //   }
-
-  //   setRows((prevRows) => prevRows.filter((row) => row.id !== id));
-  //   // Notify parent
-  //   onItemsChange();
-  // };
-
   const handleCancelClick = (id) => () => {
     setRowModesModel((prev) => ({
       ...prev,
@@ -328,59 +313,6 @@ export default function FullFeaturedCrudGrid({
     }
   };
 
-  // const processRowUpdate = async (newRow) => {
-  //   const { isNew, id, ...cleanRow } = newRow;
-  //   cleanRow.item_name = cleanRow.item_name.trim();
-  //   const normalizedInput = normalizeText(cleanRow.item_name);
-
-  //   try {
-  //     if (isNew) {
-  //       const { data, error: fetchError } = await supabase
-  //         .from("itemsList")
-  //         .select("id, item_name");
-
-  //       if (fetchError) throw fetchError;
-
-  //       const isDuplicate = data.some((item) => {
-  //         const dbNormalized = normalizeText(item.item_name);
-  //         return dbNormalized === normalizedInput;
-  //       });
-
-  //       if (isDuplicate) {
-  //         alert(`Item "${cleanRow.item_name}" already exists.`);
-  //         return { ...newRow, _error: true }; // Tag for later use if needed
-  //       }
-
-  //       const { data: insertData, error } = await supabase
-  //         .from("itemsList")
-  //         .insert([cleanRow])
-  //         .select();
-
-  //       if (error) throw error;
-
-  //       const [inserted] = insertData;
-  //       setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
-  //       return inserted;
-  //     } else {
-  //       const { error } = await supabase
-  //         .from("itemsList")
-  //         .update(cleanRow)
-  //         .eq("id", id);
-
-  //       if (error) throw error;
-
-  //       const updatedRow = { ...cleanRow, id };
-  //       setRows((prev) =>
-  //         prev.map((row) => (row.id === id ? updatedRow : row))
-  //       );
-  //       return updatedRow;
-  //     }
-  //   } catch (err) {
-  //     console.error(`${isNew ? "Insert" : "Update"} error:`, err.message);
-  //     return newRow;
-  //   }
-  // };
-
   const handleRowModesModelChange = (newModel) => {
     setRowModesModel(newModel);
     // Notify parent
@@ -405,7 +337,6 @@ export default function FullFeaturedCrudGrid({
   });
 
   // Filter between dates
-  // Get value between dates
   // 1. Filter rows by date
   const { filteredRows, filteredTotalValue } = useMemo(() => {
     let filtered = rows;
@@ -557,7 +488,7 @@ export default function FullFeaturedCrudGrid({
     {
       field: "image",
       headerName: "Image",
-      width: 300,
+      width: 200,
       editable: true,
       renderCell: (params) =>
         params.value ? (
@@ -606,9 +537,27 @@ export default function FullFeaturedCrudGrid({
       ),
     },
     {
+      field: "active",
+      headerName: "Active",
+      type: "boolean", // enables checkbox rendering
+      width: 120,
+      editable: true,
+      renderCell: (params) => (
+        <Chip
+          label={params.value ? "Active" : "Inactive"}
+          color={params.value ? "success" : "error"}
+          size="small"
+          sx={{
+            width: "70px",
+            "& .MuiChip-root": {},
+          }}
+        />
+      ),
+    },
+    {
       field: "details",
       headerName: "Details",
-      width: 400,
+      width: 200,
       editable: true,
     },
   ];
