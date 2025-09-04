@@ -49,7 +49,7 @@ const POSPage = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const inputRef = useRef(null);
   const [resetFlag, setResetFlag] = useState(false);
-  const [paymentType, setPaymentType] = useState("Cash");
+  const [paymentType, setPaymentType] = useState("Espèces");
   const [sampleMenu, setSampleMenu] = useState([]);
   const [selectedTab, setSelectedTab] = useState(0);
   const categories = ["Food", "Beverage", "Produces"];
@@ -230,6 +230,7 @@ const POSPage = () => {
       change_given: parseFloat(calculateChange()),
       payment_type: paymentType, // ← use the state here
       created_at: new Date().toISOString(),
+      orderNumber: getNextOrderNumber(), // ✅ use it here
     };
 
     // Ask for confirmation before saving and printing
@@ -255,7 +256,7 @@ const POSPage = () => {
         { ...saleData, date: new Date(saleData.date) },
       ]);
 
-      setPaymentType("Cash");
+      setPaymentType("Espèces");
       setResetFlag(true);
 
       if (isPrint) {
@@ -268,6 +269,7 @@ const POSPage = () => {
           })),
         };
 
+        triggerPrint(saleData);
         triggerPrint(printSaleData); // ✅ Print with normalized prices
       }
 
@@ -301,6 +303,28 @@ const POSPage = () => {
 
     return data.id;
   };
+
+  // Get the next order number for the current day
+  function getNextOrderNumber() {
+    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    const savedData =
+      JSON.parse(localStorage.getItem("dailyOrderCounter")) || {};
+
+    if (savedData.date !== today) {
+      // New day → reset
+      savedData.date = today;
+      savedData.counter = 1;
+    } else {
+      // Same day → increment
+      savedData.counter += 1;
+    }
+
+    // Save
+    localStorage.setItem("dailyOrderCounter", JSON.stringify(savedData));
+
+    // Format: 3-digit number like 001, 002, 003
+    return String(savedData.counter).padStart(3, "0");
+  }
 
   // Print Layout
   const triggerPrint = async (saleData) => {
@@ -396,6 +420,14 @@ const POSPage = () => {
         border-top: 1px dashed #aaa;
         margin: 12px 0;
       }
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+      }
+      .summary-row p {
+        margin: 0; /* optional: removes extra spacing */
+      }
     </style>
   </head>
   <body>
@@ -404,12 +436,17 @@ const POSPage = () => {
  <img src="${logoUrl}" alt="Honō Logo" style="height: 60px; margin-bottom: 4px;" />
  <h4 style="margin: 0; font-family: 'Dancing Script', cursive; font-size: 20px;">La flamme du savoir-faire</h4>
 <p style="font-size: 16px; margin: 0;">✽ ✽ ✽</p>
-  <p></p>
+  <p style="margin: 0; font-size: 14px;">12 Rue des Lilas, 75000 Paris</p>
+  <p style="margin: 0; font-size: 14px;">SIRET: 123 456 789 00010</p>
+  <p style="margin: 0; font-size: 14px;">Tel: 06 37 65 87 95</p>
 </div>
- 
+<div>
+ <p style="text-align: center; font-weight: bold; font-size: 28px;">
+  <strong></strong> ${saleData.orderNumber}
+ </p>
+ <p style="text-align: center; margin-bottom: 25px;">N. de Commande</p>
+</div>
     <p><strong>Date:</strong> ${formatDateEU(saleData.date)}</p>
-    <p>Numéro de vente: 000${latestId ?? "N/A"}</p>
-    <p><strong>Paiement:</strong> ${saleData.payment_type}</p>
 
     <hr class="divider" />
     <table>
@@ -428,18 +465,45 @@ const POSPage = () => {
     <hr class="divider" />
 
     <div class="summary">
-      <p><strong>Total:</strong> €${saleData.sales_total.toFixed(2)}</p>
-      <h4><strong>Total avec réduction:</strong> €${saleData.sale_total_disc.toFixed(
-        2
-      )}</h4>
-      <p><strong>Réduction:</strong> ${saleData.discount_perc}%</p>
-      <p><strong>Montant reçu:</strong> €${saleData.received_amount.toFixed(
-        2
-      )}</p>
-      <p><strong>Monnaie rendue:</strong> €${saleData.change_given.toFixed(
-        2
-      )}</p>
-    </div>
+     <div class="summary-row">
+      <p>Référence:<strong> 000${latestId ?? "N/A"}</strong></p>
+      <p style="text-align: right;">Sous-total:<strong> €${saleData.sales_total.toFixed(2)}</strong></p>
+     </div>
+
+      <div class="summary-row">
+      <p>Payé par/en:<strong> ${
+        saleData.payment_type
+      }</strong></p>
+     <p style="text-align: right;">Réduction:<strong> ${
+       saleData.discount_perc
+     }%</strong></p>
+     </div>
+
+
+     <h2 style="text-align: right;">À payer:<strong> €${saleData.sale_total_disc.toFixed(
+      2
+     )}</strong></h2>
+ 
+
+     <p style="text-align: right;">Montant reçu:<strong> €${saleData.received_amount.toFixed(
+      2
+     )}</strong></p>
+     <p style="text-align: right; margin-bottom: 25px;">Rendue:<strong> €${saleData.change_given.toFixed(
+      2
+     )}</strong></p>
+
+      <div class="summary-row">
+      <p>Taux TVA</p>
+      <p style="text-align: right;">Total HT</p>
+      <p style="text-align: right;">dont TVA</p>
+     </div>
+      <div class="summary-row">
+      <p><strong>20%</strong></p>
+      <p style="text-align: center;"><strong> €${(saleData.sales_total / 1.2).toFixed(2)}</strong></p>
+      <p style="text-align: center;"><strong> €${(saleData.sales_total - (saleData.sales_total / 1.2)).toFixed(2)}</strong></p>
+     </div>
+
+  </div>
 
     <div class="thankyou">
     <p></p>
@@ -1031,7 +1095,7 @@ const POSPage = () => {
                 >
                   {[
                     {
-                      value: "Cash",
+                      value: "Espèces",
                       icon: <AttachMoneyIcon />,
                       bgColor: "#545e75",
                       color: "#35ff69",
@@ -1043,13 +1107,13 @@ const POSPage = () => {
                       color: "#54defd",
                     },
                     {
-                      value: "Voucher",
+                      value: "Bon d'achat",
                       icon: <LocalActivityOutlinedIcon />,
                       bgColor: "#545e75",
                       color: "#ff3cc7",
                     },
                     {
-                      value: "Other",
+                      value: "Autres",
                       icon: <PaymentsOutlinedIcon />,
                       bgColor: "#545e75",
                       color: "#fed811",
