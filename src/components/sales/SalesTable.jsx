@@ -354,6 +354,24 @@ export default function FullFeaturedCrudGrid({
             ];
       },
     },
+      {
+      field: "id",
+      headerName: "Sales N.",
+      type: "numeric",
+      align: "right",
+      headerAlign: "right",
+      width: 80,
+      editable: true,
+    },
+    {
+      field: "orderNumber",
+      headerName: "Order N.",
+      type: "numeric",
+      align: "right",
+      headerAlign: "right",
+      width: 80,
+      editable: true,
+    },
     {
       field: "date",
       headerName: "Date",

@@ -218,6 +218,16 @@ const POSPage = () => {
         ? parseFloat(((discountTotal / fullPriceTotal) * 100).toFixed(2))
         : 0;
 
+    // ✅ Get the next order number from Supabase
+    const { data: orderNum, error: numError } = await supabase.rpc(
+      "get_next_order_number"
+    );
+    if (numError) {
+      console.error("Error generating order number:", numError);
+      alert("Error generating order number.");
+      return;
+    }
+
     const saleData = {
       date: new Date().toISOString(),
       items: cleanedItems,
@@ -230,7 +240,7 @@ const POSPage = () => {
       change_given: parseFloat(calculateChange()),
       payment_type: paymentType, // ← use the state here
       created_at: new Date().toISOString(),
-      orderNumber: getNextOrderNumber(), // ✅ use it here
+      orderNumber: orderNum, // ✅ Now from Supabase
     };
 
     // Ask for confirmation before saving and printing
@@ -303,28 +313,6 @@ const POSPage = () => {
 
     return data.id;
   };
-
-  // Get the next order number for the current day
-  function getNextOrderNumber() {
-    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-    const savedData =
-      JSON.parse(localStorage.getItem("dailyOrderCounter")) || {};
-
-    if (savedData.date !== today) {
-      // New day → reset
-      savedData.date = today;
-      savedData.counter = 1;
-    } else {
-      // Same day → increment
-      savedData.counter += 1;
-    }
-
-    // Save
-    localStorage.setItem("dailyOrderCounter", JSON.stringify(savedData));
-
-    // Format: 3-digit number like 001, 002, 003
-    return String(savedData.counter).padStart(3, "0");
-  }
 
   // Print Layout
   const triggerPrint = async (saleData) => {
@@ -467,13 +455,13 @@ const POSPage = () => {
     <div class="summary">
      <div class="summary-row">
       <p>Référence:<strong> 000${latestId ?? "N/A"}</strong></p>
-      <p style="text-align: right;">Sous-total:<strong> €${saleData.sales_total.toFixed(2)}</strong></p>
+      <p style="text-align: right;">Sous-total:<strong> €${saleData.sales_total.toFixed(
+        2
+      )}</strong></p>
      </div>
 
       <div class="summary-row">
-      <p>Payé par/en:<strong> ${
-        saleData.payment_type
-      }</strong></p>
+      <p>Payé par/en:<strong> ${saleData.payment_type}</strong></p>
      <p style="text-align: right;">Réduction:<strong> ${
        saleData.discount_perc
      }%</strong></p>
@@ -481,15 +469,15 @@ const POSPage = () => {
 
 
      <h2 style="text-align: right;">À payer:<strong> €${saleData.sale_total_disc.toFixed(
-      2
+       2
      )}</strong></h2>
  
 
      <p style="text-align: right;">Montant reçu:<strong> €${saleData.received_amount.toFixed(
-      2
+       2
      )}</strong></p>
      <p style="text-align: right; margin-bottom: 25px;">Rendue:<strong> €${saleData.change_given.toFixed(
-      2
+       2
      )}</strong></p>
 
       <div class="summary-row">
@@ -499,8 +487,13 @@ const POSPage = () => {
      </div>
       <div class="summary-row">
       <p><strong>20%</strong></p>
-      <p style="text-align: center;"><strong> €${(saleData.sales_total / 1.2).toFixed(2)}</strong></p>
-      <p style="text-align: center;"><strong> €${(saleData.sales_total - (saleData.sales_total / 1.2)).toFixed(2)}</strong></p>
+      <p style="text-align: center;"><strong> €${(
+        saleData.sales_total / 1.2
+      ).toFixed(2)}</strong></p>
+      <p style="text-align: center;"><strong> €${(
+        saleData.sales_total -
+        saleData.sales_total / 1.2
+      ).toFixed(2)}</strong></p>
      </div>
 
   </div>
