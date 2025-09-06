@@ -9,6 +9,7 @@ import {
   FormControl,
   Select,
   MenuItem,
+  Button,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -32,20 +33,54 @@ import supabase from "../supabaseClient";
 function EditToolbar() {}
 
 // 🔧 Combines custom toolbar + MUI toolbar
-function CombinedToolbar({ setRows, setNewRowId, setRowModesModel }) {
+function CombinedToolbar({
+  setRows,
+  setNewRowId,
+  setRowModesModel,
+  selectionModel,
+  handleDeleteSelected,
+}) {
   return (
-    <Stack spacing={1}>
+    <Stack spacing={1} direction="row" alignItems="center">
+      {/* Existing toolbar buttons */}
       <EditToolbar
         setRows={setRows}
         setNewRowId={setNewRowId}
         setRowModesModel={setRowModesModel}
       />
+
       <GridToolbar
         sx={{
           "& .MuiSvgIcon-root": { color: "lightgray" },
           "& .MuiButtonBase-root": { color: "lightgray" },
         }}
       />
+
+      {/* Bulk Delete Button */}
+      <Button
+        variant="outlined"
+        onClick={handleDeleteSelected}
+        disabled={selectionModel.length === 0}
+        sx={{
+          width: "140px",
+          fontSize: "0.8rem", // adjust icon size as needed
+          color:
+            selectionModel.length > 0
+              ? "#d00000 !important"
+              : "#999 !important",
+          borderRadius: 1,
+          border: "1px solid #ff0054",
+          fontWeight: 500,
+          minWidth: "140px",
+          height: "100%",
+          "&:hover": {
+            //  backgroundColor: "#e7e7e7", // remove hover background
+            border: "1px solid #d00000",
+          },
+        }}
+      >
+        Delete ({selectionModel.length})
+      </Button>
     </Stack>
   );
 }
@@ -66,6 +101,40 @@ export default function FullFeaturedCrudGrid({
   const [, setNewRowId] = React.useState(null);
   const [selectedPaiment, setSelectedPaiment] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
+  const [selectionModel, setSelectionModel] = React.useState([]);
+
+  const handleDeleteSelected = async () => {
+    if (selectionModel.length === 0) return;
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete ${selectionModel.length} row(s)?`
+    );
+    if (!confirmDelete) return;
+
+    // Delete from Supabase
+    const { error } = await supabase
+      .from("sales")
+      .delete()
+      .in("id", selectionModel); // <-- delete all selected IDs at once
+
+    if (error) {
+      console.error("Supabase bulk DELETE error:", error.message);
+      alert("Error deleting rows.");
+      return;
+    }
+
+    // Remove from local state
+    setRows((prevRows) =>
+      prevRows.filter((row) => !selectionModel.includes(row.id))
+    );
+
+    // Reset selection
+    setSelectionModel([]);
+
+    // Optional: notify parent
+    onSalesChange();
+  };
+
   const uniquePaiment = [
     ...new Set((rows || []).map((row) => row.payment_type).filter(Boolean)),
   ];
@@ -354,7 +423,7 @@ export default function FullFeaturedCrudGrid({
             ];
       },
     },
-      {
+    {
       field: "id",
       headerName: "Sales N.",
       type: "numeric",
@@ -779,6 +848,7 @@ export default function FullFeaturedCrudGrid({
               setToDate(null);
               setSelectedPaiment(""); // Reset payment_type
               setSelectedItem(""); // Reset payment_type
+              setSelectionModel([]); // reset selection
             }}
             sx={{
               width: "70px",
@@ -809,12 +879,20 @@ export default function FullFeaturedCrudGrid({
             onRowEditStop={handleRowEditStop}
             processRowUpdate={processRowUpdate}
             getRowId={(row) => row.id}
+            checkboxSelection // ✅ adds checkboxes
+            disableRowSelectionOnClick // ✅ avoids selecting row when editing
+            onRowSelectionModelChange={(newSelection) =>
+              setSelectionModel(newSelection)
+            }
+            rowSelectionModel={selectionModel}
             slots={{
               toolbar: () => (
                 <CombinedToolbar
                   setRows={setRows}
                   setNewRowId={setNewRowId}
                   setRowModesModel={setRowModesModel}
+                  selectionModel={selectionModel} // pass selection
+                  handleDeleteSelected={handleDeleteSelected} // ✅ pass bulk delete
                 />
               ),
             }}
