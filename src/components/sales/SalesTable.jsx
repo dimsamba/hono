@@ -1,4 +1,3 @@
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import CachedIcon from "@mui/icons-material/Cached";
 import {
   GlobalStyles,
@@ -22,9 +21,7 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import React, { useState, useEffect, useMemo } from "react";
 import {
   DataGrid,
-  GridActionsCellItem,
   GridRowEditStopReasons,
-  GridRowModes,
   GridToolbar,
 } from "@mui/x-data-grid";
 import supabase from "../supabaseClient";
@@ -210,24 +207,6 @@ export default function FullFeaturedCrudGrid({
     }
   };
 
-  const handleDeleteClick = (id) => async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this row?"
-    );
-    if (!confirmDelete) return;
-
-    const { error } = await supabase.from("sales").delete().eq("id", id);
-
-    if (error) {
-      console.error("Supabase DELETE error:", error.message);
-      return;
-    }
-
-    setRows((prevRows) => prevRows.filter((row) => row.id !== id));
-    // Notify parent
-    onSalesChange();
-  };
-
   const processRowUpdate = async (newRow) => {
     const { isNew, id, ...cleanRow } = newRow;
 
@@ -405,40 +384,21 @@ export default function FullFeaturedCrudGrid({
 
   const columns = [
     {
-      field: "actions",
-      type: "actions",
-      headerName: "Del",
-      width: 60,
-      cellClassName: "actions",
-      getActions: ({ id }) => {
-        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-        return isInEditMode
-          ? []
-          : [
-              <GridActionsCellItem
-                icon={<DeleteIcon />}
-                label="Delete"
-                onClick={handleDeleteClick(id)}
-              />,
-            ];
-      },
-    },
-    {
       field: "id",
       headerName: "Sales N.",
       type: "numeric",
-      align: "right",
-      headerAlign: "right",
-      width: 80,
+      align: "center",
+      headerAlign: "center",
+      width: 100,
       editable: true,
     },
     {
       field: "orderNumber",
       headerName: "Order N.",
       type: "numeric",
-      align: "right",
-      headerAlign: "right",
-      width: 80,
+      align: "center",
+      headerAlign: "center",
+      width: 120,
       editable: true,
     },
     {
