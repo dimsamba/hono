@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 // MUI Icons
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined"; // Overview
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined"; // Vendor
-import CurrencyExchangeOutlinedIcon from "@mui/icons-material/CurrencyExchangeOutlined"; // Sales
+import ShoppingBasketOutlinedIcon from '@mui/icons-material/ShoppingBasketOutlined';
 import PlaylistAddOutlinedIcon from "@mui/icons-material/PlaylistAddOutlined"; // Items
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined"; // Family Finance
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined"; // Inventory
@@ -25,15 +25,15 @@ import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined"; // Lab
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined"; // Finances
 import BuildCircleOutlinedIcon from "@mui/icons-material/BuildCircleOutlined"; // Tools
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
-import DocumentScannerOutlinedIcon from '@mui/icons-material/DocumentScannerOutlined';
+import DocumentScannerOutlinedIcon from "@mui/icons-material/DocumentScannerOutlined";
 
 const MENU_ITEMS = [
   { name: "Overview", icon: InsertChartOutlinedIcon, href: "/overview" },
   { name: "Vendor", icon: StorefrontOutlinedIcon, href: "/vendor" },
-  { name: "Sales Table", icon: CurrencyExchangeOutlinedIcon, href: "/sales" },
-  { name: "Items List", icon: PlaylistAddOutlinedIcon, href: "/items" },
+  { name: "Sales", icon: ShoppingBasketOutlinedIcon, href: "/sales" },
+  { name: "Item's List", icon: PlaylistAddOutlinedIcon, href: "/items" },
   {
-    name: "Family Finance",
+    name: "Family Finances",
     icon: SavingsOutlinedIcon,
     href: "/family-finance",
   },
@@ -69,7 +69,7 @@ const MENU_ITEMS = [
       { name: "Timer", icon: AlarmOnOutlinedIcon, href: "/timer" },
     ],
   },
-   { name: "documents", icon: DocumentScannerOutlinedIcon, href: "/documents" },
+  { name: "Documents", icon: DocumentScannerOutlinedIcon, href: "/documents" },
 ];
 
 export default function Sidebar() {
@@ -147,7 +147,7 @@ export default function Sidebar() {
                           className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-200 mr-2"
                         >
                           <child.icon
-                            style={{ fontSize: 20, color: "#3FA89B" }}
+                            style={{ fontSize: 20, color: "#485696" }}
                           />
                           <span className="text-gray-700 text-medium">
                             {child.name}
@@ -163,7 +163,25 @@ export default function Sidebar() {
                   to={item.href}
                   className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-200 mr-2"
                 >
-                  <item.icon style={{ fontSize: 25, color: "#3FA89B" }} />
+                  <item.icon
+                    style={{
+                      fontSize: 25,
+                      color:
+                        item.name === "Overview"
+                          ? "#3a86ff"
+                          : item.name === "Vendor"
+                          ? "#f85e00"
+                          : item.name === "Sales"
+                          ? "#f85e00"
+                          : item.name === "Item's List"
+                          ? "#f85e00"
+                          : item.name === "Family Finances"
+                          ? "#9d4edd"
+                          : item.name === "Documents"
+                          ? "#9d4edd"
+                          : "#3FA89B", 
+                    }}
+                  />
                   <span className="text-gray-700 font-medium">{item.name}</span>
                 </Link>
               )}

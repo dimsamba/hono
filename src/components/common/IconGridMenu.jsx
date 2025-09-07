@@ -20,14 +20,14 @@ import FormatListNumberedTwoToneIcon from "@mui/icons-material/FormatListNumbere
 import AlarmOnOutlinedIcon from "@mui/icons-material/AlarmOnOutlined";
 import EuroOutlinedIcon from "@mui/icons-material/EuroOutlined";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
-import CurrencyExchangeOutlinedIcon from "@mui/icons-material/CurrencyExchangeOutlined";
+import ShoppingBasketOutlinedIcon from '@mui/icons-material/ShoppingBasketOutlined';
 import DocumentScannerOutlinedIcon from '@mui/icons-material/DocumentScannerOutlined';
 
 // Your items
 export const MENU_ITEMS = [
   { name: "Overview", icon: InsertChartOutlinedIcon, href: "/overview" },
   { name: "Vendor", icon: StorefrontOutlinedIcon, href: "/vendor" },
-  { name: "Sales Table", icon: CurrencyExchangeOutlinedIcon, href: "/sales" },
+  { name: "Sales", icon: ShoppingBasketOutlinedIcon, href: "/sales" },
   { name: "Item's List", icon: PlaylistAddOutlinedIcon, href: "/items" },
   { name: "Inventory", icon: Inventory2OutlinedIcon, href: "/inventory" },
   { name: "Recipe", icon: RamenDiningOutlinedIcon, href: "/recipe" },
@@ -83,13 +83,19 @@ export default function IconGridMenu() {
                 style={{
                   fontSize: 50,
                   color:
-                    item.name === "Overview"
-                      ? "#0466c8"
-                      : item.name === "Vendor"
-                      ? "#ff006e"
-                      : item.name === "Family Finances"
-                      ? "#7678ed"
-                      : "#3FA89B",
+                   item.name === "Overview"
+                          ? "#3a86ff"
+                          : item.name === "Vendor"
+                          ? "#f85e00"
+                          : item.name === "Sales"
+                          ? "#f85e00"
+                          : item.name === "Item's List"
+                          ? "#f85e00"
+                          : item.name === "Family Finances"
+                          ? "#9d4edd"
+                           : item.name === "Documents"
+                          ? "#9d4edd"
+                          : "#3FA89B",
                 }}
               />
             </motion.div>
