@@ -395,7 +395,7 @@ const POSPage = () => {
         font-size: 14px;
       }
       .thankyou {
-        margin-top: 20px;
+        margin-top: 50px;
         text-align: center;
         font-weight: bold;
         font-size: 14px;
@@ -480,6 +480,8 @@ const POSPage = () => {
        2
      )}</strong></p>
 
+       <hr class="divider" />
+
       <div class="summary-row">
       <p>Taux TVA</p>
       <p style="text-align: right;">Total HT</p>
@@ -499,8 +501,9 @@ const POSPage = () => {
   </div>
 
     <div class="thankyou">
-    <p></p>
-     <h4 style="margin: 0; font-family: 'Dancing Script', cursive; font-size: 20px;">Merci de soutenir les petits agriculteurs</h4>
+      <h4 style="margin: 20px 0 0; font-family: 'Dancing Script', cursive; font-size: 20px;">
+    Merci de soutenir les petits agriculteurs
+  </h4>
     </div>
   </body>
   </html>
