@@ -476,6 +476,7 @@ export default function FullFeaturedCrudGrid({
         "Fruits-Vegetables",
         "Grains",
         "Herbs-Spices",
+        "Ingrédients",
         "Meat",
         "Miscellaneous",
         "Nuts",
