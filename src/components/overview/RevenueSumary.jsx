@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Box } from "@mui/material";
 import {
   Bar,
   BarChart,
@@ -11,8 +10,6 @@ import {
   YAxis,
 } from "recharts";
 import supabase from "../supabaseClient";
-import { color } from "framer-motion";
-import { mt } from "date-fns/locale";
 
 const RevenueSummary = () => {
   const [chartData, setChartData] = useState([]);
@@ -126,13 +123,13 @@ const RevenueSummary = () => {
             />
             <Legend
               payload={[
-                { value: "Gross Revenue", type: "triangle", color: "#fb6f92" },
-                { value: "Net Profit", type: "triangle", color: "#00afb9" },
                 {
                   value: "Cost Percentage",
                   type: "triangle",
-                  color: "#adc178",
+                  color: "#90dbf4",
                 },
+                { value: "Gross Revenue", type: "triangle", color: "#f3722c" },
+                { value: "Net Profit", type: "triangle", color: "#2ec4b6" },
               ]}
               align="right"
               formatter={(value) => {
@@ -145,7 +142,7 @@ const RevenueSummary = () => {
             />
             <Bar
               dataKey="cost_perc"
-              fill="#adc178"
+              fill="#90dbf4"
               barSize={30}
               yAxisId="right"
               label={({ x, y, value }) => (
@@ -164,7 +161,7 @@ const RevenueSummary = () => {
 
             <Bar
               dataKey="total_revenue"
-              fill="#fb6f92"
+              fill="#f3722c"
               barSize={30}
               yAxisId="left"
               label={({ x, y, value }) => (
@@ -184,7 +181,7 @@ const RevenueSummary = () => {
             />
             <Bar
               dataKey="net_profit"
-              fill="#00afb9"
+              fill="#2ec4b6"
               barSize={30}
               yAxisId="left"
               label={({ x, y, value }) => (

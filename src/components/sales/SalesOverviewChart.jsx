@@ -176,8 +176,8 @@ const SalesOverviewChart = () => {
             />
             <Legend
               payload={[
-                { value: "Expenses", type: "triangle", color: "#ff006e" },
-                { value: "Sales", type: "triangle", color: "#00afb9" },
+                { value: "Sales", type: "triangle", color: "#2ec4b6" },
+                { value: "Expenses", type: "triangle", color: "#fb6f92" },
               ]}
               align="right"
               formatter={(value) => {
@@ -193,19 +193,19 @@ const SalesOverviewChart = () => {
 
             <Area
               type="monotone"
-              dataKey="expenses"
-              name="Expenses"
-              stroke="#ff006e"
-              fill="#ff006e"
-              fillOpacity={0.3}
+              dataKey="sales"
+              name="Sales"
+              stroke="#2ec4b6"
+              fill="#2ec4b6"
+              fillOpacity={0.7}
             />
             <Area
               type="monotone"
-              dataKey="sales"
-              name="Sales"
-              stroke="#edf6f9"
-              fill="#00afb9"
-              fillOpacity={0.3}
+              dataKey="expenses"
+              name="Expenses"
+              stroke="#fb6f92"
+              fill="#fb6f92"
+              fillOpacity={0.8}
             />
           </AreaChart>
         </ResponsiveContainer>

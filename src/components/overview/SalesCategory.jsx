@@ -101,7 +101,7 @@ const SalesCategory = () => {
             height={sortedCategoryData.length * 40}
             margin={{ top: 1, right: 50, left: 5, bottom: 1 }}
           >
-            <CartesianGrid strokeMiterlimit="1 1" stroke="lightGray" />
+            <CartesianGrid strokeMiterlimit="1 1" stroke="#edf2fb" />
             <XAxis type="number" stroke="dimGray" />
             <YAxis
               dataKey="name"
@@ -125,8 +125,7 @@ const SalesCategory = () => {
 
             <Bar
               dataKey="value"
-              fill="#4cc9f0"
-              barSize={25}
+              barSize={12}
               isAnimationActive={true}
               height={sortedCategoryData.length * 40}
             >
@@ -143,9 +142,9 @@ const SalesCategory = () => {
                   return (
                     <text
                       x={x + width + 5}
-                      y={y + height / 3}
+                      y={y + height / 1.5}
                       fill="#555"
-                      fontSize={13}
+                      fontSize={14}
                       dominantBaseline="middle"
                     >
                       {`${percent}%`}
