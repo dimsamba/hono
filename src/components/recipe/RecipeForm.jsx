@@ -34,6 +34,7 @@ const RecipeForm = ({
   const [recipeName, setRecipeName] = useState("");
   const [recipeNote, setRecipeNote] = useState("");
   const [recipeType, setRecipeType] = useState("");
+  const [portionsType, setPortionsType] = useState("");
   const [numberOfPortions, setNumberOfPortions] = useState("");
   const [actualSalePrice, setActualSalePrice] = useState("");
   const [loading, setLoading] = useState(false);
@@ -214,6 +215,7 @@ const RecipeForm = ({
           cost_per_portion: cpp,
           num_items: numItems,
           number_of_portions: numberOfPortions,
+          portion_type: portionsType,
           min_sale_price: minSalePrice,
           actual_sale_price: salePrice,
           actual_food_cost_pct: actualFoodCostPct,
@@ -252,16 +254,16 @@ const RecipeForm = ({
         category: "Ingrédients",
         pack_type: "n/a",
         qnty_item_pack: 1,
-        unit_type: "unit",
-        unit_per_itm: 1,
+        unit_type: portionsType,
+        unit_per_itm: numberOfPortions,
         total_units_per_pack: numberOfPortions,
-        price_per_pack: cpp,
-        price_per_item: cpp,
-        price_per_unit: cpp,
+        price_per_pack: totalCost,
+        price_per_item: totalCost / numberOfPortions,
+        price_per_unit: totalCost / numberOfPortions,
         yield_pct: 100,
-        effective_price_per_unit: cpp,
+        effective_price_per_unit: totalCost / numberOfPortions,
         supplier: "Kitchen",
-        note: null,
+        note: recipeNote,
       };
 
       const { error: inventoryError } = await supabase
@@ -302,6 +304,7 @@ const RecipeForm = ({
     // ✅ Reset state
     setRecipeName("");
     setRecipeType("");
+    setPortionsType("");
     setNumberOfPortions("");
     setActualSalePrice("");
     setRecipeNote("");
@@ -360,6 +363,7 @@ const RecipeForm = ({
         num_items: numItems,
         cost_per_portion: cpp,
         number_of_portions: numberOfPortions,
+        portion_type: portionsType,
         min_sale_price: minSalePrice,
         actual_sale_price: salePrice,
         actual_food_cost_pct: actualFoodCostPct,
@@ -380,16 +384,16 @@ const RecipeForm = ({
         category: "Ingrédients",
         pack_type: "n/a",
         qnty_item_pack: 1,
-        unit_type: "unit",
-        unit_per_itm: 1,
+        unit_type: portionsType,
+        unit_per_itm: numberOfPortions,
         total_units_per_pack: numberOfPortions,
-        price_per_pack: cpp,
-        price_per_item: cpp,
-        price_per_unit: cpp,
+        price_per_pack: totalCost,
+        price_per_item: totalCost / numberOfPortions,
+        price_per_unit: totalCost / numberOfPortions,
         yield_pct: 100,
-        effective_price_per_unit: cpp,
+        effective_price_per_unit: totalCost / numberOfPortions,
         supplier: "Kitchen",
-        note: null,
+        note: recipeNote,
       };
 
       // Upsert (insert if not exists, update if exists)
@@ -446,6 +450,7 @@ const RecipeForm = ({
     // Reset state
     setRecipeName("");
     setRecipeType("");
+    setPortionsType("");
     setNumberOfPortions("");
     setActualSalePrice("");
     setRecipeNote("");
@@ -510,10 +515,30 @@ const RecipeForm = ({
     { value: "other", label: "Other" },
   ];
 
+  // Portions Type
+  const portionsTypes = [
+    { value: "portion", label: "Portion" },
+    { value: "unit", label: "Unit" },
+    { value: "gm", label: "gm" },
+    { value: "ml", label: "ml" },
+    { value: "slice", label: "Slice" },
+    { value: "piece", label: "Piece" },
+    { value: "cup", label: "Cup" },
+    { value: "bowl", label: "Bowl" },
+    { value: "bottle", label: "Bottle" },
+    { value: "glass", label: "Glass" },
+    { value: "jar", label: "Jar" },
+    { value: "can", label: "Can" },
+    { value: "box", label: "Box" },
+    { value: "bag", label: "Bag" },
+    { value: "other", label: "Other" },
+  ];
+
   // make sure the form is filled before add new item
   const formFilled =
     recipeName !== "" &&
     recipeType !== "" &&
+    portionsType !== "" &&
     numberOfPortions !== "" &&
     actualSalePrice !== "";
 
@@ -537,6 +562,7 @@ const RecipeForm = ({
       setRecipeName(recipe.recipe_name);
       setRecipeNote(recipe.note);
       setRecipeType(recipe.recipe_type);
+      setPortionsType(recipe.portion_type);
       setNumberOfPortions(recipe.number_of_portions);
       setActualSalePrice(recipe.actual_sale_price);
 
@@ -636,6 +662,7 @@ const RecipeForm = ({
       setRecipeNote("");
       setIngredients([]);
       setRecipeSelected(false);
+      setPortionsType("");
 
       // ✅ Refresh the recipe list
       fetchRecipes();
@@ -823,9 +850,10 @@ const RecipeForm = ({
                 </Select>
               </FormControl>
 
+              {/* Number of Portions */}
               <FormControl
                 sx={{
-                  gridColumn: "span 2",
+                  gridColumn: "span 1",
                   ...sharedStyles,
                   width: "100%",
                   // Selected value text
@@ -844,11 +872,10 @@ const RecipeForm = ({
                   },
                 }}
               >
-                {/* Number of Portions */}
                 <TextField
                   fullWidth
                   variant="outlined"
-                  label="Number of Portions"
+                  label="N. Portions"
                   type="number"
                   value={numberOfPortions}
                   onChange={(e) => {
@@ -869,6 +896,64 @@ const RecipeForm = ({
                 />
               </FormControl>
 
+              {/* Type */}
+              <FormControl
+                sx={{
+                  gridColumn: "span 1",
+                  ...sharedStyles,
+                  width: "100%",
+                  // Selected value text
+                  "& .MuiSelect-select": {
+                    color: "dimGray !important",
+                    fontSize: "16px",
+                    fontWeight: 500, // semibold
+                  },
+                  // Dropdown icon (arrow)
+                  "& .MuiSvgIcon-root": {
+                    fontSize: "2.2rem",
+                    color: "#38a3a5", // customize icon color
+                  },
+                  "& .MuiFormLabel-root": {
+                    color: "#38a3a5 !important",
+                  },
+                }}
+              >
+                <InputLabel>Type</InputLabel>
+                <Select
+                  value={portionsType}
+                  label="Type"
+                  onChange={(e) => setPortionsType(e.target.value)}
+                  required
+                  sx={{
+                    ...sharedStyles,
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        ...sharedStyles,
+                        backgroundColor: "#f5f5f5", // ✅ gray background for dropdown
+                        color: "#777",
+                      },
+                    },
+                    MenuListProps: {
+                      sx: {
+                        ...sharedStyles,
+                        "& .MuiMenuItem-root": {
+                          fontSize: 16,
+                        },
+                      },
+                    },
+                  }}
+                >
+                  {portionsTypes.map((type) => (
+                    <MenuItem key={type.value} value={type.value}>
+                      {type.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* Actual Sale Price */}
               <FormControl
                 sx={{
                   gridColumn: "span 2",
@@ -890,7 +975,6 @@ const RecipeForm = ({
                   },
                 }}
               >
-                {/* Actual Sale Price */}
                 <TextField
                   fullWidth
                   variant="outlined"
@@ -915,6 +999,7 @@ const RecipeForm = ({
                 />
               </FormControl>
 
+              {/* Note */}
               <FormControl
                 sx={{
                   gridColumn: "span 4",
@@ -936,7 +1021,6 @@ const RecipeForm = ({
                   },
                 }}
               >
-                {/* Note */}
                 <TextField
                   fullWidth
                   variant="outlined"
@@ -1171,6 +1255,7 @@ const RecipeForm = ({
                 onClick={() => {
                   setRecipeName("");
                   setRecipeType("");
+                  setPortionsType("");
                   setNumberOfPortions("");
                   setActualSalePrice("");
                   setRecipeNote("");
