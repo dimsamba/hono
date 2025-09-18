@@ -494,13 +494,65 @@ const CostForm = () => {
             />
           }
           title={
-            <span className={netProfitFromDates < 0 ? "text-red-400" : ""}>
-              Net Profit: € {formatCurrency(netProfitFromDates)}
+            <span className={netProfit < 0 ? "text-red-400" : ""}>
+              Net Profit:{"  "}
+              <span
+                style={{
+                  color: "#00747c",
+                  fontSize: "22px",
+                  fontWeight: 500,
+                  verticalAlign: "middle",
+                }}
+              >
+                €{formatCurrency(netProfitFromDates)}
+              </span>
             </span>
           }
-          value={`Cost: ${formatCurrency(foodCostPercentage)}%`}
-          subtitle={`Revenue: € ${formatCurrency(totalRevenue)}`}
-          subtitle2={`Expenses: € ${formatCurrency(totalExpenses)}`}
+          value={
+            <span style={{ verticalAlign: "middle" }}>
+              Cost:{"  "}
+              <span
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: 500,
+                  verticalAlign: "middle",
+                }}
+              >
+                {formatCurrency(foodCostPercentage)}%
+              </span>
+            </span>
+          }
+          subtitle={
+            <span style={{ verticalAlign: "middle" }}>
+              Revenue:{"  "}
+              <span
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: 500,
+                  verticalAlign: "middle",
+                }}
+              >
+                €{formatCurrency(totalRevenue)}
+              </span>
+            </span>
+          }
+          subtitle2={
+            <span style={{ verticalAlign: "middle" }}>
+              Expenses:{"  "}
+              <span
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: 500,
+                  verticalAlign: "middle",
+                }}
+              >
+                €{formatCurrency(totalExpenses)}
+              </span>
+            </span>
+          }
         />
 
         {/* Grand Net Revenue */}
@@ -513,11 +565,49 @@ const CostForm = () => {
           title={"Latest Entry"}
           value={
             <span className={netProfit < 0 ? "text-red-400" : ""}>
-              Net Profit: € {formatCurrency(netProfit)}
+              Net Profit: {"  "}
+                <span
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: 500,
+                  verticalAlign: "middle",
+                }}
+              >
+               € {formatCurrency(netProfit)}
+              </span>
             </span>
           }
-          subtitle={`Revenue: € ${formatCurrency(revenue)}`}
-          subtitle2={`Expenses: € ${formatCurrency(expenses)}`}
+          subtitle={
+            <span style={{ verticalAlign: "middle" }}>
+              Revenue:{"  "}
+              <span
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: 500,
+                  verticalAlign: "middle",
+                }}
+              >
+                €{formatCurrency(revenue)}
+              </span>
+            </span>
+          }
+          subtitle2={
+            <span style={{ verticalAlign: "middle" }}>
+              Expenses:{"  "}
+              <span
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: 500,
+                  verticalAlign: "middle",
+                }}
+              >
+                €{formatCurrency(expenses)}
+              </span>
+            </span>
+          }
         />
       </motion.div>
 

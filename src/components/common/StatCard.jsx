@@ -55,14 +55,14 @@ const StatCard = ({
             height: "5px",
             ml: 1,
             mt: 1,
-            mb: 1
+            mb: 1,
           }}
         >
-          <Typography variant="h4" sx={{ color: "#004e64", lineHeight: 1 }}>
+           <Typography variant="h5" sx={{ color: "#004e64", lineHeight: 1 }}>
             {value}
           </Typography>
-          <Typography
-            variant="h4"
+        <Typography
+            variant="h5"
             sx={{ color: colors.orange[500], lineHeight: 1 }}
           >
             {valueRed}
@@ -83,13 +83,29 @@ const StatCard = ({
         >
           <Typography
             variant="h6"
-            sx={{ color: colors.grey[400], lineHeight: 1 }}
+            sx={{
+              color: colors.grey[400],
+              height: 40,
+              lineHeight: "40px",
+              textAlign: "center",
+              fontWeight: [500],
+              verticalAlign: "middle",
+              mb: 0.5,
+            }}
           >
             {subtitle}
           </Typography>
           <Typography
             variant="h6"
-            sx={{ color: colors.orange[500], lineHeight: 1, fontWeight: [500] }}
+            sx={{
+              color: colors.grey[400],
+              height: 40,
+              lineHeight: "40px",
+              textAlign: "center",
+              fontWeight: [500],
+              verticalAlign: "middle",
+              mb: 0.5,
+            }}
           >
             {subtitleRed}
           </Typography>
@@ -115,7 +131,12 @@ const StatCard = ({
           </Typography>
           <Typography
             variant="h6"
-            sx={{ color: colors.orange[500], lineHeight: 1, fontWeight: [500] }}
+            sx={{
+              color: colors.grey[400],
+              height: 40,
+              lineHeight: "40px",
+              textAlign: "center",
+            }}
           >
             {subtitleRed2}
           </Typography>

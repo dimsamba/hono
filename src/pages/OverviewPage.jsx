@@ -196,13 +196,54 @@ const OverviewPage = () => {
             title={`30 days Financial Summary`}
             value={
               <>
-                <span className={netProfit < 0 ? "text-red-400" : ""}>
-                  Net profit: € {formatCurrency(netProfit)}
+                <span
+                  className={netProfit < 0 ? "text-red-400" : ""}
+                  style={{ verticalAlign: "center" }}
+                >
+                  Net profit:{" "}
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "22px",
+                      fontWeight: [500],
+                      verticalAlign: "center",
+                    }}
+                  >
+                    € {formatCurrency(netProfit)}
+                  </span>
                 </span>
               </>
             }
-            subtitle={`Revenue € ${formatCurrency(revenue)}`}
-            subtitleRed2={`Expenses € ${formatCurrency(expenses)}`}
+            subtitle={
+              <span style={{ verticalAlign: "middle" }}>
+                Revenu: &nbsp;
+                <span
+                  style={{
+                    color: "#00747c",
+                    fontSize: "18px",
+                    fontWeight: 500,
+                    verticalAlign: "middle",
+                  }}
+                >
+                  €{formatCurrency(revenue)}
+                </span>
+              </span>
+            }
+            subtitleRed2={
+              <span style={{ verticalAlign: "middle" }}>
+                Expenses: &nbsp;
+                <span
+                  style={{
+                    color: "#e76f51",
+                    fontSize: "18px",
+                    fontWeight: 500,
+                    verticalAlign: "middle",
+                  }}
+                >
+                  €{formatCurrency(expenses)}
+                </span>
+              </span>
+            }
           />
 
           {/* Sales */}
@@ -211,20 +252,53 @@ const OverviewPage = () => {
               <PointOfSaleIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
             }
             title={`Sales Summary`}
-            value={`Total: € ${formatCurrency(totalSalesValue)}`}
-            subtitle={`Last 30 Days: € ${formatCurrency(
-              totalSalesValue30Days
-            )}`}
-            subtitle2={`N. Sales: ${sales.length} / ${
-              salesLastMonth.filter((sale) => {
-                const today = new Date();
-                const thirtyDaysAgo = new Date();
-                thirtyDaysAgo.setDate(today.getDate() - 30);
-
-                const saleDate = new Date(sale.date); // or sale.date
-                return saleDate >= thirtyDaysAgo && saleDate <= today;
-              }).length
-            } in 30 Days`}
+            value={
+              <>
+                <span>
+                  Total:{" "}
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "22px",
+                      fontWeight: [500],
+                    }}
+                  >
+                    € {formatCurrency(totalSalesValue)}
+                  </span>
+                </span>
+              </>
+            }
+            subtitle={
+              <span style={{ verticalAlign: "middle" }}>
+                Last 30 Days: &nbsp;
+                <span
+                  style={{
+                    color: "#00747c",
+                    fontSize: "18px",
+                    fontWeight: 500,
+                    verticalAlign: "middle",
+                  }}
+                >
+                  €{formatCurrency(totalSalesValue30Days)}
+                </span>
+              </span>
+            }
+            subtitle2={
+              <span style={{ verticalAlign: "middle" }}>
+                N. Sales: &nbsp;
+                <span
+                  style={{
+                    color: "#00747c",
+                    fontSize: "18px",
+                    fontWeight: 500,
+                    verticalAlign: "middle",
+                  }}
+                >
+                  {sales.length} / {salesLastMonth.length} &nbsp;
+                </span>
+                in 30 Days
+              </span>
+            }
           />
           {/* Inventory */}
           <StatCard

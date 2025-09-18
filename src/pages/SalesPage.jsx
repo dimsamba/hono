@@ -47,7 +47,6 @@ const SalesPage = () => {
     setItemCounts(counts);
   };
 
-
   // Filter sales from the last 30 days
   const now = new Date();
   const thirtyDaysAgo = new Date();
@@ -103,7 +102,21 @@ const SalesPage = () => {
               key={refreshKey} // 👈 triggers re-render when key changes
               title={`Sales Summary`}
               value={`€ ${formatCurrency(totalSalesValue)}`}
-              subtitle={`${sales.length} Sales`}
+              subtitle={
+                <span style={{ verticalAlign: "middle" }}>
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    {sales.length} &nbsp;
+                  </span>
+                  Sales
+                </span>
+              }
             />
             <StatCard
               icon={
@@ -114,7 +127,21 @@ const SalesPage = () => {
               key={refreshKey} // 👈 triggers re-render when key changes
               title={`Last 30 Days`}
               value={`€ ${formatCurrency(totalSalesValue30Days)}`}
-              subtitle={`${salesLastMonth.length} Sales`} // Simplified filter logic here
+              subtitle={
+                <span style={{ verticalAlign: "middle" }}>
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    {salesLastMonth.length} &nbsp;
+                  </span>
+                  Sales
+                </span>
+              } // Simplified filter logic here
             />
             <StatCardBg
               icon={
@@ -124,8 +151,47 @@ const SalesPage = () => {
               }
               title={`Filtered`}
               value={`€ ${formatCurrency(metrics.totalSalesAmount)}`}
-              subtitle={`${metrics.totalEntries} Sales / ${metrics.totalItems} Items`}
-              subtitle2={`${metrics.filteredItemCount} Selected item`}
+              subtitle={
+                <span style={{ verticalAlign: "middle" }}>
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    {metrics.totalEntries} &nbsp;
+                  </span>
+                  Sales &nbsp;| &nbsp;
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    {metrics.totalItems} &nbsp;
+                  </span>
+                  Items
+                </span>
+              }
+              subtitle2={
+                <span style={{ verticalAlign: "middle" }}>
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    {metrics.filteredItemCount} &nbsp;
+                  </span>
+                  Selected item
+                </span>
+              }
             />
           </Box>
         </motion.div>

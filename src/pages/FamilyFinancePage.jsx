@@ -82,7 +82,21 @@ const FamilyFinancePage = () => {
               key={refreshKey} // 👈 triggers re-render when key changes
               title={`Grand Total`}
               value={` € ${formatCurrency(totalAmount)}`}
-              subtitle={` ${FamilyFinanceTable.length} Entries`}
+              subtitle={
+                <span style={{ verticalAlign: "middle" }}>
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    {FamilyFinanceTable.length} &nbsp;
+                  </span>
+                  Entries
+                </span>
+              }
             />
             <StatCard
               key={refreshKey}

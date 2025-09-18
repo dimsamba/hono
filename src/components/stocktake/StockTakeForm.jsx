@@ -462,11 +462,37 @@ const StockTakeForm = ({
             />
           }
           title={"Stock Take Summary"}
-          value={`${stockTake.length} Entries`}
+          value={
+            <span style={{ verticalAlign: "middle" }}>
+              N. of Entries:{" "}
+              <span
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: 500,
+                  verticalAlign: "middle",
+                }}
+              >
+                {stockTake.length}
+              </span>{" "}
+            </span>
+          }
           value2={
-            latestEntryDate
-              ? `Last Entry: ${format(new Date(latestEntryDate), "dd-MM-yyyy")}`
-              : "No data available"
+            <span style={{ verticalAlign: "middle" }}>
+              Last Entry:{" "}
+              <span
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: 500,
+                  verticalAlign: "middle",
+                }}
+              >
+                {latestEntryDate
+                  ? ` ${format(new Date(latestEntryDate), "dd-MM-yyyy")}`
+                  : "No data available"}
+              </span>{" "}
+            </span>
           }
         />
         <StatCardRecipe
@@ -476,8 +502,36 @@ const StockTakeForm = ({
             />
           }
           title={`Cost Calculations`}
-          value={`Items Count  ${totalItems}`}
-          value2={`Total Value: € ${formatCurrency(totalValue)}`}
+          value={
+            <span style={{ verticalAlign: "middle" }}>
+              Items Count:{" "}
+              <span
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: 500,
+                  verticalAlign: "middle",
+                }}
+              >
+                {totalItems}
+              </span>{" "}
+            </span>
+          }
+          value2={
+            <span style={{ verticalAlign: "middle" }}>
+              Total Value:{" "}
+              <span
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: 500,
+                  verticalAlign: "middle",
+                }}
+              >
+                €{formatCurrency(totalValue)}
+              </span>{" "}
+            </span>
+          }
         />
       </motion.div>
 

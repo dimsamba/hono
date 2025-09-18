@@ -103,7 +103,10 @@ const RecipeForm = ({
 
   // Calculatios
   useEffect(() => {
-    const total = ingredients.reduce((sum, i) => sum + (i.cost || 0), 0);
+    const baseTotal = ingredients.reduce((sum, i) => sum + (i.cost || 0), 0);
+    const feeRate = 0.0175;
+    const total = baseTotal + baseTotal * feeRate;
+
     setTotalCost(total);
 
     const cpp = numberOfPortions > 0 ? total / numberOfPortions : 0;
@@ -113,9 +116,9 @@ const RecipeForm = ({
     setCostPerPortion(cpp);
     setMinSalePrice(minPrice);
     setActualFoodCostPct(pct);
-    setActualRecipeCost(total);
+    setActualRecipeCost(totalCost);
 
-    if (onTotalCostChange) onTotalCostChange(total);
+    if (onTotalCostChange) onTotalCostChange(totalCost);
   }, [ingredients, numberOfPortions, actualSalePrice]);
 
   // Handle item changes
@@ -180,12 +183,16 @@ const RecipeForm = ({
     const cost = numberOfPortions > 0 ? totalCost / numberOfPortions : 0;
     const minPrice = cost * 4;
     const foodPct = actualSalePrice > 0 ? (cost / actualSalePrice) * 100 : 0;
-    const total = ingredients.reduce((sum, i) => sum + (i.cost || 0), 0);
 
+    const baseTotal = ingredients.reduce((sum, i) => sum + (i.cost || 0), 0);
+    const feeRate = 0.0175;
+    const total = baseTotal + baseTotal * feeRate;
+
+    setActualRecipeCost(total);
     setCostPerPortion(cost);
     setMinSalePrice(minPrice);
     setActualFoodCostPct(foodPct);
-    setTotalCost(total);
+    setTotalCost(totalCost);
   }, [numberOfPortions, totalCost, actualSalePrice]); // 👈 make sure dependencies are correct
 
   // Save recipe
@@ -652,7 +659,7 @@ const RecipeForm = ({
       console.error("Error deleting recipe:", error.message);
       alert("Failed to delete recipe.");
     } else {
-      alert("Recipe deleted successfully.");
+      // alert("Recipe deleted successfully.");
 
       // ✅ Clear form state
       setRecipeName("");
@@ -703,40 +710,112 @@ const RecipeForm = ({
         <StatCardRecipe
           icon={
             <RamenDiningOutlinedIcon
-              sx={{ color: "#38a3a5", fontSize: "26px" }}
+              sx={{ color: "#00747c", fontSize: "26px" }}
             />
           }
           title={"Recipes Sumary"}
-          value={`${recipes.length} Saved Recipes`}
+          value={
+            <spam>
+              Saved Recipes:{" "}
+              <spam
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: [500],
+                }}
+              >
+                {recipes.length}
+              </spam>
+            </spam>
+          }
           value2={
-            latestEntryDate
-              ? `Last Entry: ${format(new Date(latestEntryDate), "dd-MM-yyyy")}`
-              : "No data available"
+            latestEntryDate ? (
+              <>
+                Last Entry:{" "}
+                <span
+                  style={{
+                    color: "#00747c",
+                    fontSize: "20px",
+                    fontWeight: 500,
+                  }}
+                >
+                  {format(new Date(latestEntryDate), "dd-MM-yyyy")}
+                </span>
+              </>
+            ) : (
+              "No data available"
+            )
           }
         />
 
         <StatCardRecipe
           icon={
-            <LoyaltyOutlinedIcon sx={{ color: "#38a3a5", fontSize: "26px" }} />
+            <LoyaltyOutlinedIcon sx={{ color: "#00747c", fontSize: "26px" }} />
           }
           title={`Selling Info`}
-          value={`Price per portion: € ${formatCurrency(costPerPortion)}`}
-          value2={`MSP: € ${formatCurrency(minSalePrice)}`}
+          value={
+            <span>
+              Price per portion: {"  "}
+              <spam
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: [500],
+                }}
+              >
+                €{formatCurrency(costPerPortion)}
+              </spam>
+            </span>
+          }
+          value2={
+            <span>
+              MSP For 25% FC: {"  "}
+              <span
+                style={{
+                  color: "#00747c",
+                  fontSize: "18px",
+                  fontWeight: [500],
+                }}
+              >
+                €{formatCurrency(minSalePrice)}
+              </span>
+            </span>
+          }
         />
         <StatCardRecipe
           icon={
             <PriceChangeOutlinedIcon
-              sx={{ color: "#38a3a5", fontSize: "26px" }}
+              sx={{ color: "#00747c", fontSize: "26px" }}
             />
           }
           title={`Cost Info`}
-          value={`Recipe Cost: € ${formatCurrency(totalCost)}`}
+          value={
+            <spam>
+              Recipe Cost w/ 1.75%: {" "}
+              <spam
+                style={{
+                  color: actualFoodCostPct > 28 ? "#00747c" : "inherit",
+                  fontSize: "18px",
+                  fontWeight: [500],
+                }}
+              >
+                €{formatCurrency(totalCost)}
+              </spam>
+            </spam>
+          }
           value2={
-            <span
-              style={{ color: actualFoodCostPct > 28 ? "#f78154" : "inherit" }}
-            >
-              Actual FC: {formatCurrency(actualFoodCostPct)}%
-            </span>
+            <spam>
+              Actual FC: {" "}
+              <span
+                style={{
+                  color: actualFoodCostPct > 28 ? "#00747c" : "inherit",
+                  fontSize: "18px",
+                  fontWeight: [500],
+                }}
+              >
+                {formatCurrency(actualFoodCostPct)}%
+              </span>
+            </spam>
           }
         />
       </motion.div>

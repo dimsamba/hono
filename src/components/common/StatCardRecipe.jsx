@@ -76,7 +76,7 @@ const StatCardRecipe = ({
             width: "100%",
             height: "5px",
             ml: 1,
-            mt: 1,
+            mt: 1.5,
           }}
         >
           <Typography variant="h5" sx={{ color: "#004e64", lineHeight: 1 }}>

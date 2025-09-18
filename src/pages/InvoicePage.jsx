@@ -80,89 +80,190 @@ const invoicePaga = () => {
             <StatCard
               key={refreshKey} // 👈 triggers re-render when key changes
               title={`Overview`}
-              value={`€ ${formatCurrency(totalAmountTTC)}`}
-              subtitleRed={(() => {
-                const now = new Date();
-                const in7Days = new Date();
-                in7Days.setDate(now.getDate() + 8);
+              value={`€${formatCurrency(totalAmountTTC)}`}
+              subtitleRed={
+                <span style={{ verticalAlign: "middle" }}>
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    {(() => {
+                      const now = new Date();
+                      const in7Days = new Date();
+                      in7Days.setDate(now.getDate() + 8);
 
-                // Normalize dates to ignore time
-                const normalizeDate = (d) =>
-                  new Date(d.getFullYear(), d.getMonth(), d.getDate());
+                      // Normalize dates to ignore time
+                      const normalizeDate = (d) =>
+                        new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
-                const start = normalizeDate(now);
-                const end = normalizeDate(in7Days);
+                      const start = normalizeDate(now);
+                      const end = normalizeDate(in7Days);
 
-                const dueInvoices = invoicesData.filter((inv) => {
-                  const invDate = normalizeDate(new Date(inv.invoice_date));
-                  return !inv.paid && invDate >= start && invDate <= end;
-                });
+                      const dueInvoices = invoicesData.filter((inv) => {
+                        const invDate = normalizeDate(
+                          new Date(inv.invoice_date)
+                        );
+                        return !inv.paid && invDate >= start && invDate <= end;
+                      });
 
-                const totalAmount = dueInvoices.reduce((sum, inv) => {
-                  const amount = parseFloat(inv.amount_ttc) || 0;
-                  return sum + amount;
-                }, 0);
+                      const totalAmount = dueInvoices.reduce((sum, inv) => {
+                        const amount = parseFloat(inv.amount_ttc) || 0;
+                        return sum + amount;
+                      }, 0);
 
-                return `${dueInvoices.length} (7 days) € ${formatCurrency(
-                  totalAmount
-                )}`;
-              })()}
-              subtitleRed2={`${
-                invoicesData.filter((inv) => {
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-                  const invDate = new Date(inv.invoice_date);
-                  invDate.setHours(0, 0, 0, 0);
-                  return !inv.paid && invDate < today;
-                }).length
-              } Overdue (€ ${formatCurrency(
-                invoicesData
-                  .filter((inv) => {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    const invDate = new Date(inv.invoice_date);
-                    invDate.setHours(0, 0, 0, 0);
-                    return !inv.paid && invDate < today;
-                  })
-                  .reduce((acc, curr) => acc + (curr.amount_ttc || 0), 0)
-              )})`}
+                      return `${dueInvoices.length} 
+                     / €${formatCurrency(totalAmount)}`;
+                    })()}
+                    <span></span>
+                  </span>{" "}
+                  Due 7 days
+                </span>
+              }
+              subtitleRed2={
+                <span style={{ verticalAlign: "middle" }}>
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    {
+                      invoicesData.filter((inv) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const invDate = new Date(inv.invoice_date);
+                        invDate.setHours(0, 0, 0, 0);
+                        return !inv.paid && invDate < today;
+                      }).length
+                    }
+                  </span>{" "}
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    {" "}
+                    / €
+                    {formatCurrency(
+                      invoicesData
+                        .filter((inv) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          const invDate = new Date(inv.invoice_date);
+                          invDate.setHours(0, 0, 0, 0);
+                          return !inv.paid && invDate < today;
+                        })
+                        .reduce((acc, curr) => acc + (curr.amount_ttc || 0), 0)
+                    )}
+                  </span>{" "}
+                  Overdue
+                </span>
+              }
             />
 
             <StatCard
               key={refreshKey} // 👈 triggers re-render when key changes
               title={`Overview`}
               value={`${invoicesData.length} Entries`}
-              subtitle={`${(() => {
-                const paidInvoices = invoicesData.filter((inv) => inv.paid);
-                const totalPaid = paidInvoices.reduce((sum, inv) => {
-                  const amount = parseFloat(inv.amount_ttc) || 0;
-                  return sum + amount;
-                }, 0);
-                return `${paidInvoices.length} Paid € ${formatCurrency(
-                  totalPaid
-                )}`;
-              })()}`}
-              subtitleRed2={`${invoicesData.filter((inv) => !inv.paid).length}
-               Unpaid ${(() => {
-                 const unpaidInvoices = invoicesData.filter((inv) => !inv.paid);
+              subtitle={
+                <span style={{ verticalAlign: "middle" }}>
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    {(() => {
+                      const paidInvoices = invoicesData.filter(
+                        (inv) => inv.paid
+                      );
+                      const totalPaid = paidInvoices.reduce((sum, inv) => {
+                        const amount = parseFloat(inv.amount_ttc) || 0;
+                        return sum + amount;
+                      }, 0);
+                      return `${paidInvoices.length} / €${formatCurrency(
+                        totalPaid
+                      )}`;
+                    })()}
+                  </span>{" "}
+                  Paid Invoices
+                </span>
+              }
+              subtitleRed2={
+                <span style={{ verticalAlign: "middle" }}>
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    {invoicesData.filter((inv) => !inv.paid).length}
+                    {" / "}
+                    {(() => {
+                      const unpaidInvoices = invoicesData.filter(
+                        (inv) => !inv.paid
+                      );
 
-                 const totalAmount = unpaidInvoices.reduce((sum, inv) => {
-                   const amount = parseFloat(inv.amount_ttc) || 0;
-                   return sum + amount;
-                 }, 0);
+                      const totalAmount = unpaidInvoices.reduce((sum, inv) => {
+                        const amount = parseFloat(inv.amount_ttc) || 0;
+                        return sum + amount;
+                      }, 0);
 
-                 return `€ ${formatCurrency(totalAmount)}`;
-               })()}`}
+                      return `€${formatCurrency(totalAmount)}`;
+                    })()}
+                  </span>{" "}
+                  Unpaid Invoices
+                </span>
+              }
             />
 
             <StatCardBg
               key={refreshKey} // 👈 triggers re-render when key changes
               title={`Filtered`}
-              value={`€ ${formatCurrency(filteredTotalValue)}`}
-              subtitle={`Paid TTC € ${formatCurrency(filteredPaidValue)}`}
-              subtitleRed2={`Unpaid TTC € ${formatCurrency(
-                filteredUnpaidValue
-              )}`}
+              value={`€${formatCurrency(filteredTotalValue)}`}
+              subtitle={
+                <span style={{ verticalAlign: "middle" }}>
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    €{formatCurrency(filteredPaidValue)}
+                  </span>{" "}
+                  Paid TTC
+                </span>
+              }
+              subtitleRed2={
+                <span style={{ verticalAlign: "middle" }}>
+                  <span
+                    style={{
+                      color: "#00747c",
+                      fontSize: "18px",
+                      fontWeight: 500,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    €{formatCurrency(filteredUnpaidValue)}
+                  </span>{" "}
+                  Unpaid TTC
+                </span>
+              }
             />
           </Box>
         </motion.div>
