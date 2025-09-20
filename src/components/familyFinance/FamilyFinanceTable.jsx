@@ -696,7 +696,7 @@ export default function FullFeaturedCrudGrid({
     {
       field: "amount",
       headerName: "Amount",
-      width: 100,
+      width: 120,
       editable: true,
       type: "number",
       align: "right",

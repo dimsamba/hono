@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   Box,
   Button,
@@ -10,88 +10,12 @@ import {
   FormControl,
   InputLabel,
   GlobalStyles,
+  Modal,
+  Dialog,
+  DialogContent,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { useTimers } from "../components/TimerContext";
-
-// Keypad Component
-const Keypad = ({ onKeyPress, onBackspace, onEnter }) => {
-  const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        width: 200,
-        mt: 1,
-        position: "sticky",
-        top: 20,
-        p: 2,
-        backgroundColor: "#f5f5f5",
-        borderRadius: "8px",
-        border: "1px solid #3FA89B",
-        boxShadow: "0 1px 1px rgba(0, 0, 0, 0.2)",
-      }}
-    >
-      <Grid container spacing={1}>
-        {keys.map((key) => (
-          <Grid item xs={6} key={key}>
-            <Button
-              variant="contained"
-              fullWidth
-              onClick={() => onKeyPress(key)}
-              sx={{
-                backgroundColor: "#f5f5f5",
-                color: "#38a3a5",
-                fontWeight: 500,
-                fontSize: "30px",
-                height: 61.5,
-                "&:hover": {
-                  backgroundColor: "#e2ece9",
-                },
-              }}
-            >
-              {key}
-            </Button>
-          </Grid>
-        ))}
-
-        <Grid item xs={6}>
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={onBackspace}
-            sx={{
-              backgroundColor: "#f07167",
-              color: "white",
-              fontWeight: 700,
-              fontSize: "30px",
-              height: "66px",
-            }}
-          >
-            {"<<"}
-          </Button>
-        </Grid>
-        <Grid item xs={6}>
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={onEnter}
-            sx={{
-              backgroundColor: "#76c893",
-              color: "white",
-              fontWeight: 1000,
-              fontSize: "40px",
-              height: "66px",
-            }}
-          >
-            ↵
-          </Button>
-        </Grid>
-      </Grid>
-    </Box>
-  );
-};
 
 const soundLabels = {
   "Alarm1.wav": "Alarm 1",
@@ -161,7 +85,6 @@ const Timer = ({
 
   return (
     <Box
-      onClick={() => inputRef.current.focus()}
       sx={{
         my: 1,
         mt: 1.1,
@@ -207,10 +130,9 @@ const Timer = ({
           label="Set Time"
           type="text"
           value={inputValue}
-          InputProps={{
-            readOnly: true,
-          }}
+          InputProps={{ readOnly: true }}
           onFocus={() => onFocus(index)}
+          onClick={() => onFocus(index)} // 👈 allow reopening on click
           sx={{
             ...sharedStyles,
             mb: 2,
@@ -350,8 +272,27 @@ const Timer = ({
 
 // Main Page
 const TimerPage = () => {
-  const { timers, setTimers, updateTimer } = useTimers(); // ⬅ from context
-  const [focusedIndex, setFocusedIndex] = useState(null);
+  const { timers, setTimers, updateTimer } = useTimers();
+  const [activeTimerIndex, setActiveTimerIndex] = useState(null);
+  const [openKeypad, setOpenKeypad] = useState(false);
+  const [ignoreNextFocus, setIgnoreNextFocus] = useState(false);
+
+  const handleOpenKeypad = (index) => {
+    if (ignoreNextFocus) {
+      setIgnoreNextFocus(false);
+      return;
+    }
+    setActiveTimerIndex(index);
+    setOpenKeypad(true);
+  };
+
+  const handleCloseKeypad = () => {
+    setIgnoreNextFocus(true); // prevent immediate re-open
+    const activeEl = document.activeElement;
+    if (activeEl && activeEl.blur) activeEl.blur();
+    setOpenKeypad(false);
+    setActiveTimerIndex(null);
+  };
 
   const handleSoundChange = (index, soundFile) => {
     const audio = new Audio(`/sounds/${soundFile}`);
@@ -362,29 +303,148 @@ const TimerPage = () => {
   };
 
   const handleKeypadInput = (key) => {
-    if (focusedIndex === null) return;
-    const timer = timers[focusedIndex];
+    if (activeTimerIndex === null) return;
+    const timer = timers[activeTimerIndex];
     const newValue = timer.inputValue + key;
     const minutes = parseInt(newValue);
-    updateTimer(focusedIndex, {
+    updateTimer(activeTimerIndex, {
       inputValue: newValue,
       secondsLeft: isNaN(minutes) ? 0 : minutes * 60,
     });
   };
 
   const handleBackspace = () => {
-    if (focusedIndex === null) return;
-    const timer = timers[focusedIndex];
+    if (activeTimerIndex === null) return;
+    const timer = timers[activeTimerIndex];
     const newValue = timer.inputValue.slice(0, -1);
     const minutes = parseInt(newValue);
-    updateTimer(focusedIndex, {
+    updateTimer(activeTimerIndex, {
       inputValue: newValue,
       secondsLeft: isNaN(minutes) ? 0 : minutes * 60,
     });
   };
 
   const handleEnter = () => {
-    if (focusedIndex !== null) handleStart(focusedIndex);
+    if (activeTimerIndex !== null) {
+      handleStart(activeTimerIndex);
+      handleCloseKeypad();
+    }
+  };
+
+  const sharedStyles = {
+    "& .MuiInputLabel-root": {
+      color: "#38a3a5",
+      fontSize: 14,
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        border: "1px solid #38a3a5",
+      },
+      "&:hover fieldset": {
+        borderColor: "darkGreen",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#25a18e",
+      },
+    },
+  };
+
+  // Keypad Component
+  const Keypad = ({ value, onKeyPress, onBackspace, onEnter, onClose }) => {
+    const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          width: 300,
+          p: 2,
+          backgroundColor: "#f5f5f5",
+          borderRadius: 2,
+          border: "2px solid #38a3a5",
+          backgroundColor: "#f5f5f5",
+        }}
+      >
+        <Grid container spacing={1}>
+          {/* Display the current value */}
+          <Grid item xs={12}>
+            <TextField
+              type="text"
+              value={value} // 👈 controlled by parent
+              InputProps={{ readOnly: true }}
+              fullWidth
+              sx={{
+                ...sharedStyles,
+                "& .MuiInputBase-input": {
+                  color: "#38a3a5", // 👈 change text color
+                  fontSize: 28, // optional
+                  fontWeight: 500, // optional
+                  textAlign: "center",
+                },
+              }}
+            />
+          </Grid>
+
+          {/* Key buttons */}
+          {keys.map((key) => (
+            <Grid item xs={4} key={key}>
+              <Button
+                type="button"
+                variant="contained"
+                fullWidth
+                onClick={() => onKeyPress(key)}
+                sx={{
+                  backgroundColor: "#f5f5f5",
+                  color: "#38a3a5",
+                  fontSize: 30,
+                  height: 61.5,
+                }}
+              >
+                {key}
+              </Button>
+            </Grid>
+          ))}
+
+          {/* Backspace */}
+          <Grid item xs={4}>
+            <Button
+              type="button"
+              variant="contained"
+              fullWidth
+              onClick={onBackspace}
+              sx={{
+                backgroundColor: "#f07167",
+                border: "1px solid #111",
+                color: "white",
+                fontSize: 30,
+                height: 63,
+              }}
+            >
+              {"<<"}
+            </Button>
+          </Grid>
+
+          {/* Enter */}
+          <Grid item xs={4}>
+            <Button
+              type="button"
+              variant="contained"
+              fullWidth
+              onClick={onEnter}
+              sx={{
+                backgroundColor: "#76c893",
+                border: "1px solid #111",
+                color: "white",
+                fontSize: 40,
+                height: 63,
+              }}
+            >
+              ↵
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+    );
   };
 
   const handleStart = (index) => {
@@ -443,40 +503,63 @@ const TimerPage = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10 bg-gray-100">
       <main className="max-w-7xl mx-auto">
-        <Box sx={{ px: 1, pt: 3 }}>
-          <h3 className="text-base mb-4 ml-1 text-[#3FA89B] font-bold">
-            MULTI-TIMER
-          </h3>
+        <h3 className="text-base mb-4 ml-1 text-[#3FA89B] font-bold">
+          MULTI-TIMER
+        </h3>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 3,
+            //  backgroundColor: "orange !important",
+            ml: 2,
+          }}
+        >
+          {/* Timers stay always visible */}
+          <Box className="Timers" sx={{ flex: 1 }}>
+            <motion.div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              {timers.map((timer, i) => (
+                <Timer
+                  key={i}
+                  index={i}
+                  inputValue={timer.inputValue}
+                  secondsLeft={timer.secondsLeft}
+                  isRunning={timer.isRunning}
+                  isFlashing={timer.isFlashing}
+                  onFocus={() => handleOpenKeypad(i)} // ✅ pass index
+                  onPause={handlePause}
+                  onReset={handleReset}
+                  selectedSound={timer.selectedSound}
+                  onSoundChange={handleSoundChange}
+                />
+              ))}
+            </motion.div>
+          </Box>
 
-          <Box sx={{ display: "flex", gap: 3 }}>
-            <Box className="KeyPad">
+          {/* Keypad Dialog */}
+          <Dialog
+            open={openKeypad}
+            onClose={handleCloseKeypad}
+            BackdropProps={{
+              style: { backgroundColor: "transparent", }, // 👈 remove black overlay
+            }}
+          >
+            <DialogContent
+              sx={{
+                p: 0,
+                backgroundColor: "#f5f5f5" 
+              }}
+            >
               <Keypad
+                value={timers[activeTimerIndex]?.inputValue || ""} // 👈 pass value
                 onKeyPress={handleKeypadInput}
                 onBackspace={handleBackspace}
                 onEnter={handleEnter}
+                onClose={handleCloseKeypad}
+                disableEnforceFocus={false}
               />
-            </Box>
-
-            <Box className="Timers" sx={{ flex: 1 }}>
-              <motion.div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                {timers.map((timer, i) => (
-                  <Timer
-                    key={i}
-                    index={i}
-                    inputValue={timer.inputValue}
-                    secondsLeft={timer.secondsLeft}
-                    isRunning={timer.isRunning}
-                    isFlashing={timer.isFlashing}
-                    onFocus={setFocusedIndex}
-                    onPause={handlePause}
-                    onReset={handleReset}
-                    selectedSound={timer.selectedSound}
-                    onSoundChange={handleSoundChange}
-                  />
-                ))}
-              </motion.div>
-            </Box>
-          </Box>
+            </DialogContent>
+          </Dialog>
         </Box>
       </main>
     </div>
