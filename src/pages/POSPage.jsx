@@ -39,6 +39,7 @@ import {
 
 const POSPage = () => {
   const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [order, setOrder] = useState([]);
@@ -638,62 +639,487 @@ const POSPage = () => {
   const disableActionButtons =
     order.length === 0 || !receivedAmount || receivedAmount < calculateTotal();
 
+  // TextField and InputLabel customizations
+  const sharedStyles = {
+    "& .MuiInputLabel-root": {
+      color: "#38a3a5",
+      fontSize: 14,
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        border: "1px solid #38a3a5",
+      },
+      "&:hover fieldset": {
+        borderColor: "darkGreen",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#25a18e",
+      },
+    },
+  };
   return (
-    <div className="flex-1 overflow-hidden relative z-10 bg-[#fcfeff] border-t-2">
+    <div className="flex-1 overflow-hidden relative z-10 bg-[#fcfeff]">
       <main
-        className="max-w-7xl mx-auto scrollbar-hide h-[640px] bg-[#fcfeff]"
+        className="max-w-7xl mx-auto scrollbar-hide h-[640px] overflow-y-auto md:overflow-y-hidden bg-[#fcfeff]"
         style={{
           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-          border: "1px solid #3FA89B",
         }}
       >
         {/* Items buttons and Sale Summary */}
         <motion.div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-1 lg:grid-cols-1 mb-3"
+          className="grid grid-cols-1 md:grid-cols-6 gap-1 mb-0 bg-slate-100"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          <Box
-            display="grid"
-            gap={0}
-            gridTemplateColumns="repeat(13, minmax(0, 1fr))"
+          {/* pop Over with Keypad, paiment type */}
+          <Popover
+            id={id}
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+            anchorReference="anchorPosition"
+            onEntered={() => {
+              if (inputRef.current) {
+                inputRef.current.focus();
+              }
+            }}
+            anchorPosition={{
+              top: window.innerHeight / 2,
+              left: window.innerWidth / 2,
+            }}
+            transformOrigin={{
+              vertical: "center",
+              horizontal: "center",
+            }}
             sx={{
-              "& > div": {
-                gridColumn: isNonMobile ? undefined : "span 3",
+              "& .MuiPaper-root": {
+                backgroundColor: "#edf2fb",
+                border: "2px solid green",
+                p: 0.5,
+                width: "330px",
               },
             }}
           >
-            {/* 1st Column Items grid */}
+            {/* Display Total */}
             <Box
-              /* 1️⃣  The scrollable wrapper */
               sx={{
-                gridColumn: "span 6", // keep your original layout rule
-                p: 0,
-                m: 1,
-                border: "1px solid #45a29e",
-                /* the important bits ↓ */
-                height: 630, // or "200px" — fixed box height
-                backgroundColor: "black !important",
-
-                overflowY: "auto", // allow vertical scrolling
-                overflowX: "hidden", // no horizontal scrollbars
-
-                /* hide the scrollbar everywhere */
-                scrollbarWidth: "none", // Firefox
-                "-ms-overflow-style": "none", // old Edge / IE
-                "&::-webkit-scrollbar": { display: "none" }, // Chrome, Safari, new Edge
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderTop: "1px solid #3FA89B",
+                paddingTop: 0,
+                px: 0.5,
               }}
             >
-              <Grid2
+              <Typography sx={{ color: "#4a4e69", fontSize: 28 }}>
+                Total:
+              </Typography>
+              <Typography sx={{ color: "#4a4e69", fontSize: 40 }}>
+                €{formatCurrency(calculateTotal())}
+              </Typography>
+            </Box>
+            {/* Icon buttons in one row */}
+            <Box
+              className="w-full"
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <Grid
                 container
-                spacing={1}
+                sx={{ width: "100%", flexGrow: 1 }} // Optional: constrain width
+              >
+                {[
+                  {
+                    value: "Espèces",
+                    icon: <AttachMoneyIcon />,
+                    bgColor: "#545e75",
+                    color: "#35ff69",
+                  },
+                  {
+                    value: "CB",
+                    icon: <CreditCardIcon />,
+                    bgColor: "#545e75",
+                    color: "#54defd",
+                  },
+                  {
+                    value: "Bon d'achat",
+                    icon: <LocalActivityOutlinedIcon />,
+                    bgColor: "#545e75",
+                    color: "#ff3cc7",
+                  },
+                  {
+                    value: "Autres",
+                    icon: <PaymentsOutlinedIcon />,
+                    bgColor: "#545e75",
+                    color: "#fed811",
+                  },
+                ].map(({ value, icon, bgColor, color }) => (
+                  <Grid item xs={3} key={value}>
+                    <Tooltip
+                      title={value}
+                      arrow
+                      placement="top"
+                      slotProps={{
+                        tooltip: {
+                          sx: {
+                            fontSize: 14,
+                            fontWeight: 600,
+                            backgroundColor: "#233d4d",
+                            color: "white",
+                          },
+                        },
+                      }}
+                    >
+                      <IconButton
+                        value={value}
+                        onClick={() => handlePaymentTypeChange(value)}
+                        sx={{
+                          color: paymentType === value ? "#ccdbdc" : "#777",
+                          transition: "0.2s",
+                          "&:hover": {
+                            color: "#3FA89B",
+                            backgroundColor: "#007090",
+                          },
+                          backgroundColor:
+                            paymentType === value ? "#1a9cb3" : bgColor,
+                          borderColor:
+                            paymentType === value ? "#005ae0" : "#008083",
+                          borderRadius: 0,
+                          height: "60px",
+                          width: "100%",
+                          border: "1px solid white",
+                        }}
+                      >
+                        {React.cloneElement(icon, {
+                          sx: { fontSize: 32, color: color },
+                        })}
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                ))}
+              </Grid>
+
+              {/* Save buttons below */}
+              <Box display="flex" gap={0.4} my={0.5} width="100%">
+                <Button
+                  variant="outlined"
+                  startIcon={<Save />}
+                  onClick={() => {
+                    saveSale(false);
+                    handleClose(); // 👈 close after saving
+                  }}
+                  disabled={disableActionButtons}
+                  sx={{
+                    backgroundColor: "#26A889",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "#62CDB4",
+                    },
+                    border: 0,
+                    borderRadius: 0,
+                    height: "100px",
+                    width: "100%",
+                    minWidth: 0, // Prevents default button minWidth from breaking layout
+                    minWidth: 0,
+                    opacity: disableActionButtons ? 0.5 : 1, // Optional: visual feedback
+                    pointerEvents: disableActionButtons ? "none" : "auto", // Optional: make fully inactive
+                  }}
+                >
+                  Pay & Save
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  startIcon={<Print />}
+                  onClick={() => {
+                    saveSale(true);
+                    handleClose(); // 👈 close after saving
+                  }}
+                  disabled={disableActionButtons}
+                  sx={{
+                    backgroundColor: "#00b4d8",
+                    color: "white",
+                    fontSize: 14,
+                    "&:hover": {
+                      backgroundColor: "#90e0ef",
+                    },
+                    border: 0,
+                    borderRadius: 0,
+                    height: "100px",
+                    width: "100%",
+                    minWidth: 0, // Prevents default button minWidth from breaking layout
+                    minWidth: 0,
+                    opacity: disableActionButtons ? 0.5 : 1,
+                    pointerEvents: disableActionButtons ? "none" : "auto",
+                  }}
+                >
+                  Pay & Print
+                </Button>
+              </Box>
+            </Box>
+
+            {/* KeyPad Received Amount */}
+            <Box className="flex-1 mt-1">
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, 1fr)",
+                  gap: 0.1,
+                  mb: 1,
+                }}
+              >
+                {[
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  ".",
+                  "0",
+                  "backspace",
+                ].map((key) =>
+                  key === "backspace" ? (
+                    <IconButton
+                      key="backspace"
+                      onClick={() =>
+                        setReceivedAmount((prev) => prev.slice(0, -1))
+                      }
+                      sx={{
+                        height: 50,
+                        fontSize: 24,
+                        width: "100%", // Makes it fill the grid column
+                        minWidth: 0, // Crucial for responsiveness
+                        border: "1px solid #003049",
+                        borderRadius: 1,
+                        color: "#003049",
+                        "&:hover": {
+                          backgroundColor: "#f0fff1",
+                        },
+                      }}
+                    >
+                      <BackspaceIcon />
+                    </IconButton>
+                  ) : (
+                    <Button
+                      key={key}
+                      variant="outlined"
+                      onClick={() => handleKeypadInput(key)}
+                      sx={{
+                        height: 50,
+                        fontSize: 34,
+                        border: "1px solid #003049",
+                        color: "#003049",
+                        width: "100%", // Ensures button fills grid cell
+                        minWidth: 0, // Prevents default button minWidth from breaking layout
+                        "&:hover": {
+                          backgroundColor: "#f0fff1",
+                        },
+                      }}
+                    >
+                      {key}
+                    </Button>
+                  )
+                )}
+              </Box>
+            </Box>
+
+            {/* Comment Input */}
+            <Box sx={{ width: "100%", position: "relative" }}>
+              <FormControl
                 sx={{
                   width: "100%",
-                  p: 0.5, // cancel the default negative margins Grid adds
+                  flexGrow: 1,
+                  minWidth: 0,
+                }}
+              >
+                <TextField
+                  variant="outlined"
+                  multiline
+                  label={"Comment"}
+                  minRows={2}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  inputRef={inputRef}
+                  sx={{
+                    ...sharedStyles,
+                    mt: 0.5,
+                    flexGrow: 1,
+                    minWidth: 0,
+                    "& .MuiInputBase-inputMultiline": {
+                      color: "#555",
+                      fontSize: 18,
+                      minHeight: "40px",
+                    },
+                  }}
+                />
+              </FormControl>
+            </Box>
+
+            {/* Clear comment and Close Buttons */}
+            <Box display="flex" gap={0.4} my={0.5} width="100%">
+              <Button
+                variant="outlined"
+                onClick={() => setComment("")}
+                sx={{
+                  backgroundColor: "#f0c808",
+                  color: "white",
+                  fontSize: 14,
+                  "&:hover": {
+                    backgroundColor: "#ff8600",
+                  },
+                  border: 0,
+                  borderRadius: 0.5,
+                  height: "50px",
+                  width: "100%",
+                  minWidth: 0, // Prevents default button minWidth from breaking layout
+                  minWidth: 0,
+                }}
+              >
+                Clear
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={handleClose}
+                sx={{
+                  backgroundColor: "#d00000",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#ba324f",
+                  },
+                  border: 0,
+                  borderRadius: 0.5,
+                  height: "50px",
+                  width: "30%",
+                  minWidth: 0, // Prevents default button minWidth from breaking layout
+                  minWidth: 0,
+                }}
+              >
+                Close
+              </Button>
+            </Box>
+          </Popover>
+
+          {/* 1st Column Items grid */}
+          <div className="md:col-span-4">
+            <Box
+              sx={{
+                p: 0.5,
+                border: "1px solid #45a29e",
+                height: { xs: "auto", md: 630 },
+                overflowY: { xs: "visible", md: "auto" },
+                backgroundColor: "#ebf1fa",
+              }}
+            >
+              <Grid container spacing={1} sx={{ mb: 0.5 }}>
+                {/* StatCard Box */}
+                <Grid item xs={12}>
+                  <Box
+                    sx={{
+                      backgroundColor: "#ebf1fa",
+                      height: "100%",
+                      textAlign: "midle",
+                      mt: 1,
+                    }}
+                  >
+                    <StatCardVend
+                      title2="Today Sales"
+                      icon={
+                        <PointOfSaleIcon
+                          sx={{
+                            color: "#118ab2",
+                            fontSize: "26px",
+                          }}
+                        />
+                      }
+                      title={`€ ${formatCurrency(totalSalesToday)}`}
+                      icon1={
+                        <LoyaltyOutlinedIcon
+                          sx={{ color: "#118ab2", fontSize: "26px" }}
+                        />
+                      }
+                      subtitle={`${todaysSales.length} Sales`}
+                      icon2={
+                        <CategoryOutlinedIcon
+                          sx={{ color: "#118ab2", fontSize: "26px" }}
+                        />
+                      }
+                      subtitle2={`${totalItemsToday} Items`}
+                    />
+                  </Box>
+                </Grid>
+
+                {/* Tabs Box */}
+                <Grid item xs={12}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      width: "100%",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Tabs
+                      orientation={isSmall ? "vertical" : "horizontal"}
+                      value={selectedTab}
+                      onChange={(_e, newValue) => setSelectedTab(newValue)}
+                      variant={isSmall ? "scrollable" : "fullWidth"}
+                      sx={{
+                        width: "100%",
+                        //   backgroundColor: "red",
+                        "& .MuiTabs-flexContainer": {
+                          flexDirection: isSmall ? "column" : "row",
+                          gap: "2px",
+                          width: "100%", // ensure container fills parent
+                        },
+                        "& .MuiTab-root": {
+                          flex: 1,
+                          minWidth: 0,
+                          width: "100%", // 👈 force tab to take full row/col
+                          minHeight: "61px",
+                          backgroundColor: "#545e75",
+                          fontSize: 16,
+                          fontWeight: 100,
+                          color: "#cae9ff",
+                          justifyContent: "center",
+                          "&.Mui-selected": {
+                            color: "#a7d7c5",
+                            fontWeight: 700,
+                            fontSize: 18,
+                            backgroundColor: "#1a9cb3",
+                          },
+                          "&:hover": {
+                            backgroundColor: "#007090",
+                            fontWeight: 600,
+                          },
+                        },
+                        "& .MuiTab-wrapper": {
+                          width: "100%", // 👈 make label wrapper fill too
+                        },
+                      }}
+                    >
+                      {categories.map((cat, index) => (
+                        <Tab label={cat} key={index} />
+                      ))}
+                    </Tabs>
+                  </Box>
+                </Grid>
+              </Grid>
+
+              {/* Items Grid */}
+              <Grid2
+                container
+                spacing={0.5}
+                sx={{
+                  width: "100%",
+                  p: 0, // cancel the default negative margins Grid adds
                   /* keep items packed to the top, so empty space is below them */
                   alignContent: "flex-start",
-                  backgroundColor: "Black",
+                  //  backgroundColor: "Black",
                 }}
               >
                 {sampleMenu.map((item) => (
@@ -813,546 +1239,166 @@ const POSPage = () => {
                 ))}
               </Grid2>
             </Box>
+          </div>
 
-            {/* 2 nd Column Tab menu */}
+          {/* 2rd Column: Sales Summary */}
+          <div className="md:col-span-2">
             <Box
+              flex={2}
+              width="100%"
+              py={1}
+              px={1}
               sx={{
-                gridColumn: "span 3",
-                width: "100%", // Narrow middle column
+                flexGrow: 1,
+                backgroundColor: "#ebf1fa",
+                border: "1px solid #45a29e",
+                height: "630px",
               }}
             >
-              {/* StadCards */}
-              <Box
+              <IconButton
+                onClick={handleClick}
+                variant="contained"
+                color="primary"
                 sx={{
-                  backgroundColor: "#ebf1fa",
-                  border: "1px solid #45a29e",
-                  mt: 1,
-                  height: "165px",
-                }}
-              >
-                <StatCardVend
-                  title2={`Today Sales`}
-                  icon={
-                    <PointOfSaleIcon
-                      sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-                    />
-                  }
-                  title={`€ ${formatCurrency(totalSalesToday)}`}
-                  icon1={
-                    <LoyaltyOutlinedIcon
-                      sx={{ color: colors.orange[500], fontSize: "26px" }}
-                    />
-                  }
-                  subtitle={`${todaysSales.length} Sales`}
-                  icon2={
-                    <CategoryOutlinedIcon
-                      sx={{ color: colors.primary[200], fontSize: "26px" }}
-                    />
-                  }
-                  subtitle2={`${totalItemsToday} Items`}
-                />
-              </Box>
-
-              {/* Tab Menu */}
-              <Box
-                sx={{
-                  display: "flex",
+                  color: "white",
+                  mb: 2,
+                  backgroundColor: "#669bbc",
+                  borderRadius: 1,
                   width: "100%",
-                  justifyContent: "center", // Center horizontally
+                  height: "70px",
+                  "&:hover": {
+                    backgroundColor: "#118ab2", // Optional hover color
+                  },
                 }}
               >
-                <Tabs
-                  orientation="vertical"
-                  value={selectedTab}
-                  onChange={(_e, newValue) => setSelectedTab(newValue)}
-                  variant="standard"
-                  sx={{
-                    height: "100%", // Full height
-                    width: "100%", // Fixed width (optional)
-                    mt: 0.5,
-                    backgroundColor: "red",
-                  }}
-                >
-                  {categories.map((cat, index) => (
-                    <Tab
-                      label={cat}
-                      key={index}
-                      sx={{
-                        backgroundColor: "#545e75",
-                        width: "100%",
-                        maxWidth: "100%",
-                        fontSize: 16,
-                        fontWeight: 100,
-                        color: "#cae9ff",
-                        height: "61px",
-                        justifyContent: "center",
-                        borderBottom: "1px solid lightGray",
-                        "&.Mui-selected": {
-                          color: "#a7d7c5",
-                          fontWeight: 700,
-                          fontSize: 18,
-                          backgroundColor: "#1a9cb3",
-                        },
-                        "&:hover": {
-                          backgroundColor: "#007090",
-                          fontWeight: 600,
-                        },
-                      }}
-                    />
-                  ))}
-                </Tabs>
-              </Box>
+                Check out
+              </IconButton>
 
-              {/* KeyPad Received Amount */}
-              <Box className="flex-1 mt-1">
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(3, 1fr)",
-                    gap: 0.1,
-                    mt: 0,
-                    border: "1px solid #003049",
-                  }}
-                >
-                  {[
-                    "1",
-                    "2",
-                    "3",
-                    "4",
-                    "5",
-                    "6",
-                    "7",
-                    "8",
-                    "9",
-                    ".",
-                    "0",
-                    "backspace",
-                  ].map((key) =>
-                    key === "backspace" ? (
-                      <IconButton
-                        key="backspace"
-                        onClick={() =>
-                          setReceivedAmount((prev) => prev.slice(0, -1))
-                        }
-                        sx={{
-                          height: 50,
-                          fontSize: 24,
-                          width: "100%", // Makes it fill the grid column
-                          minWidth: 0, // Crucial for responsiveness
-                          border: "1px solid #003049",
-                          borderRadius: 1,
-                          color: "#003049",
-                          "&:hover": {
-                            backgroundColor: "#f0fff1",
-                          },
-                        }}
-                      >
-                        <BackspaceIcon />
-                      </IconButton>
-                    ) : (
-                      <Button
-                        key={key}
-                        variant="outlined"
-                        onClick={() => handleKeypadInput(key)}
-                        sx={{
-                          height: 50,
-                          fontSize: 34,
-                          border: "1px solid #003049",
-                          color: "#003049",
-                          width: "100%", // Ensures button fills grid cell
-                          minWidth: 0, // Prevents default button minWidth from breaking layout
-                          "&:hover": {
-                            backgroundColor: "#f0fff1",
-                          },
-                        }}
-                      >
-                        {key}
-                      </Button>
-                    )
-                  )}
-                </Box>
-              </Box>
-
-              {/* Comment box */}
               <Box
-                className="flex-1 mb-2 mt-1 w-full"
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
+                mb={3}
                 sx={{
-                  backgroundColor: "#white",
-                  height: 66,
+                  width: "100%",
+                  minWidth: "0", // Ensure it doesn't shrink too much
+                  textAlign: "center", // Center all text inside
+                  borderBottom: "1px solid #3FA89B",
+                  paddingBottom: 1,
                 }}
               >
-                <IconButton
-                  onClick={handleClick}
-                  color="primary"
-                  sx={{
-                    borderRadius: 0,
-                    width: "100%",
-                    height: "100%",
-                    border: "2px solid #003049",
-                    "&:hover": {
-                      backgroundColor: "#f0fff1",
-                    },
-                  }}
+                <Typography sx={{ color: "#3FA89B", fontSize: 18 }}>
+                  Order Summary
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#333", fontSize: 14 }}
                 >
+                  {formattedDate}
+                </Typography>
+              </Box>
+
+              {/* Order Items */}
+              <Box
+                sx={{
+                  maxHeight: "205px",
+                  overflowY: "auto",
+                  pr: 1,
+                  scrollbarWidth: "none",
+                  "&::-webkit-scrollbar": {
+                    display: "none",
+                  },
+                }}
+              >
+                {order.map((item) => (
                   <Box
+                    key={item.id}
                     display="flex"
+                    justifyContent="space-between"
                     alignItems="center"
-                    gap={1}
+                    mt={0} // Reduced vertical spacing
                     sx={{
-                      color: "#003049",
-                      height: "100%",
-                    }}
-                  >
-                    <ChatBubbleOutlineIcon />
-                    <span>Comment</span>
-                  </Box>
-                </IconButton>
-
-                <Popover
-                  id={id}
-                  open={open}
-                  anchorEl={anchorEl}
-                  onClose={handleClose}
-                  onEntered={() => {
-                    if (inputRef.current) {
-                      inputRef.current.focus();
-                    }
-                  }}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left",
-                  }}
-                >
-                  <Box sx={{ width: 250, position: "relative", p: 0 }}>
-                    {/* Close Button */}
-                    <IconButton
-                      size="small"
-                      onClick={handleClose}
-                      sx={{
-                        position: "absolute",
-                        top: 4,
-                        right: 4,
-                        zIndex: 1,
-                        color: "#006ba6",
-                      }}
-                    >
-                      <CancelOutlinedIcon fontSize="small" />
-                    </IconButton>
-
-                    {/* Comment Input */}
-                    <FormControl fullWidth>
-                      <TextField
-                        fullWidth
-                        variant="outlined"
-                        multiline
-                        minRows={2}
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        inputRef={inputRef}
-                        sx={{
-                          backgroundColor: "#ebf1fa",
-                          border: "2px solid #006ba6",
-                          borderRadius: 1,
-                          "& .MuiInputBase-inputMultiline": {
-                            color: "#333",
-                            fontSize: 16,
-                            minHeight: "40px",
-                            backgroundColor: "#ebf1fa",
-                          },
-                        }}
-                      />
-                    </FormControl>
-                  </Box>
-                </Popover>
-              </Box>
-            </Box>
-
-            {/* 3rd Column: Sales Summary */}
-            <Box
-              sx={{
-                gridColumn: "span 4", // Remaining 3 columns
-                p: 0.5,
-                mt: 0.5,
-              }}
-            >
-              <Box
-                className="w-full"
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-              >
-                {/* Icon buttons in one row */}
-                <Grid
-                  container
-                  sx={{ width: "100%", flexGrow: 1 }} // Optional: constrain width
-                >
-                  {[
-                    {
-                      value: "Espèces",
-                      icon: <AttachMoneyIcon />,
-                      bgColor: "#545e75",
-                      color: "#35ff69",
-                    },
-                    {
-                      value: "CB",
-                      icon: <CreditCardIcon />,
-                      bgColor: "#545e75",
-                      color: "#54defd",
-                    },
-                    {
-                      value: "Bon d'achat",
-                      icon: <LocalActivityOutlinedIcon />,
-                      bgColor: "#545e75",
-                      color: "#ff3cc7",
-                    },
-                    {
-                      value: "Autres",
-                      icon: <PaymentsOutlinedIcon />,
-                      bgColor: "#545e75",
-                      color: "#fed811",
-                    },
-                  ].map(({ value, icon, bgColor, color }) => (
-                    <Grid item xs={3} key={value}>
-                      <Tooltip
-                        title={value}
-                        arrow
-                        placement="top"
-                        slotProps={{
-                          tooltip: {
-                            sx: {
-                              fontSize: 14,
-                              fontWeight: 600,
-                              backgroundColor: "#233d4d",
-                              color: "white",
-                            },
-                          },
-                        }}
-                      >
-                        <IconButton
-                          value={value}
-                          onClick={() => handlePaymentTypeChange(value)}
-                          sx={{
-                            color: paymentType === value ? "#ccdbdc" : "#777",
-                            transition: "0.2s",
-                            "&:hover": {
-                              color: "#3FA89B",
-                              backgroundColor: "#007090",
-                            },
-                            backgroundColor:
-                              paymentType === value ? "#1a9cb3" : bgColor,
-                            borderColor:
-                              paymentType === value ? "#005ae0" : "#008083",
-                            borderRadius: 0,
-                            height: "60px",
-                            width: "100%",
-                            border: "1px solid white",
-                          }}
-                        >
-                          {React.cloneElement(icon, {
-                            sx: { fontSize: 32, color: color },
-                          })}
-                        </IconButton>
-                      </Tooltip>
-                    </Grid>
-                  ))}
-                </Grid>
-
-                {/* Save buttons below */}
-                <Box display="flex" gap={0.4} my={0.5} width="100%">
-                  <Button
-                    variant="outlined"
-                    startIcon={<Save />}
-                    onClick={() => saveSale(false)}
-                    disabled={disableActionButtons}
-                    sx={{
-                      backgroundColor: "#26A889",
-                      color: "white",
-                      "&:hover": {
-                        backgroundColor: "#62CDB4",
+                      maxHeight: "200px !important",
+                      overflowY: "auto",
+                      scrollbarWidth: "none", // Firefox
+                      "&::-webkit-scrollbar": {
+                        display: "none", // Chrome, Safari, Edge
                       },
-                      border: 0,
-                      borderRadius: 0,
-                      height: "100px",
-                      width: "100%",
-                      minWidth: 0, // Prevents default button minWidth from breaking layout
-                      minWidth: 0,
-                      opacity: disableActionButtons ? 0.5 : 1, // Optional: visual feedback
-                      pointerEvents: disableActionButtons ? "none" : "auto", // Optional: make fully inactive
                     }}
                   >
-                    Pay & Save
-                  </Button>
-
-                  <Button
-                    variant="outlined"
-                    startIcon={<Print />}
-                    onClick={() => saveSale(true)}
-                    disabled={disableActionButtons}
-                    sx={{
-                      backgroundColor: "#00b4d8",
-                      color: "white",
-                      fontSize: 14,
-                      "&:hover": {
-                        backgroundColor: "#90e0ef",
-                      },
-                      border: 0,
-                      borderRadius: 0,
-                      height: "100px",
-                      width: "100%",
-                      minWidth: 0, // Prevents default button minWidth from breaking layout
-                      minWidth: 0,
-                      opacity: disableActionButtons ? 0.5 : 1,
-                      pointerEvents: disableActionButtons ? "none" : "auto",
-                    }}
-                  >
-                    Pay & Print
-                  </Button>
-                </Box>
-              </Box>
-
-              {/* Sales Sumary */}
-              <Box
-                flex={2}
-                width="100%"
-                py={1}
-                px={2}
-                sx={{
-                  flexGrow: 1,
-                  backgroundColor: "#ebf1fa",
-                  border: "1px solid #45a29e",
-                }}
-              >
-                <Box
-                  mb={3}
-                  sx={{
-                    width: "100%",
-                    minWidth: "0", // Ensure it doesn't shrink too much
-                    textAlign: "center", // Center all text inside
-                    borderBottom: "1px solid #3FA89B",
-                    paddingBottom: 1,
-                  }}
-                >
-                  <Typography sx={{ color: "#3FA89B", fontSize: 18 }}>
-                    Order Summary
-                  </Typography>
-
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "#333", fontSize: 14 }}
-                  >
-                    {formattedDate}
-                  </Typography>
-                </Box>
-
-                {/* Order Items */}
-                <Box
-                  sx={{
-                    maxHeight: "205px",
-                    overflowY: "auto",
-                    pr: 1,
-                    scrollbarWidth: "none",
-                    "&::-webkit-scrollbar": {
-                      display: "none",
-                    },
-                  }}
-                >
-                  {order.map((item) => (
-                    <Box
-                      key={item.id}
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      mt={0} // Reduced vertical spacing
-                      sx={{
-                        maxHeight: "200px !important",
-                        overflowY: "auto",
-                        scrollbarWidth: "none", // Firefox
-                        "&::-webkit-scrollbar": {
-                          display: "none", // Chrome, Safari, Edge
-                        },
-                      }}
-                    >
-                      <Typography
-                        sx={{ fontSize: "0.875rem", lineHeight: 1.2 }}
-                      >
-                        {item.quantity} {item.name} (€
-                        {item.originalPrice?.toFixed(2)})
-                        {item.price !== item.originalPrice &&
-                          ` → €${item.price.toFixed(2)}`}
+                    <Typography sx={{ fontSize: "0.875rem", lineHeight: 1.2 }}>
+                      {item.quantity} {item.name} (€
+                      {item.originalPrice?.toFixed(2)})
+                      {item.price !== item.originalPrice &&
+                        ` → €${item.price.toFixed(2)}`}
+                    </Typography>
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                      <Typography>
+                        €{(item.quantity * item.price).toFixed(2)}
                       </Typography>
-                      <Box display="flex" alignItems="center" gap={0.5}>
-                        <Typography>
-                          €{(item.quantity * item.price).toFixed(2)}
-                        </Typography>
-                        <IconButton
-                          onClick={() => removeFromOrder(item)}
-                          sx={{ color: "#af3800", p: "4px" }} // Smaller button padding
-                        >
-                          <CancelOutlinedIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
+                      <IconButton
+                        onClick={() => removeFromOrder(item)}
+                        sx={{ color: "#af3800", p: "4px" }} // Smaller button padding
+                      >
+                        <CancelOutlinedIcon fontSize="small" />
+                      </IconButton>
                     </Box>
-                  ))}
+                  </Box>
+                ))}
+              </Box>
+
+              {/* Footer */}
+              <Box mt={2} sx={{ width: "100%", minWidth: 0 }}>
+                {/* Row 1 */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    borderTop: "1px solid #3FA89B",
+                    paddingTop: 1,
+                  }}
+                >
+                  <Typography sx={{ color: "#4a4e69", fontSize: 20 }}>
+                    Total:
+                  </Typography>
+                  <Typography sx={{ color: "#4a4e69", fontSize: 40 }}>
+                    €{formatCurrency(calculateTotal())}
+                  </Typography>
                 </Box>
 
-                {/* Footer */}
-                <Box mt={2} sx={{ width: "100%", minWidth: 0 }}>
-                  {/* Row 1 */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      borderTop: "1px solid #3FA89B",
-                      paddingTop: 1,
-                    }}
-                  >
-                    <Typography sx={{ color: "#4a4e69", fontSize: 20 }}>
-                      Total:
-                    </Typography>
-                    <Typography sx={{ color: "#4a4e69", fontSize: 40 }}>
-                      €{formatCurrency(calculateTotal())}
-                    </Typography>
-                  </Box>
+                {/* Row 2 */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography sx={{ color: "#3FA89B", fontSize: 20 }}>
+                    Received:
+                  </Typography>
+                  <Typography sx={{ color: "#3FA89B", fontSize: 25 }}>
+                    €{formatCurrency(receivedAmount)}
+                  </Typography>
+                </Box>
 
-                  {/* Row 2 */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography sx={{ color: "#3FA89B", fontSize: 20 }}>
-                      Received:
-                    </Typography>
-                    <Typography sx={{ color: "#3FA89B", fontSize: 25 }}>
-                      €{formatCurrency(receivedAmount)}
-                    </Typography>
-                  </Box>
-
-                  {/* Row 3 */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography sx={{ color: "#f07167", fontSize: 20 }}>
-                      Change:
-                    </Typography>
-                    <Typography sx={{ color: "#f07167", fontSize: 25 }}>
-                      €{formatCurrency(calculateChange())}
-                    </Typography>
-                  </Box>
+                {/* Row 3 */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography sx={{ color: "#f07167", fontSize: 20 }}>
+                    Change:
+                  </Typography>
+                  <Typography sx={{ color: "#f07167", fontSize: 25 }}>
+                    €{formatCurrency(calculateChange())}
+                  </Typography>
                 </Box>
               </Box>
             </Box>
-          </Box>
+          </div>
         </motion.div>
       </main>
     </div>
