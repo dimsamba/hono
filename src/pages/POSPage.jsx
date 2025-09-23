@@ -1027,20 +1027,28 @@ const POSPage = () => {
               sx={{
                 border: "1px solid #45a29e",
                 height: { xs: "auto", md: 630 },
-                overflowY: { xs: "visible", md: "auto" },
+                overflowX: "hidden", // 👈 stop horizontal scroll
                 backgroundColor: "#ebf1fa",
               }}
             >
-              <Grid container spacing={1} sx={{ mb: 0.5 }}>
+              <Grid
+                container
+                spacing={1}
+                sx={{
+                  mb: 0.5,
+                //  backgroundColor: "Orange",
+                }}
+              >
                 {/* StatCard Box */}
                 <Grid item xs={12}>
                   <Box
                     sx={{
                       backgroundColor: "#264653",
                       height: "70px",
-                      textAlign: "midle",
-                      display: "flex", // 👈 enable flexbox
-                      justifyContent: "center", // 👈 center horizontally
+                      textAlign: "center",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center", // vertically center StatCardVend
                     }}
                   >
                     <StatCardVend
@@ -1071,16 +1079,14 @@ const POSPage = () => {
                 </Grid>
 
                 {/* Tabs Box */}
-                {/* <Grid item xs={12} sx={{ backgroundColor: "green"}}> */}
                 <Grid
                   container
                   spacing={0}
                   sx={{
-                    display: "flex",
-                    textAlign: "midle",
+                    mx: 0,
                     width: "100%",
                     mt: 0.3,
-                    justifyContent: "center", // 👈 center horizontally
+                    justifyContent: "center",
                   }}
                 >
                   <Box
@@ -1095,18 +1101,15 @@ const POSPage = () => {
                       onChange={(_e, newValue) => setSelectedTab(newValue)}
                       variant={isSmall ? "scrollable" : "fullWidth"}
                       sx={{
-                        display: "flex", // 👈 enable flexbox
-                        justifyContent: "center", // 👈 center horizontally
                         width: "100%",
                         "& .MuiTabs-flexContainer": {
                           gap: "2px",
-                          width: "100%", // ensure container fills parent
+                          flexDirection: isSmall ? "column" : "row", // make sure orientation matches
                         },
                         "& .MuiTab-root": {
-                          flex: 1,
+                          flexGrow: 1,
                           minWidth: 0,
-                          width: "100%", // 👈 force tab to take full row/col
-                          minHeight: "61px",
+                          minHeight: "55px",
                           backgroundColor: "#545e75",
                           fontSize: 16,
                           fontWeight: 100,
@@ -1123,20 +1126,17 @@ const POSPage = () => {
                           },
                         },
                         "& .MuiTab-wrapper": {
-                          width: "100%", // 👈 make label wrapper fill too
+                          width: "100%",
+                        },
+                        // 👇 Fix indicator position for vertical mode
+                        "& .MuiTabs-indicator": {
+                          left: 0, // align to left edge of each Tab
+                          width: "4px", // indicator thickness
                         },
                       }}
                     >
                       {categories.map((cat, index) => (
-                        <Tab
-                          label={cat}
-                          key={index}
-                          sx={{
-                            flexGrow: 1,
-                            width: "100%",
-                            minWidth: 0,
-                          }}
-                        />
+                        <Tab label={cat} key={index} />
                       ))}
                     </Tabs>
                   </Box>
@@ -1148,11 +1148,10 @@ const POSPage = () => {
                 container
                 spacing={0.5}
                 sx={{
+                  mx: 0,
                   width: "100%",
-                  p: 0, // cancel the default negative margins Grid adds
-                  /* keep items packed to the top, so empty space is below them */
+                  p: 0,
                   alignContent: "flex-start",
-                  //  backgroundColor: "Black",
                 }}
               >
                 {sampleMenu.map((item) => (
@@ -1279,8 +1278,8 @@ const POSPage = () => {
             <Box
               flex={2}
               width="100%"
-              py={1}
-              px={1}
+              //  py={1}
+              //  px={1}
               sx={{
                 flexGrow: 1,
                 backgroundColor: "#ebf1fa",
@@ -1295,12 +1294,12 @@ const POSPage = () => {
                 sx={{
                   color: "white",
                   mb: 2,
-                  backgroundColor: "#669bbc",
-                  borderRadius: 1,
+                  backgroundColor: "#e36414",
+                  borderRadius: 0,
                   width: "100%",
                   height: "70px",
                   "&:hover": {
-                    backgroundColor: "#118ab2", // Optional hover color
+                    backgroundColor: "#9a031e", // Optional hover color
                   },
                 }}
               >
@@ -1317,15 +1316,8 @@ const POSPage = () => {
                   paddingBottom: 1,
                 }}
               >
-                <Typography sx={{ color: "#3FA89B", fontSize: 18 }}>
+                <Typography sx={{ color: "#007ea7", fontSize: 18 }}>
                   Order Summary
-                </Typography>
-
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#333", fontSize: 14 }}
-                >
-                  {formattedDate}
                 </Typography>
               </Box>
 
@@ -1334,7 +1326,7 @@ const POSPage = () => {
                 sx={{
                   maxHeight: "205px",
                   overflowY: "auto",
-                  pr: 1,
+                  px: 0.5,
                   scrollbarWidth: "none",
                   "&::-webkit-scrollbar": {
                     display: "none",
@@ -1347,7 +1339,6 @@ const POSPage = () => {
                     display="flex"
                     justifyContent="space-between"
                     alignItems="center"
-                    mt={0} // Reduced vertical spacing
                     sx={{
                       maxHeight: "200px !important",
                       overflowY: "auto",
@@ -1357,19 +1348,31 @@ const POSPage = () => {
                       },
                     }}
                   >
-                    <Typography sx={{ fontSize: "0.875rem", lineHeight: 1.2 }}>
+                    <Typography
+                      sx={{
+                        fontSize: "0.875rem",
+                        lineHeight: 1.2,
+                        color: "#1b4965",
+                      }}
+                    >
                       {item.quantity} {item.name} (€
                       {item.originalPrice?.toFixed(2)})
                       {item.price !== item.originalPrice &&
                         ` → €${item.price.toFixed(2)}`}
                     </Typography>
                     <Box display="flex" alignItems="center" gap={0.5}>
-                      <Typography>
+                      <Typography
+                        sx={{
+                          fontSize: "0.875rem",
+                          lineHeight: 1.2,
+                          color: "#1b4965",
+                        }}
+                      >
                         €{(item.quantity * item.price).toFixed(2)}
                       </Typography>
                       <IconButton
                         onClick={() => removeFromOrder(item)}
-                        sx={{ color: "#af3800", p: "4px" }} // Smaller button padding
+                        sx={{ color: "#1b4965", p: "4px" }} // Smaller button padding
                       >
                         <CancelOutlinedIcon fontSize="small" />
                       </IconButton>
@@ -1379,7 +1382,7 @@ const POSPage = () => {
               </Box>
 
               {/* Footer */}
-              <Box mt={2} sx={{ width: "100%", minWidth: 0 }}>
+              <Box mt={1} sx={{ width: "100%", minWidth: 0 }}>
                 {/* Row 1 */}
                 <Box
                   sx={{
@@ -1387,13 +1390,14 @@ const POSPage = () => {
                     justifyContent: "space-between",
                     alignItems: "center",
                     borderTop: "1px solid #3FA89B",
-                    paddingTop: 1,
+                    px: 0.5,
+                    height: "60px",
                   }}
                 >
-                  <Typography sx={{ color: "#007ea7", fontSize: 20 }}>
+                  <Typography sx={{ color: "#007ea7", fontSize: 30 }}>
                     Total:
                   </Typography>
-                  <Typography sx={{ color: "#007ea7", fontSize: 40 }}>
+                  <Typography sx={{ color: "#007ea7", fontSize: 30 }}>
                     €{formatCurrency(calculateTotal())}
                   </Typography>
                 </Box>
@@ -1404,6 +1408,8 @@ const POSPage = () => {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    px: 0.5,
+                    height: "20px",
                   }}
                 >
                   <Typography sx={{ color: "#1b4965", fontSize: 20 }}>
@@ -1420,6 +1426,7 @@ const POSPage = () => {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    px: 0.5,
                   }}
                 >
                   <Typography sx={{ color: "#d90368", fontSize: 20 }}>
