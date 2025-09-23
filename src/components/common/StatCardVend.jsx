@@ -22,7 +22,7 @@ const StatCardVend = ({
       px={5}
     >
       <Box>
-        <Typography
+        {/* <Typography
           variant="h3"
           sx={{
             color: "#666",
@@ -30,7 +30,7 @@ const StatCardVend = ({
           }}
         >
           {title2}
-        </Typography>
+        </Typography> */}
       </Box>
       <Box display="flex" alignItems="center" gap="5px">
         <Box>{icon}</Box>
