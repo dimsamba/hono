@@ -18,11 +18,14 @@ const StatCardVend = ({
       display="flex"
       justifyContent="space-between"
       alignItems="center"
-      py={0.5}
-      px={5}
+      px={2}
+      sx={{
+        maxWidth:"500px",
+     //   backgroundColor: "red"
+      }}
     >
-      <Box>
-        {/* <Typography
+      {/* <Box>
+        <Typography
           variant="h3"
           sx={{
             color: "#666",
@@ -30,29 +33,29 @@ const StatCardVend = ({
           }}
         >
           {title2}
-        </Typography> */}
-      </Box>
+        </Typography>
+      </Box> */}
       <Box display="flex" alignItems="center" gap="5px">
-        <Box>{icon}</Box>
+        {/* <Box>{icon}</Box> */}
         <Typography
-          variant="h4"
-          sx={{ color: "#118ab2", fontWeight: "bold" }}
+          variant="h2"
+          sx={{ color: "#e0fbfc", fontWeight: "bold", fontWeight: 400 }}
         >
           {title}
         </Typography>
       </Box>
       <Box display="flex" alignItems="center" gap="5px">
-        <Box>{icon1}</Box>
+        {/* <Box>{icon1}</Box> */}
         <Typography
           variant="h4"
-          sx={{color: "#118ab2", fontWeight: "bold" }}
+          sx={{color: "#f1faee", fontWeight: "bold", fontWeight: 300 }}
         >
           {subtitle}
         </Typography>
       </Box>
       <Box display="flex" alignItems="center" gap="5px">
-        <Box>{icon2}</Box>
-        <Typography variant="h4" sx={{ color: "#118ab2", fontWeight: "bold" }}>
+        {/* <Box>{icon2}</Box> */}
+        <Typography variant="h4" sx={{ color: "#f1faee", fontWeight: "bold", fontWeight: 300 }}>
           {subtitle2}
         </Typography>
       </Box>

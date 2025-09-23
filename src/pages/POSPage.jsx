@@ -705,18 +705,34 @@ const POSPage = () => {
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                justifyContent: "space-between", // keep left & right separation
+                alignItems: "flex-end", // 👈 push text to bottom
                 borderTop: "1px solid #3FA89B",
-                paddingTop: 0,
                 px: 0.5,
+                height: "50px", // 👈 give it a fixed or relative height
               }}
             >
-              <Typography sx={{ color: "#4a4e69", fontSize: 28 }}>
-                Total:
+              <Typography sx={{ color: "#007ea7", fontSize: 28 }}>
+                Sale Total:
               </Typography>
-              <Typography sx={{ color: "#4a4e69", fontSize: 40 }}>
+              <Typography sx={{ color: "#007ea7", fontSize: 28 }}>
                 €{formatCurrency(calculateTotal())}
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between", // keep left & right separation
+                alignItems: "flex-end", // 👈 push text to bottom
+                px: 0.5,
+                height: "20px", // 👈 give it a fixed or relative height
+              }}
+            >
+              <Typography sx={{ color: "#1b4965", fontSize: 18 }}>
+                Received:
+              </Typography>
+              <Typography sx={{ color: "#1b4965", fontSize: 20 }}>
+                €{formatCurrency(receivedAmount)}
               </Typography>
             </Box>
             {/* Icon buttons in one row */}
@@ -1009,7 +1025,6 @@ const POSPage = () => {
           <div className="md:col-span-4">
             <Box
               sx={{
-                p: 0.5,
                 border: "1px solid #45a29e",
                 height: { xs: "auto", md: 630 },
                 overflowY: { xs: "visible", md: "auto" },
@@ -1021,10 +1036,11 @@ const POSPage = () => {
                 <Grid item xs={12}>
                   <Box
                     sx={{
-                      backgroundColor: "#ebf1fa",
-                      height: "100%",
+                      backgroundColor: "#264653",
+                      height: "70px",
                       textAlign: "midle",
-                      mt: 1,
+                      display: "flex", // 👈 enable flexbox
+                      justifyContent: "center", // 👈 center horizontally
                     }}
                   >
                     <StatCardVend
@@ -1055,12 +1071,22 @@ const POSPage = () => {
                 </Grid>
 
                 {/* Tabs Box */}
-                <Grid item xs={12}>
+                {/* <Grid item xs={12} sx={{ backgroundColor: "green"}}> */}
+                <Grid
+                  container
+                  spacing={0}
+                  sx={{
+                    display: "flex",
+                    textAlign: "midle",
+                    width: "100%",
+                    mt: 0.3,
+                    justifyContent: "center", // 👈 center horizontally
+                  }}
+                >
                   <Box
                     sx={{
                       display: "flex",
                       width: "100%",
-                      justifyContent: "center",
                     }}
                   >
                     <Tabs
@@ -1069,10 +1095,10 @@ const POSPage = () => {
                       onChange={(_e, newValue) => setSelectedTab(newValue)}
                       variant={isSmall ? "scrollable" : "fullWidth"}
                       sx={{
+                        display: "flex", // 👈 enable flexbox
+                        justifyContent: "center", // 👈 center horizontally
                         width: "100%",
-                        //   backgroundColor: "red",
                         "& .MuiTabs-flexContainer": {
-                          flexDirection: isSmall ? "column" : "row",
                           gap: "2px",
                           width: "100%", // ensure container fills parent
                         },
@@ -1085,7 +1111,6 @@ const POSPage = () => {
                           fontSize: 16,
                           fontWeight: 100,
                           color: "#cae9ff",
-                          justifyContent: "center",
                           "&.Mui-selected": {
                             color: "#a7d7c5",
                             fontWeight: 700,
@@ -1103,7 +1128,15 @@ const POSPage = () => {
                       }}
                     >
                       {categories.map((cat, index) => (
-                        <Tab label={cat} key={index} />
+                        <Tab
+                          label={cat}
+                          key={index}
+                          sx={{
+                            flexGrow: 1,
+                            width: "100%",
+                            minWidth: 0,
+                          }}
+                        />
                       ))}
                     </Tabs>
                   </Box>
@@ -1357,10 +1390,10 @@ const POSPage = () => {
                     paddingTop: 1,
                   }}
                 >
-                  <Typography sx={{ color: "#4a4e69", fontSize: 20 }}>
+                  <Typography sx={{ color: "#007ea7", fontSize: 20 }}>
                     Total:
                   </Typography>
-                  <Typography sx={{ color: "#4a4e69", fontSize: 40 }}>
+                  <Typography sx={{ color: "#007ea7", fontSize: 40 }}>
                     €{formatCurrency(calculateTotal())}
                   </Typography>
                 </Box>
@@ -1373,10 +1406,10 @@ const POSPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  <Typography sx={{ color: "#3FA89B", fontSize: 20 }}>
+                  <Typography sx={{ color: "#1b4965", fontSize: 20 }}>
                     Received:
                   </Typography>
-                  <Typography sx={{ color: "#3FA89B", fontSize: 25 }}>
+                  <Typography sx={{ color: "#1b4965", fontSize: 25 }}>
                     €{formatCurrency(receivedAmount)}
                   </Typography>
                 </Box>
@@ -1389,10 +1422,10 @@ const POSPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  <Typography sx={{ color: "#f07167", fontSize: 20 }}>
+                  <Typography sx={{ color: "#d90368", fontSize: 20 }}>
                     Change:
                   </Typography>
-                  <Typography sx={{ color: "#f07167", fontSize: 25 }}>
+                  <Typography sx={{ color: "#d90368", fontSize: 25 }}>
                     €{formatCurrency(calculateChange())}
                   </Typography>
                 </Box>
