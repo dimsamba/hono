@@ -6,7 +6,7 @@ import CurrencyExchangeOutlinedIcon from "@mui/icons-material/CurrencyExchangeOu
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import AppsOutlinedIcon from "@mui/icons-material/AppsOutlined";
 import PlaylistAddOutlinedIcon from "@mui/icons-material/PlaylistAddOutlined";
-import FormatListNumberedTwoToneIcon from '@mui/icons-material/FormatListNumberedTwoTone';
+import FormatListNumberedTwoToneIcon from "@mui/icons-material/FormatListNumberedTwoTone";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 
 import icon from "../../../public/icons/icon-192x192.png";
@@ -155,30 +155,41 @@ const Topbar = ({ title }) => {
           />
         </Box>
         {/* Title */}
-        <Typography variant="h4" color="#3FA89B" mr="25px">
+        <Typography variant="h4" color="#007ea7" mr="25px">
           {title}
         </Typography>
 
         {/* Shortcut Icon */}
-        {/* <div
+        <div
           className="relative cursor-pointer"
-          onMouseEnter={handleOpen}
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            backgroundColor: "#e36414",
+            borderRadius: 5,
           }}
         >
           <motion.div
             variants={iconVariants}
             initial="initial"
             whileHover="hover"
-            transition={{ type: "spring", stiffness: 200, damping: 25 }}
+            onClick={() => {
+              navigate("/vendor");
+            }}
+            style={{
+              cursor: "pointer",
+              width: "40px", // 👈 fixed width
+              height: "40px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            <AppsOutlinedIcon sx={{ color: "#3FA89B", fontSize: "35px" }} />
+            <StorefrontOutlinedIcon sx={{ color: "white", fontSize: "35px" }} />
           </motion.div>
-        </div> */}
-
+        </div>
+        {/* 
         <Menu
           anchorEl={shortcutAnchorEl}
           open={openShortcut}
@@ -195,9 +206,9 @@ const Topbar = ({ title }) => {
             },
           }}
         >
-          <Box display="flex" gap={0} justifyContent="center">
-            {/* Overview */}
-            <Tooltip
+          <Box display="flex" gap={0} justifyContent="center"> */}
+        {/* Overview */}
+        {/* <Tooltip
               title="Overview"
               placement="top"
               arrow
@@ -242,10 +253,10 @@ const Topbar = ({ title }) => {
                   sx={{ color: "#0466c8", fontSize: "35px" }}
                 />
               </motion.div>
-            </Tooltip>
+            </Tooltip> */}
 
-            {/* Vendor */}
-            <Tooltip
+        {/* Vendor */}
+        {/* <Tooltip
               title="Vendor"
               placement="top"
               arrow
@@ -290,10 +301,10 @@ const Topbar = ({ title }) => {
                   sx={{ color: "#ff006e", fontSize: "35px" }}
                 />
               </motion.div>
-            </Tooltip>
+            </Tooltip> */}
 
-            {/* Sales */}
-            <Tooltip
+        {/* Sales */}
+        {/* <Tooltip
               title="Sales"
               placement="top"
               arrow
@@ -338,10 +349,10 @@ const Topbar = ({ title }) => {
                   sx={{ color: "#3FA89B", fontSize: "30px" }}
                 />
               </motion.div>
-            </Tooltip>
+            </Tooltip> */}
 
-            {/* Items List */}
-            <Tooltip
+        {/* Items List */}
+        {/* <Tooltip
               title="Item's List"
               placement="top"
               arrow
@@ -386,10 +397,10 @@ const Topbar = ({ title }) => {
                   sx={{ color: "#3FA89B", fontSize: "35px" }}
                 />
               </motion.div>
-            </Tooltip>
+            </Tooltip> */}
 
-             {/* Task List */}
-            <Tooltip
+        {/* Task List */}
+        {/* <Tooltip
               title="Task List"
               placement="top"
               arrow
@@ -434,10 +445,10 @@ const Topbar = ({ title }) => {
                   sx={{ color: "#3FA89B", fontSize: "35px" }}
                 />
               </motion.div>
-            </Tooltip>
+            </Tooltip> */}
 
-             {/* Family Finances */}
-            <Tooltip
+        {/* Family Finances */}
+        {/* <Tooltip
               title="Family Finances"
               placement="top"
               arrow
@@ -484,7 +495,7 @@ const Topbar = ({ title }) => {
               </motion.div>
             </Tooltip>
           </Box>
-        </Menu>
+        </Menu> */}
       </Box>
 
       {/* RIGHT BOX */}
@@ -510,7 +521,12 @@ const Topbar = ({ title }) => {
             >
               <NotificationsActiveOutlinedIcon
                 onClick={stopRingingTimers}
-                sx={{ color: "#eb6424", fontSize: 30, cursor: "pointer", mr: 1 }}
+                sx={{
+                  color: "#007ea7",
+                  fontSize: 30,
+                  cursor: "pointer",
+                  mr: 1,
+                }}
               />
             </motion.div>
           )}
@@ -529,7 +545,7 @@ const Topbar = ({ title }) => {
           >
             <AccessAlarmsOutlinedIcon
               sx={{
-                color: "#3FA89B",
+                color: "#007ea7",
                 fontSize: "30px",
                 mr: 1,
               }}
@@ -550,7 +566,7 @@ const Topbar = ({ title }) => {
             pr: 1,
             fontSize: "1.3rem",
             fontWeight: 500,
-            color: "#3FA899",
+            color: "#007ea7",
             fontFamily: "monospace",
             borderRadius: "6px",
             ml: 2,
@@ -563,7 +579,6 @@ const Topbar = ({ title }) => {
         <IconButton
           sx={{ color: colors.grey[700] }}
           onMouseEnter={(event) => setAnchorEl(event.currentTarget)}
-
         >
           <Badge
             badgeContent={invoiceAlerts.length}
@@ -580,7 +595,7 @@ const Topbar = ({ title }) => {
           >
             <NotificationsOutlinedIcon
               sx={{
-                color: "#3FA89B",
+                color: "#007ea7",
                 fontSize: "27px",
               }}
             />
@@ -613,10 +628,10 @@ const Topbar = ({ title }) => {
               backgroundColor: "#f3f4f6",
             }}
           >
-            <Typography variant="h6">
+            <Typography variant="h6" color="#007ea7">
               <FileCopyOutlinedIcon
                 sx={{
-                  color: colors.greenAccent[700],
+                  color: "#007ea7",
                   fontSize: "16px",
                   mr: 1,
                 }}
@@ -638,7 +653,7 @@ const Topbar = ({ title }) => {
                 sx={{
                   display: "flex",
                   backgroundColor: "#f3f4f6",
-                  color: "#111",
+                  color: "#1b4965",
                 }}
               >
                 <Typography
@@ -764,7 +779,7 @@ const Topbar = ({ title }) => {
           >
             <EventAvailableOutlinedIcon
               sx={{
-                color: "#3FA89B",
+                color: "#007ea7",
                 fontSize: "27px",
               }}
             />
@@ -804,10 +819,10 @@ const Topbar = ({ title }) => {
               },
             }}
           >
-            <Typography variant="h6">
+            <Typography variant="h6" color="#007ea7">
               <EventAvailableOutlinedIcon
                 sx={{
-                  color: colors.greenAccent[700],
+                  color: "#007ea7",
                   fontSize: "16px",
                   mr: 1,
                 }}
@@ -833,7 +848,7 @@ const Topbar = ({ title }) => {
                 }}
                 sx={{
                   backgroundColor: "#f3f4f6", // Tailwind's bg-gray-100
-                  color: "#111",
+                  color: "#1b4965",
                 }}
               >
                 <Typography

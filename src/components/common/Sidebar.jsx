@@ -124,7 +124,7 @@ export default function Sidebar() {
                     className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-200 cursor-pointer mr-2"
                   >
                     <item.icon style={{ fontSize: 25, color: "#3FA89B" }} />
-                    <span className="text-gray-700 font-medium flex items-center justify-between w-full">
+                    <span className="text-[#007ea7] font-medium flex items-center justify-between w-full">
                       {item.name}
                       <ExpandMoreOutlinedIcon
                         className={`ml-2 transition-transform duration-200 ${
@@ -149,7 +149,7 @@ export default function Sidebar() {
                           <child.icon
                             style={{ fontSize: 20, color: "#485696" }}
                           />
-                          <span className="text-gray-700 text-medium">
+                          <span className="text-[#007ea7] text-medium">
                             {child.name}
                           </span>
                         </Link>
@@ -182,7 +182,7 @@ export default function Sidebar() {
                           : "#3FA89B", 
                     }}
                   />
-                  <span className="text-gray-700 font-medium">{item.name}</span>
+                  <span className="text-[#007ea7] font-medium">{item.name}</span>
                 </Link>
               )}
             </div>

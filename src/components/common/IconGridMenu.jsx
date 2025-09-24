@@ -99,7 +99,7 @@ export default function IconGridMenu() {
                 }}
               />
             </motion.div>
-            <span className="mt-1 text-sm font-medium text-gray-700">
+            <span className="mt-1 text-sm font-medium text-[#007ea7]">
               {item.name}
             </span>
           </Link>

@@ -1278,8 +1278,6 @@ const POSPage = () => {
             <Box
               flex={2}
               width="100%"
-              //  py={1}
-              //  px={1}
               sx={{
                 flexGrow: 1,
                 backgroundColor: "#ebf1fa",
