@@ -19,6 +19,9 @@ import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BackspaceIcon from "@mui/icons-material/Backspace";
+import LunchDiningOutlinedIcon from "@mui/icons-material/LunchDiningOutlined";
+import LocalDrinkOutlinedIcon from "@mui/icons-material/LocalDrinkOutlined";
+import AgricultureOutlinedIcon from "@mui/icons-material/AgricultureOutlined";
 
 import {
   Box,
@@ -53,8 +56,13 @@ const POSPage = () => {
   const [paymentType, setPaymentType] = useState("Espèces");
   const [sampleMenu, setSampleMenu] = useState([]);
   const [selectedTab, setSelectedTab] = useState(0);
-  const categories = ["Food", "Beverage", "Produces"];
-  const currentCategory = categories[selectedTab];
+  //const categories = ["Food", "Beverage", "Produces"];
+  const categories = [
+    { label: "Food", icon: <LunchDiningOutlinedIcon /> },
+    { label: "Beverage", icon: <LocalDrinkOutlinedIcon /> },
+    { label: "Produces", icon: <AgricultureOutlinedIcon /> },
+  ];
+  const currentCategory = categories[selectedTab]?.label;
   const formattedDate = `${today.getDate().toString().padStart(2, "0")}-${(
     today.getMonth() + 1
   )
@@ -660,7 +668,7 @@ const POSPage = () => {
   return (
     <div className="flex-1 overflow-hidden relative z-10 bg-[#fcfeff]">
       <main
-        className="max-w-7xl mx-auto scrollbar-hide h-[640px] overflow-y-auto md:overflow-y-hidden bg-[#fcfeff]"
+        className="max-w-7xl mx-auto scrollbar-hide h-[700px] overflow-y-auto md:overflow-y-hidden bg-[#fcfeff]"
         style={{
           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
         }}
@@ -1036,7 +1044,7 @@ const POSPage = () => {
                 spacing={1}
                 sx={{
                   mb: 0.5,
-                //  backgroundColor: "Orange",
+                  //  backgroundColor: "Orange",
                 }}
               >
                 {/* StatCard Box */}
@@ -1045,6 +1053,8 @@ const POSPage = () => {
                     sx={{
                       backgroundColor: "#264653",
                       height: "70px",
+                      borderBottom: "1px solid #45a29e",
+                      width: "100%",
                       textAlign: "center",
                       display: "flex",
                       justifyContent: "center",
@@ -1096,47 +1106,66 @@ const POSPage = () => {
                     }}
                   >
                     <Tabs
-                      orientation={isSmall ? "vertical" : "horizontal"}
                       value={selectedTab}
                       onChange={(_e, newValue) => setSelectedTab(newValue)}
-                      variant={isSmall ? "scrollable" : "fullWidth"}
+                      variant="fullWidth"
                       sx={{
                         width: "100%",
                         "& .MuiTabs-flexContainer": {
                           gap: "2px",
-                          flexDirection: isSmall ? "column" : "row", // make sure orientation matches
+                          flexDirection: "row", // always row
                         },
                         "& .MuiTab-root": {
-                          flexGrow: 1,
-                          minWidth: 0,
+                          flex: 1, // 👈 equal width
+                          minWidth: 0, // 👈 prevents overflow on small screens
                           minHeight: "55px",
-                          backgroundColor: "#545e75",
-                          fontSize: 16,
+                          backgroundColor: "#4f6d7a",
+                          fontSize: "28px",
                           fontWeight: 100,
                           color: "#cae9ff",
                           "&.Mui-selected": {
-                            color: "#a7d7c5",
+                            color: "#333",
                             fontWeight: 700,
-                            fontSize: 18,
-                            backgroundColor: "#1a9cb3",
+                            fontSize: "28px !important",
+                            backgroundColor: "#70e000",
                           },
                           "&:hover": {
-                            backgroundColor: "#007090",
+                            backgroundColor: "#166088",
                             fontWeight: 600,
                           },
                         },
                         "& .MuiTab-wrapper": {
                           width: "100%",
                         },
-                        // 👇 Fix indicator position for vertical mode
                         "& .MuiTabs-indicator": {
-                          left: 0, // align to left edge of each Tab
-                          width: "4px", // indicator thickness
+                          bottom: 0,
+                          left: 0,
+                          height: "4px",
+                          width: "100%",
                         },
                       }}
                     >
                       {categories.map((cat, index) => (
-                        <Tab label={cat} key={index} />
+                        <Tab
+                          key={index}
+                          icon={
+                            React.isValidElement(cat.icon)
+                              ? React.cloneElement(cat.icon, {
+                                  sx: {
+                                    fontSize: { xs: 30, sm: 30, md: 30 },
+                                    "&.Mui-selected": {
+                                      color: "#333",
+                                      backgroundColor: "#70e000",
+                                    },
+                                    "&:hover": {
+                                      backgroundColor: "#166088",
+                                    },
+                                  }, // responsive sizes
+                                })
+                              : null
+                          }
+                          aria-label={cat.label}
+                        />
                       ))}
                     </Tabs>
                   </Box>
