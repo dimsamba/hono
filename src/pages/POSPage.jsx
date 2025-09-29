@@ -1124,14 +1124,15 @@ const POSPage = () => {
                           fontWeight: 100,
                           color: "#cae9ff",
                           "&.Mui-selected": {
-                            color: "#333",
+                            color: "#1e6091",
                             fontWeight: 700,
                             fontSize: "28px !important",
-                            backgroundColor: "#70e000",
+                            backgroundColor: "#4cc9f0",
                           },
                           "&:hover": {
-                            backgroundColor: "#166088",
+                            backgroundColor: "#4cc9f0",
                             fontWeight: 600,
+                            color: "#1e6091",
                           },
                         },
                         "& .MuiTab-wrapper": {
@@ -1153,13 +1154,6 @@ const POSPage = () => {
                               ? React.cloneElement(cat.icon, {
                                   sx: {
                                     fontSize: { xs: 30, sm: 30, md: 30 },
-                                    "&.Mui-selected": {
-                                      color: "#333",
-                                      backgroundColor: "#70e000",
-                                    },
-                                    "&:hover": {
-                                      backgroundColor: "#166088",
-                                    },
                                   }, // responsive sizes
                                 })
                               : null
