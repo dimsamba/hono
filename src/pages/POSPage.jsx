@@ -1052,7 +1052,7 @@ const POSPage = () => {
                   <Box
                     sx={{
                       backgroundColor: "#264653",
-                      height: "70px",
+                      height: "60px",
                       borderBottom: "1px solid #45a29e",
                       width: "100%",
                       textAlign: "center",
@@ -1085,6 +1085,24 @@ const POSPage = () => {
                       }
                       subtitle2={`${totalItemsToday} Items`}
                     />
+                  </Box>
+                  <Box
+                    sx={{
+                      backgroundColor: "#264653",
+                      height: "50px",
+                      width: "100%",
+                      textAlign: "center",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center", // vertically center StatCardVend
+                    }}
+                  >
+                    <Typography sx={{ color: "#cae9ff", fontSize: 22 }}>
+                     Sales total:
+                    </Typography>
+                    <Typography sx={{ color: "#cae9ff", fontSize: 28, ml: 1 }}>
+                      €{formatCurrency(calculateTotal())}
+                    </Typography>
                   </Box>
                 </Grid>
 
