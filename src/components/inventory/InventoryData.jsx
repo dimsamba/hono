@@ -482,6 +482,7 @@ export default function FullFeaturedCrudGrid({
         "Nuts",
         "Oils-Fats",
         "Other",
+        "Packaging",
         "Pasta",
         "Pastry-Goods",
         "Pickles",
