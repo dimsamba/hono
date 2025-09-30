@@ -173,7 +173,7 @@ const CostForm = () => {
       if (!fromDate || !toDate) return;
 
       const start = dayjs(fromDate).format("YYYY-MM-DD");
-      const end = dayjs(toDate).format("YYYY-MM-DD");
+      const end = dayjs(toDate).endOf("day").format("YYYY-MM-DD HH:mm:ss");
 
       // Fix: use the same month for both start and end of previous month
       const previousMonth = dayjs(fromDate).subtract(1, "month");

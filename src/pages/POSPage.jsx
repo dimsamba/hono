@@ -1158,9 +1158,8 @@ const POSPage = () => {
                         },
                         "& .MuiTabs-indicator": {
                           bottom: 0,
-                          left: 0,
-                          height: "4px",
-                          width: "100%",
+                          height: "8px",
+                          backgroundColor: "#9ef01a",
                         },
                       }}
                     >
@@ -1171,7 +1170,7 @@ const POSPage = () => {
                             React.isValidElement(cat.icon)
                               ? React.cloneElement(cat.icon, {
                                   sx: {
-                                    fontSize: { xs: 30, sm: 30, md: 30 },
+                                    fontSize: { xs: 35, sm: 35, md: 35 },
                                   }, // responsive sizes
                                 })
                               : null
