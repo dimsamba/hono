@@ -1052,7 +1052,7 @@ const POSPage = () => {
                   <Box
                     sx={{
                       backgroundColor: "#264653",
-                      height: "60px",
+                      height: "45px",
                       borderBottom: "1px solid #45a29e",
                       width: "100%",
                       textAlign: "center",
@@ -1067,7 +1067,7 @@ const POSPage = () => {
                         <PointOfSaleIcon
                           sx={{
                             color: "#118ab2",
-                            fontSize: "26px",
+                            fontSize: "20px",
                           }}
                         />
                       }
@@ -1089,7 +1089,7 @@ const POSPage = () => {
                   <Box
                     sx={{
                       backgroundColor: "#264653",
-                      height: "50px",
+                      height: "40px",
                       width: "100%",
                       textAlign: "center",
                       display: "flex",
@@ -1097,12 +1097,46 @@ const POSPage = () => {
                       alignItems: "center", // vertically center StatCardVend
                     }}
                   >
-                    <Typography sx={{ color: "#cae9ff", fontSize: 22 }}>
-                     Sales total:
-                    </Typography>
-                    <Typography sx={{ color: "#cae9ff", fontSize: 28, ml: 1 }}>
-                      €{formatCurrency(calculateTotal())}
-                    </Typography>
+                    <Box
+                      sx={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center", // vertically center StatCardVend
+                      }}
+                    >
+                      <Typography sx={{ color: "#cae9ff", fontSize: 18 }}>
+                        Total:
+                      </Typography>
+                      <Typography
+                        sx={{ color: "#cae9ff", fontSize: 22, ml: 1 }}
+                      >
+                        €{formatCurrency(calculateTotal())}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                         width: "100%",
+                      }}
+                    >
+                      <IconButton
+                        onClick={handleClick}
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          color: "white",
+                          backgroundColor: "#e36414",
+                          borderRadius: 0,
+                          width: "100%",
+                          height: "40px",
+                          "&:hover": {
+                            backgroundColor: "#9a031e", // Optional hover color
+                          },
+                        }}
+                      >
+                        Check out
+                      </IconButton>
+                    </Box>
                   </Box>
                 </Grid>
 
@@ -1136,9 +1170,9 @@ const POSPage = () => {
                         "& .MuiTab-root": {
                           flex: 1, // 👈 equal width
                           minWidth: 0, // 👈 prevents overflow on small screens
-                          minHeight: "55px",
+                          minHeight: "45px",
                           backgroundColor: "#4f6d7a",
-                          fontSize: "28px",
+                          fontSize: "20px",
                           fontWeight: 100,
                           color: "#cae9ff",
                           "&.Mui-selected": {
@@ -1158,7 +1192,7 @@ const POSPage = () => {
                         },
                         "& .MuiTabs-indicator": {
                           bottom: 0,
-                          height: "8px",
+                          height: "4px",
                           backgroundColor: "#9ef01a",
                         },
                       }}
@@ -1170,7 +1204,7 @@ const POSPage = () => {
                             React.isValidElement(cat.icon)
                               ? React.cloneElement(cat.icon, {
                                   sx: {
-                                    fontSize: { xs: 35, sm: 35, md: 35 },
+                                    fontSize: { xs: 30, sm: 30, md: 30 },
                                   }, // responsive sizes
                                 })
                               : null
@@ -1325,25 +1359,6 @@ const POSPage = () => {
                 height: "630px",
               }}
             >
-              <IconButton
-                onClick={handleClick}
-                variant="contained"
-                color="primary"
-                sx={{
-                  color: "white",
-                  mb: 2,
-                  backgroundColor: "#e36414",
-                  borderRadius: 0,
-                  width: "100%",
-                  height: "70px",
-                  "&:hover": {
-                    backgroundColor: "#9a031e", // Optional hover color
-                  },
-                }}
-              >
-                Check out
-              </IconButton>
-
               <Box
                 mb={3}
                 sx={{
@@ -1352,9 +1367,14 @@ const POSPage = () => {
                   textAlign: "center", // Center all text inside
                   borderBottom: "1px solid #3FA89B",
                   paddingBottom: 1,
+                  paddingTop: 1,
+                  backgroundColor: "#264653",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center", // vertically center StatCardVend
                 }}
               >
-                <Typography sx={{ color: "#007ea7", fontSize: 18 }}>
+                <Typography sx={{ color: "#cae9ff", fontSize: 18 }}>
                   Order Summary
                 </Typography>
               </Box>
