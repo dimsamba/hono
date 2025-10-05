@@ -480,7 +480,7 @@ const POSPage = () => {
      <h2 style="text-align: right;">À payer:<strong> €${saleData.sale_total_disc.toFixed(
        2
      )}</strong></h2>
- 
+
 
      <p style="text-align: right;">Montant reçu:<strong> €${saleData.received_amount.toFixed(
        2
@@ -667,6 +667,191 @@ const POSPage = () => {
   };
   return (
     <div className="flex-1 overflow-hidden relative z-10 bg-[#fcfeff]">
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          width: "100%",
+          bgcolor: "#fcfeff",
+        }}
+      >
+        <Grid
+          container
+          sx={{
+            mb: 0.5,
+            maxWidth: "1280px",
+            width: "100%",
+            mx: "auto",
+          }}
+        >
+          {/* StatCard Box */}
+          <Grid item xs={12}>
+            <Box
+              sx={{ 
+                backgroundColor: "#264653",
+                height: "45px",
+                borderBottom: "1px solid #45a29e",
+                width: "100%",
+                textAlign: "center",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center", // vertically center StatCardVend
+              }}
+            >
+              <StatCardVend
+                title2="Today Sales"
+                icon={
+                  <PointOfSaleIcon
+                    sx={{
+                      color: "#118ab2",
+                      fontSize: "20px",
+                    }}
+                  />
+                }
+                title={`€ ${formatCurrency(totalSalesToday)}`}
+                icon1={
+                  <LoyaltyOutlinedIcon
+                    sx={{ color: "#118ab2", fontSize: "26px" }}
+                  />
+                }
+                subtitle={`${todaysSales.length} Sales`}
+                icon2={
+                  <CategoryOutlinedIcon
+                    sx={{ color: "#118ab2", fontSize: "26px" }}
+                  />
+                }
+                subtitle2={`${totalItemsToday} Items`}
+              />
+            </Box>
+            <Box
+              sx={{
+                backgroundColor: "#264653",
+                height: "40px",
+                width: "100%",
+                textAlign: "center",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center", // vertically center StatCardVend
+              }}
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center", // vertically center StatCardVend
+                }}
+              >
+                <Typography sx={{ color: "#cae9ff", fontSize: 18 }}>
+                  Total:
+                </Typography>
+                <Typography sx={{ color: "#cae9ff", fontSize: 22, ml: 1 }}>
+                  €{formatCurrency(calculateTotal())}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  width: "100%",
+                }}
+              >
+                <IconButton
+                  onClick={handleClick}
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    color: "white",
+                    backgroundColor: "#e36414",
+                    borderRadius: 0,
+                    width: "100%",
+                    height: "40px",
+                    "&:hover": {
+                      backgroundColor: "#9a031e", // Optional hover color
+                    },
+                  }}
+                >
+                  Check out
+                </IconButton>
+              </Box>
+            </Box>
+          </Grid>
+
+          {/* Tabs Box */}
+          <Grid
+            container
+            spacing={0}
+            sx={{
+              mx: 0,
+              width: "100%",
+              mt: 0.3,
+              justifyContent: "center",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                width: "100%",
+              }}
+            >
+              <Tabs
+                value={selectedTab}
+                onChange={(_e, newValue) => setSelectedTab(newValue)}
+                variant="fullWidth"
+                sx={{
+                  width: "100%",
+                  "& .MuiTabs-flexContainer": {
+                    gap: "2px",
+                    flexDirection: "row", // always row
+                  },
+                  "& .MuiTab-root": {
+                    flex: 1, // 👈 equal width
+                    minWidth: 0, // 👈 prevents overflow on small screens
+                    minHeight: "45px",
+                    backgroundColor: "#4f6d7a",
+                    fontSize: "20px",
+                    fontWeight: 100,
+                    color: "#cae9ff",
+                    "&.Mui-selected": {
+                      color: "#1e6091",
+                      fontWeight: 700,
+                      fontSize: "28px !important",
+                      backgroundColor: "#4cc9f0",
+                    },
+                    "&:hover": {
+                      backgroundColor: "#4cc9f0",
+                      fontWeight: 600,
+                      color: "#1e6091",
+                    },
+                  },
+                  "& .MuiTab-wrapper": {
+                    width: "100%",
+                  },
+                  "& .MuiTabs-indicator": {
+                    bottom: 0,
+                    height: "4px",
+                    backgroundColor: "#9ef01a",
+                  },
+                }}
+              >
+                {categories.map((cat, index) => (
+                  <Tab
+                    key={index}
+                    icon={
+                      React.isValidElement(cat.icon)
+                        ? React.cloneElement(cat.icon, {
+                            sx: {
+                              fontSize: { xs: 30, sm: 30, md: 30 },
+                            }, // responsive sizes
+                          })
+                        : null
+                    }
+                    aria-label={cat.label}
+                  />
+                ))}
+              </Tabs>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
       <main
         className="max-w-7xl mx-auto scrollbar-hide h-[700px] overflow-y-auto md:overflow-y-hidden bg-[#fcfeff]"
         style={{
@@ -1039,184 +1224,6 @@ const POSPage = () => {
                 backgroundColor: "#ebf1fa",
               }}
             >
-              <Grid
-                container
-                spacing={1}
-                sx={{
-                  mb: 0.5,
-                  //  backgroundColor: "Orange",
-                }}
-              >
-                {/* StatCard Box */}
-                <Grid item xs={12}>
-                  <Box
-                    sx={{
-                      backgroundColor: "#264653",
-                      height: "45px",
-                      borderBottom: "1px solid #45a29e",
-                      width: "100%",
-                      textAlign: "center",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center", // vertically center StatCardVend
-                    }}
-                  >
-                    <StatCardVend
-                      title2="Today Sales"
-                      icon={
-                        <PointOfSaleIcon
-                          sx={{
-                            color: "#118ab2",
-                            fontSize: "20px",
-                          }}
-                        />
-                      }
-                      title={`€ ${formatCurrency(totalSalesToday)}`}
-                      icon1={
-                        <LoyaltyOutlinedIcon
-                          sx={{ color: "#118ab2", fontSize: "26px" }}
-                        />
-                      }
-                      subtitle={`${todaysSales.length} Sales`}
-                      icon2={
-                        <CategoryOutlinedIcon
-                          sx={{ color: "#118ab2", fontSize: "26px" }}
-                        />
-                      }
-                      subtitle2={`${totalItemsToday} Items`}
-                    />
-                  </Box>
-                  <Box
-                    sx={{
-                      backgroundColor: "#264653",
-                      height: "40px",
-                      width: "100%",
-                      textAlign: "center",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center", // vertically center StatCardVend
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: "100%",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center", // vertically center StatCardVend
-                      }}
-                    >
-                      <Typography sx={{ color: "#cae9ff", fontSize: 18 }}>
-                        Total:
-                      </Typography>
-                      <Typography
-                        sx={{ color: "#cae9ff", fontSize: 22, ml: 1 }}
-                      >
-                        €{formatCurrency(calculateTotal())}
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                         width: "100%",
-                      }}
-                    >
-                      <IconButton
-                        onClick={handleClick}
-                        variant="contained"
-                        color="primary"
-                        sx={{
-                          color: "white",
-                          backgroundColor: "#e36414",
-                          borderRadius: 0,
-                          width: "100%",
-                          height: "40px",
-                          "&:hover": {
-                            backgroundColor: "#9a031e", // Optional hover color
-                          },
-                        }}
-                      >
-                        Check out
-                      </IconButton>
-                    </Box>
-                  </Box>
-                </Grid>
-
-                {/* Tabs Box */}
-                <Grid
-                  container
-                  spacing={0}
-                  sx={{
-                    mx: 0,
-                    width: "100%",
-                    mt: 0.3,
-                    justifyContent: "center",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      width: "100%",
-                    }}
-                  >
-                    <Tabs
-                      value={selectedTab}
-                      onChange={(_e, newValue) => setSelectedTab(newValue)}
-                      variant="fullWidth"
-                      sx={{
-                        width: "100%",
-                        "& .MuiTabs-flexContainer": {
-                          gap: "2px",
-                          flexDirection: "row", // always row
-                        },
-                        "& .MuiTab-root": {
-                          flex: 1, // 👈 equal width
-                          minWidth: 0, // 👈 prevents overflow on small screens
-                          minHeight: "45px",
-                          backgroundColor: "#4f6d7a",
-                          fontSize: "20px",
-                          fontWeight: 100,
-                          color: "#cae9ff",
-                          "&.Mui-selected": {
-                            color: "#1e6091",
-                            fontWeight: 700,
-                            fontSize: "28px !important",
-                            backgroundColor: "#4cc9f0",
-                          },
-                          "&:hover": {
-                            backgroundColor: "#4cc9f0",
-                            fontWeight: 600,
-                            color: "#1e6091",
-                          },
-                        },
-                        "& .MuiTab-wrapper": {
-                          width: "100%",
-                        },
-                        "& .MuiTabs-indicator": {
-                          bottom: 0,
-                          height: "4px",
-                          backgroundColor: "#9ef01a",
-                        },
-                      }}
-                    >
-                      {categories.map((cat, index) => (
-                        <Tab
-                          key={index}
-                          icon={
-                            React.isValidElement(cat.icon)
-                              ? React.cloneElement(cat.icon, {
-                                  sx: {
-                                    fontSize: { xs: 30, sm: 30, md: 30 },
-                                  }, // responsive sizes
-                                })
-                              : null
-                          }
-                          aria-label={cat.label}
-                        />
-                      ))}
-                    </Tabs>
-                  </Box>
-                </Grid>
-              </Grid>
-
               {/* Items Grid */}
               <Grid2
                 container
