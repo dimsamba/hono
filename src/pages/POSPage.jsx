@@ -38,6 +38,7 @@ import {
   useMediaQuery,
   useTheme,
   Popover,
+  Divider,
 } from "@mui/material";
 
 const POSPage = () => {
@@ -687,7 +688,7 @@ const POSPage = () => {
           {/* StatCard Box */}
           <Grid item xs={12}>
             <Box
-              sx={{ 
+              sx={{
                 backgroundColor: "#264653",
                 height: "45px",
                 borderBottom: "1px solid #45a29e",
@@ -899,10 +900,8 @@ const POSPage = () => {
               sx={{
                 display: "flex",
                 justifyContent: "space-between", // keep left & right separation
-                alignItems: "flex-end", // 👈 push text to bottom
-                borderTop: "1px solid #3FA89B",
                 px: 0.5,
-                height: "50px", // 👈 give it a fixed or relative height
+                height: "45px", // 👈 give it a fixed or relative height
               }}
             >
               <Typography sx={{ color: "#007ea7", fontSize: 28 }}>
@@ -921,13 +920,30 @@ const POSPage = () => {
                 height: "20px", // 👈 give it a fixed or relative height
               }}
             >
-              <Typography sx={{ color: "#1b4965", fontSize: 18 }}>
+              <Typography sx={{ color: "#2a9d8f", fontSize: 18 }}>
                 Received:
               </Typography>
-              <Typography sx={{ color: "#1b4965", fontSize: 20 }}>
+              <Typography sx={{ color: "#2a9d8f", fontSize: 20 }}>
                 €{formatCurrency(receivedAmount)}
               </Typography>
             </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                px: 0.5,
+                height: "20px", // 👈 give it a fixed or relative height
+              }}
+            >
+              <Typography sx={{ color: "#fb5607", fontSize: 18 }}>
+                Change:
+              </Typography>
+              <Typography sx={{ color: "#fb5607", fontSize: 20 }}>
+                €{formatCurrency(calculateChange())}
+              </Typography>
+            </Box>
+            <Divider sx={{ my: 0.5, borderColor: "#3FA89B" }} />
             {/* Icon buttons in one row */}
             <Box
               className="w-full"
@@ -1367,7 +1383,6 @@ const POSPage = () => {
               }}
             >
               <Box
-                mb={3}
                 sx={{
                   width: "100%",
                   minWidth: "0", // Ensure it doesn't shrink too much
@@ -1375,13 +1390,14 @@ const POSPage = () => {
                   borderBottom: "1px solid #3FA89B",
                   paddingBottom: 1,
                   paddingTop: 1,
-                  backgroundColor: "#264653",
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center", // vertically center StatCardVend
                 }}
               >
-                <Typography sx={{ color: "#cae9ff", fontSize: 18 }}>
+                <Typography
+                  sx={{ color: "#007ea7", fontSize: 20, fontWeight: 600 }}
+                >
                   Order Summary
                 </Typography>
               </Box>
@@ -1389,10 +1405,11 @@ const POSPage = () => {
               {/* Order Items */}
               <Box
                 sx={{
-                  maxHeight: "205px",
+                  maxHeight: "400px",
                   overflowY: "auto",
-                  px: 0.5,
+                  px: 0.5,           
                   scrollbarWidth: "none",
+                  backgroundColor: "#f0efeb",
                   "&::-webkit-scrollbar": {
                     display: "none",
                   },
@@ -1407,6 +1424,7 @@ const POSPage = () => {
                     sx={{
                       maxHeight: "200px !important",
                       overflowY: "auto",
+                       py: 0.2,
                       scrollbarWidth: "none", // Firefox
                       "&::-webkit-scrollbar": {
                         display: "none", // Chrome, Safari, Edge
@@ -1447,7 +1465,7 @@ const POSPage = () => {
               </Box>
 
               {/* Footer */}
-              <Box mt={1} sx={{ width: "100%", minWidth: 0 }}>
+              <Box mt={0} sx={{ width: "100%", minWidth: 0 }}>
                 {/* Row 1 */}
                 <Box
                   sx={{
@@ -1456,7 +1474,6 @@ const POSPage = () => {
                     alignItems: "center",
                     borderTop: "1px solid #3FA89B",
                     px: 0.5,
-                    height: "60px",
                   }}
                 >
                   <Typography sx={{ color: "#007ea7", fontSize: 30 }}>
@@ -1477,10 +1494,10 @@ const POSPage = () => {
                     height: "20px",
                   }}
                 >
-                  <Typography sx={{ color: "#1b4965", fontSize: 20 }}>
+                  <Typography sx={{ color: "#2a9d8f", fontSize: 20 }}>
                     Received:
                   </Typography>
-                  <Typography sx={{ color: "#1b4965", fontSize: 25 }}>
+                  <Typography sx={{ color: "#2a9d8f", fontSize: 25 }}>
                     €{formatCurrency(receivedAmount)}
                   </Typography>
                 </Box>
@@ -1494,10 +1511,10 @@ const POSPage = () => {
                     px: 0.5,
                   }}
                 >
-                  <Typography sx={{ color: "#d90368", fontSize: 20 }}>
+                  <Typography sx={{ color: "#fb5607", fontSize: 20 }}>
                     Change:
                   </Typography>
-                  <Typography sx={{ color: "#d90368", fontSize: 25 }}>
+                  <Typography sx={{ color: "#fb5607", fontSize: 25 }}>
                     €{formatCurrency(calculateChange())}
                   </Typography>
                 </Box>
