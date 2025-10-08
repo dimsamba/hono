@@ -683,7 +683,7 @@ const POSPage = () => {
             width: "100%",
             mx: "auto",
             bgcolor: "#edede9",
-         //   border: "1px solid #45a29e",
+            //   border: "1px solid #45a29e",
           }}
         >
           {/* StatCard Box */}
@@ -839,13 +839,37 @@ const POSPage = () => {
                     borderRadius: 0,
                     width: "100%",
                     height: "100%",
+                    display: "flex",
+                    flexDirection: {
+                      xs: "column", // 👈 stack vertically on mobile
+                      sm: "row", // 👈 side by side on tablet/desktop
+                    },
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
                     "&:hover": {
-                      backgroundColor: "#9a031e", // Optional hover color
+                      backgroundColor: "#9a031e",
                     },
                   }}
                 >
-                  <Typography sx={{ color: "white", fontSize: 22 }}>
-                    Check out €{formatCurrency(calculateTotal())}
+                  <Typography
+                    sx={{
+                      color: "white",
+                      fontSize: { xs: 14, sm: 16 },
+                      mr: { sm: 1, xs: 0 }, // 👈 only add right margin on larger screens
+                    }}
+                  >
+                    Checkout
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      color: "white",
+                      fontSize: { xs: 20, sm: 26 },
+                      mt: { xs: 0.5, sm: 0 }, // 👈 add slight top margin only on small screens
+                    }}
+                  >
+                    €{formatCurrency(calculateTotal())}
                   </Typography>
                 </IconButton>
               </Box>
