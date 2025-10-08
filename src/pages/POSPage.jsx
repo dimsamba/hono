@@ -667,13 +667,12 @@ const POSPage = () => {
     },
   };
   return (
-    <div className="flex-1 overflow-hidden relative z-10 bg-[#fcfeff]">
+    <div className="flex-1 overflow-hidden relative z-10 bg-[#ffffff]">
       <Box
         sx={{
           display: "flex",
           justifyContent: "center",
           width: "100%",
-          bgcolor: "#fcfeff",
         }}
       >
         <Grid
@@ -683,6 +682,8 @@ const POSPage = () => {
             maxWidth: "1280px",
             width: "100%",
             mx: "auto",
+            bgcolor: "#edede9",
+            border: "1px solid #45a29e",
           }}
         >
           {/* StatCard Box */}
@@ -726,33 +727,129 @@ const POSPage = () => {
             </Box>
             <Box
               sx={{
-                backgroundColor: "#264653",
-                height: "40px",
+                height: "100px",
                 width: "100%",
-                textAlign: "center",
                 display: "flex",
-                justifyContent: "center",
-                alignItems: "center", // vertically center StatCardVend
+                justifyContent: "space-between", // separate left/right
+                alignItems: "stretch", // allow full height right column
+                textAlign: "center",
               }}
             >
+              {/* LEFT SECTION (Total + Tabs stacked vertically) */}
               <Box
                 sx={{
-                  width: "100%",
                   display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center", // vertically center StatCardVend
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  flex: 1, // take remaining width
                 }}
               >
-                <Typography sx={{ color: "#cae9ff", fontSize: 18 }}>
-                  Total:
-                </Typography>
-                <Typography sx={{ color: "#cae9ff", fontSize: 22, ml: 1 }}>
-                  €{formatCurrency(calculateTotal())}
-                </Typography>
+                {/* Total (on top) */}
+                <Box
+                  className="Total"
+                  sx={{
+                    height: "55px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography sx={{ color: "#007ea7", fontSize: 22 }}>
+                    Sales Total:
+                  </Typography>
+                  <Typography sx={{ color: "#007ea7", fontSize: 28, ml: 1 }}>
+                    €{formatCurrency(calculateTotal())}
+                  </Typography>
+                </Box>
+                {/* Tabs (below Total) */}
+                <Box className="Tabs" sx={{ flexGrow: 1 }}>
+                  {/* Tabs Box */}
+                  <Grid
+                    container
+                    spacing={0}
+                    sx={{
+                      mx: 0,
+                      width: "100%",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        width: "100%",
+                      }}
+                    >
+                      <Tabs
+                        value={selectedTab}
+                        onChange={(_e, newValue) => setSelectedTab(newValue)}
+                        variant="fullWidth"
+                        sx={{
+                          width: "100%",
+                          "& .MuiTabs-flexContainer": {
+                            gap: "2px",
+                            flexDirection: "row", // always row
+                          },
+                          "& .MuiTab-root": {
+                            flex: 1, // 👈 equal width
+                            minWidth: 0, // 👈 prevents overflow on small screens
+                            minHeight: "45px",
+                            backgroundColor: "#4f6d7a",
+                            color: "#cae9ff",
+                            "&.Mui-selected": {
+                              color: "#f85e00",
+                              fontWeight: 900,
+                              fontSize: "28px !important",
+                              backgroundColor: "#b7e4c7",
+                              border: "2px solid #f85e00",
+                            },
+                            "&:hover": {
+                              backgroundColor: "#b7e4c7",
+                              fontWeight: 600,
+                              color: "#f85e00",
+                              border: "2px solid #f85e00",
+                            },
+                          },
+                          "& .MuiTab-wrapper": {
+                            width: "100%",
+                          },
+                          "& .MuiTabs-indicator": {
+                            bottom: 0,
+                            height: "0px",
+                            backgroundColor: "#9ef01a",
+                          },
+                        }}
+                      >
+                        {categories.map((cat, index) => (
+                          <Tab
+                            key={index}
+                            icon={
+                              React.isValidElement(cat.icon)
+                                ? React.cloneElement(cat.icon, {
+                                    sx: {
+                                      fontSize: { xs: 30, sm: 30, md: 30 },
+                                    }, // responsive sizes
+                                  })
+                                : null
+                            }
+                            aria-label={cat.label}
+                          />
+                        ))}
+                      </Tabs>
+                    </Box>
+                  </Grid>
+                </Box>
               </Box>
+              {/* RIGHT SECTION (CheckOut) */}
               <Box
+                className="CheckOut"
                 sx={{
-                  width: "100%",
+                  width: "30%", // adjust width as needed
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  pl: 0.2,
+                  pt: 0.2,
                 }}
               >
                 <IconButton
@@ -764,7 +861,7 @@ const POSPage = () => {
                     backgroundColor: "#e36414",
                     borderRadius: 0,
                     width: "100%",
-                    height: "40px",
+                    height: "100%",
                     "&:hover": {
                       backgroundColor: "#9a031e", // Optional hover color
                     },
@@ -773,82 +870,6 @@ const POSPage = () => {
                   Check out
                 </IconButton>
               </Box>
-            </Box>
-          </Grid>
-
-          {/* Tabs Box */}
-          <Grid
-            container
-            spacing={0}
-            sx={{
-              mx: 0,
-              width: "100%",
-              mt: 0.3,
-              justifyContent: "center",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                width: "100%",
-              }}
-            >
-              <Tabs
-                value={selectedTab}
-                onChange={(_e, newValue) => setSelectedTab(newValue)}
-                variant="fullWidth"
-                sx={{
-                  width: "100%",
-                  "& .MuiTabs-flexContainer": {
-                    gap: "2px",
-                    flexDirection: "row", // always row
-                  },
-                  "& .MuiTab-root": {
-                    flex: 1, // 👈 equal width
-                    minWidth: 0, // 👈 prevents overflow on small screens
-                    minHeight: "45px",
-                    backgroundColor: "#4f6d7a",
-                    fontSize: "20px",
-                    fontWeight: 100,
-                    color: "#cae9ff",
-                    "&.Mui-selected": {
-                      color: "#1e6091",
-                      fontWeight: 700,
-                      fontSize: "28px !important",
-                      backgroundColor: "#4cc9f0",
-                    },
-                    "&:hover": {
-                      backgroundColor: "#4cc9f0",
-                      fontWeight: 600,
-                      color: "#1e6091",
-                    },
-                  },
-                  "& .MuiTab-wrapper": {
-                    width: "100%",
-                  },
-                  "& .MuiTabs-indicator": {
-                    bottom: 0,
-                    height: "4px",
-                    backgroundColor: "#9ef01a",
-                  },
-                }}
-              >
-                {categories.map((cat, index) => (
-                  <Tab
-                    key={index}
-                    icon={
-                      React.isValidElement(cat.icon)
-                        ? React.cloneElement(cat.icon, {
-                            sx: {
-                              fontSize: { xs: 30, sm: 30, md: 30 },
-                            }, // responsive sizes
-                          })
-                        : null
-                    }
-                    aria-label={cat.label}
-                  />
-                ))}
-              </Tabs>
             </Box>
           </Grid>
         </Grid>
@@ -920,10 +941,10 @@ const POSPage = () => {
                 height: "20px", // 👈 give it a fixed or relative height
               }}
             >
-              <Typography sx={{ color: "#2a9d8f", fontSize: 18 }}>
+              <Typography sx={{ color: "#1b4332", fontSize: 20 }}>
                 Received:
               </Typography>
-              <Typography sx={{ color: "#2a9d8f", fontSize: 20 }}>
+              <Typography sx={{ color: "#1b4332", fontSize: 24 }}>
                 €{formatCurrency(receivedAmount)}
               </Typography>
             </Box>
@@ -936,10 +957,10 @@ const POSPage = () => {
                 height: "20px", // 👈 give it a fixed or relative height
               }}
             >
-              <Typography sx={{ color: "#fb5607", fontSize: 18 }}>
+              <Typography sx={{ color: "#9d0208", fontSize: 20 }}>
                 Change:
               </Typography>
-              <Typography sx={{ color: "#fb5607", fontSize: 20 }}>
+              <Typography sx={{ color: "#9d0208", fontSize: 24 }}>
                 €{formatCurrency(calculateChange())}
               </Typography>
             </Box>
@@ -1237,7 +1258,7 @@ const POSPage = () => {
                 border: "1px solid #45a29e",
                 height: { xs: "auto", md: 630 },
                 overflowX: "hidden", // 👈 stop horizontal scroll
-                backgroundColor: "#ebf1fa",
+                backgroundColor: "#edede9",
               }}
             >
               {/* Items Grid */}
@@ -1377,7 +1398,7 @@ const POSPage = () => {
               width="100%"
               sx={{
                 flexGrow: 1,
-                backgroundColor: "#ebf1fa",
+                backgroundColor: "#edede9",
                 border: "1px solid #45a29e",
                 height: "630px",
               }}
@@ -1407,7 +1428,7 @@ const POSPage = () => {
                 sx={{
                   maxHeight: "400px",
                   overflowY: "auto",
-                  px: 0.5,           
+                  px: 0.5,
                   scrollbarWidth: "none",
                   backgroundColor: "#f0efeb",
                   "&::-webkit-scrollbar": {
@@ -1424,7 +1445,7 @@ const POSPage = () => {
                     sx={{
                       maxHeight: "200px !important",
                       overflowY: "auto",
-                       py: 0.2,
+                      py: 0.2,
                       scrollbarWidth: "none", // Firefox
                       "&::-webkit-scrollbar": {
                         display: "none", // Chrome, Safari, Edge
