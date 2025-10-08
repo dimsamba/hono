@@ -683,7 +683,7 @@ const POSPage = () => {
             width: "100%",
             mx: "auto",
             bgcolor: "#edede9",
-            border: "1px solid #45a29e",
+         //   border: "1px solid #45a29e",
           }}
         >
           {/* StatCard Box */}
@@ -691,7 +691,7 @@ const POSPage = () => {
             <Box
               sx={{
                 backgroundColor: "#264653",
-                height: "45px",
+                height: "55px",
                 borderBottom: "1px solid #45a29e",
                 width: "100%",
                 textAlign: "center",
@@ -727,7 +727,7 @@ const POSPage = () => {
             </Box>
             <Box
               sx={{
-                height: "100px",
+                height: "74px",
                 width: "100%",
                 display: "flex",
                 justifyContent: "space-between", // separate left/right
@@ -744,23 +744,6 @@ const POSPage = () => {
                   flex: 1, // take remaining width
                 }}
               >
-                {/* Total (on top) */}
-                <Box
-                  className="Total"
-                  sx={{
-                    height: "55px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography sx={{ color: "#007ea7", fontSize: 22 }}>
-                    Sales Total:
-                  </Typography>
-                  <Typography sx={{ color: "#007ea7", fontSize: 28, ml: 1 }}>
-                    €{formatCurrency(calculateTotal())}
-                  </Typography>
-                </Box>
                 {/* Tabs (below Total) */}
                 <Box className="Tabs" sx={{ flexGrow: 1 }}>
                   {/* Tabs Box */}
@@ -773,69 +756,63 @@ const POSPage = () => {
                       justifyContent: "center",
                     }}
                   >
-                    <Box
+                    <Tabs
+                      value={selectedTab}
+                      onChange={(_e, newValue) => setSelectedTab(newValue)}
+                      variant="fullWidth"
                       sx={{
-                        display: "flex",
                         width: "100%",
+                        "& .MuiTabs-flexContainer": {
+                          gap: "2px",
+                          flexDirection: "row", // always row
+                          mt: 0.2,
+                          mr: 0.1,
+                        },
+                        "& .MuiTab-root": {
+                          flex: 1, // 👈 equal width
+                          minWidth: 0, // 👈 prevents overflow on small screens
+                          height: "64px",
+                          backgroundColor: "#4f6d7a",
+                          color: "#cae9ff",
+                          "&.Mui-selected": {
+                            color: "white",
+                            fontSize: "28px !important",
+                            backgroundColor: "#48d190",
+                            border: "1px solid white",
+                          },
+                          "&:hover": {
+                            backgroundColor: "#48d190",
+                            fontWeight: 600,
+                            color: "white",
+                          },
+                        },
+                        "& .MuiTab-wrapper": {
+                          width: "100%",
+                        },
+                        "& .MuiTabs-indicator": {
+                          bottom: 0,
+                          height: "0px",
+                          backgroundColor: "#9ef01a",
+                        },
                       }}
                     >
-                      <Tabs
-                        value={selectedTab}
-                        onChange={(_e, newValue) => setSelectedTab(newValue)}
-                        variant="fullWidth"
-                        sx={{
-                          width: "100%",
-                          "& .MuiTabs-flexContainer": {
-                            gap: "2px",
-                            flexDirection: "row", // always row
-                          },
-                          "& .MuiTab-root": {
-                            flex: 1, // 👈 equal width
-                            minWidth: 0, // 👈 prevents overflow on small screens
-                            minHeight: "45px",
-                            backgroundColor: "#4f6d7a",
-                            color: "#cae9ff",
-                            "&.Mui-selected": {
-                              color: "#f85e00",
-                              fontWeight: 900,
-                              fontSize: "28px !important",
-                              backgroundColor: "#b7e4c7",
-                              border: "2px solid #f85e00",
-                            },
-                            "&:hover": {
-                              backgroundColor: "#b7e4c7",
-                              fontWeight: 600,
-                              color: "#f85e00",
-                              border: "2px solid #f85e00",
-                            },
-                          },
-                          "& .MuiTab-wrapper": {
-                            width: "100%",
-                          },
-                          "& .MuiTabs-indicator": {
-                            bottom: 0,
-                            height: "0px",
-                            backgroundColor: "#9ef01a",
-                          },
-                        }}
-                      >
-                        {categories.map((cat, index) => (
-                          <Tab
-                            key={index}
-                            icon={
-                              React.isValidElement(cat.icon)
-                                ? React.cloneElement(cat.icon, {
-                                    sx: {
-                                      fontSize: { xs: 30, sm: 30, md: 30 },
-                                    }, // responsive sizes
-                                  })
-                                : null
-                            }
-                            aria-label={cat.label}
-                          />
-                        ))}
-                      </Tabs>
-                    </Box>
+                      {categories.map((cat, index) => (
+                        <Tab
+                          key={index}
+                          icon={React.cloneElement(cat.icon, {
+                            sx: { fontSize: 30 },
+                          })}
+                          label={
+                            <Typography
+                              sx={{ fontSize: { xs: 10, sm: 12, md: 14 } }}
+                            >
+                              {cat.label}
+                            </Typography>
+                          }
+                          value={index} // 👈 use index instead of cat.label
+                        />
+                      ))}
+                    </Tabs>
                   </Grid>
                 </Box>
               </Box>
@@ -843,7 +820,7 @@ const POSPage = () => {
               <Box
                 className="CheckOut"
                 sx={{
-                  width: "30%", // adjust width as needed
+                  width: "33.33%", // adjust width as needed
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
@@ -867,7 +844,9 @@ const POSPage = () => {
                     },
                   }}
                 >
-                  Check out
+                  <Typography sx={{ color: "white", fontSize: 22 }}>
+                    Check out €{formatCurrency(calculateTotal())}
+                  </Typography>
                 </IconButton>
               </Box>
             </Box>
