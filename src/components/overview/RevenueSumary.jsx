@@ -43,6 +43,8 @@ const RevenueSummary = () => {
         monthMap[key].cost_perc += cost_perc || 0;
       });
 
+      const MAX_MONTHS = 6;
+
       const formatted = Object.entries(monthMap)
         .map(([month, { net_profit, total_revenue, cost_perc }]) => ({
           month,
@@ -52,7 +54,7 @@ const RevenueSummary = () => {
         }))
         .sort((a, b) => new Date(a.month) - new Date(b.month));
 
-      setChartData(formatted);
+      setChartData(formatted.slice(-MAX_MONTHS));
     };
 
     fetchData();

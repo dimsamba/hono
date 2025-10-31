@@ -217,8 +217,8 @@ const CostForm = () => {
         const { data: prevData, error: prevError } = await supabase
           .from("stockTake")
           .select("date, total_value") // fetch date too for debugging
-          .gte("date", prevMonthStart)
-          .lte("date", prevMonthEnd);
+          .gte("date", `${prevMonthStart} 00:00:00`)
+          .lte("date", `${prevMonthEnd} 23:59:59`);
 
         if (prevError) {
           console.error("❌ Error fetching previous month:", prevError.message);
@@ -566,7 +566,7 @@ const CostForm = () => {
           value={
             <span className={netProfit < 0 ? "text-red-400" : ""}>
               Net Profit: {"  "}
-                <span
+              <span
                 style={{
                   color: "#00747c",
                   fontSize: "18px",
@@ -574,7 +574,7 @@ const CostForm = () => {
                   verticalAlign: "middle",
                 }}
               >
-               € {formatCurrency(netProfit)}
+                € {formatCurrency(netProfit)}
               </span>
             </span>
           }
