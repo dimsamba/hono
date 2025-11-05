@@ -651,12 +651,13 @@ const POSPage = () => {
   // TextField and InputLabel customizations
   const sharedStyles = {
     "& .MuiInputLabel-root": {
-      color: "#38a3a5",
+      color: "#007ea7",
       fontSize: 14,
     },
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
-        border: "1px solid #38a3a5",
+        border: "1px solid #007ea7",
+        backgroundColor: "#f4f4f4",
       },
       "&:hover fieldset": {
         borderColor: "darkGreen",
@@ -1049,64 +1050,6 @@ const POSPage = () => {
                   </Grid>
                 ))}
               </Grid>
-
-              {/* Save buttons below */}
-              <Box display="flex" gap={0.4} my={0.5} width="100%">
-                <Button
-                  variant="outlined"
-                  startIcon={<Save />}
-                  onClick={() => {
-                    saveSale(false);
-                    handleClose(); // 👈 close after saving
-                  }}
-                  disabled={disableActionButtons}
-                  sx={{
-                    backgroundColor: "#26A889",
-                    color: "white",
-                    "&:hover": {
-                      backgroundColor: "#62CDB4",
-                    },
-                    border: 0,
-                    borderRadius: 0,
-                    height: "100px",
-                    width: "100%",
-                    minWidth: 0, // Prevents default button minWidth from breaking layout
-                    minWidth: 0,
-                    opacity: disableActionButtons ? 0.5 : 1, // Optional: visual feedback
-                    pointerEvents: disableActionButtons ? "none" : "auto", // Optional: make fully inactive
-                  }}
-                >
-                  Pay & Save
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  startIcon={<Print />}
-                  onClick={() => {
-                    saveSale(true);
-                    handleClose(); // 👈 close after saving
-                  }}
-                  disabled={disableActionButtons}
-                  sx={{
-                    backgroundColor: "#00b4d8",
-                    color: "white",
-                    fontSize: 14,
-                    "&:hover": {
-                      backgroundColor: "#90e0ef",
-                    },
-                    border: 0,
-                    borderRadius: 0,
-                    height: "100px",
-                    width: "100%",
-                    minWidth: 0, // Prevents default button minWidth from breaking layout
-                    minWidth: 0,
-                    opacity: disableActionButtons ? 0.5 : 1,
-                    pointerEvents: disableActionButtons ? "none" : "auto",
-                  }}
-                >
-                  Pay & Print
-                </Button>
-              </Box>
             </Box>
 
             {/* KeyPad Received Amount */}
@@ -1116,7 +1059,7 @@ const POSPage = () => {
                   display: "grid",
                   gridTemplateColumns: "repeat(3, 1fr)",
                   gap: 0.1,
-                  mb: 1,
+                  mb: 0.5,
                 }}
               >
                 {[
@@ -1162,7 +1105,6 @@ const POSPage = () => {
                       sx={{
                         height: 50,
                         fontSize: 34,
-                        border: "1px solid #003049",
                         color: "#003049",
                         width: "100%", // Ensures button fills grid cell
                         minWidth: 0, // Prevents default button minWidth from breaking layout
@@ -1198,6 +1140,7 @@ const POSPage = () => {
                   sx={{
                     ...sharedStyles,
                     mt: 0.5,
+                    mb: 0.5,
                     flexGrow: 1,
                     minWidth: 0,
                     "& .MuiInputBase-inputMultiline": {
@@ -1208,6 +1151,63 @@ const POSPage = () => {
                   }}
                 />
               </FormControl>
+            </Box>
+
+            {/* Save buttons below */}
+            <Box display="flex" gap={0.4} my={0.5} width="100%">
+              <Button
+                variant="outlined"
+                startIcon={<Save />}
+                onClick={() => {
+                  saveSale(false);
+                  handleClose(); // 👈 close after saving
+                }}
+                disabled={disableActionButtons}
+                sx={{
+                  backgroundColor: "#26A889",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#62CDB4",
+                  },
+                  border: 0,
+                  borderRadius: 0,
+                  height: "100px",
+                  width: "100%",
+                  minWidth: 0, // Prevents default button minWidth from breaking layout
+                  minWidth: 0,
+                  opacity: disableActionButtons ? 0.5 : 1, // Optional: visual feedback
+                  pointerEvents: disableActionButtons ? "none" : "auto", // Optional: make fully inactive
+                }}
+              >
+                Pay & Save
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<Print />}
+                onClick={() => {
+                  saveSale(true);
+                  handleClose(); // 👈 close after saving
+                }}
+                disabled={disableActionButtons}
+                sx={{
+                  backgroundColor: "#00b4d8",
+                  color: "white",
+                  fontSize: 14,
+                  "&:hover": {
+                    backgroundColor: "#90e0ef",
+                  },
+                  border: 0,
+                  borderRadius: 0,
+                  height: "100px",
+                  width: "100%",
+                  minWidth: 0, // Prevents default button minWidth from breaking layout
+                  minWidth: 0,
+                  opacity: disableActionButtons ? 0.5 : 1,
+                  pointerEvents: disableActionButtons ? "none" : "auto",
+                }}
+              >
+                Pay & Print
+              </Button>
             </Box>
 
             {/* Clear comment and Close Buttons */}
