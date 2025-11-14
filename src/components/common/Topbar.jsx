@@ -8,6 +8,7 @@ import AppsOutlinedIcon from "@mui/icons-material/AppsOutlined";
 import PlaylistAddOutlinedIcon from "@mui/icons-material/PlaylistAddOutlined";
 import FormatListNumberedTwoToneIcon from "@mui/icons-material/FormatListNumberedTwoTone";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
+import LoopOutlinedIcon from "@mui/icons-material/LoopOutlined";
 
 import icon from "../../../public/icons/icon-192x192.png";
 import { motion } from "framer-motion";
@@ -201,6 +202,23 @@ const Topbar = ({ title }) => {
           p: 1,
         }}
       >
+        {/* Icon Refresh */}
+        <motion.div
+          variants={iconVariants}
+          initial="initial"
+          whileHover="hover"
+          transition={{ type: "spring", stiffness: 200, damping: 25 }}
+        >
+          <LoopOutlinedIcon
+            onClick={() => window.location.reload()}
+            sx={{
+              color: "#007ea7",
+              fontSize: "30px",
+              cursor: "pointer",
+            }}
+          />
+        </motion.div>
+
         {/* Icon Stop alarm */}
         <div className="relative cursor-pointer ml-3">
           {timers.some((t) => t.isFlashing) && (
