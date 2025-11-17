@@ -719,7 +719,7 @@ const RecipeForm = ({
               Saved Recipes:{" "}
               <spam
                 style={{
-                  color: "#00747c",
+                  color: "#0077b6",
                   fontSize: "18px",
                   fontWeight: [500],
                 }}
@@ -734,7 +734,7 @@ const RecipeForm = ({
                 Last Entry:{" "}
                 <span
                   style={{
-                    color: "#00747c",
+                    color: "#0077b6",
                     fontSize: "20px",
                     fontWeight: 500,
                   }}
@@ -758,7 +758,7 @@ const RecipeForm = ({
               Price per portion: {"  "}
               <spam
                 style={{
-                  color: "#00747c",
+                  color: "#0077b6",
                   fontSize: "18px",
                   fontWeight: [500],
                 }}
@@ -772,7 +772,7 @@ const RecipeForm = ({
               MSP For 25% FC: {"  "}
               <span
                 style={{
-                  color: "#00747c",
+                  color: "#0077b6",
                   fontSize: "18px",
                   fontWeight: [500],
                 }}
@@ -791,10 +791,10 @@ const RecipeForm = ({
           title={`Cost Info`}
           value={
             <spam>
-              Recipe Cost w/ 1.75%: {" "}
+              Recipe Cost: {" "}
               <spam
                 style={{
-                  color: actualFoodCostPct > 28 ? "#00747c" : "inherit",
+                  color:  "#0077b6",
                   fontSize: "18px",
                   fontWeight: [500],
                 }}
@@ -808,7 +808,7 @@ const RecipeForm = ({
               Actual FC: {" "}
               <span
                 style={{
-                  color: actualFoodCostPct > 28 ? "#00747c" : "inherit",
+                  color: actualFoodCostPct < 28 ? "#0077b6" : "#ef476f",
                   fontSize: "18px",
                   fontWeight: [500],
                 }}
