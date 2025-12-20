@@ -191,7 +191,7 @@ export default function FullFeaturedCrudGrid({
   const [rowModesModel, setRowModesModel] = React.useState({});
   const [] = React.useState(null);
 
-  // Fetch "Paid "invoices between dates
+  // Fetch Finances between dates
   React.useEffect(() => {
     const fetchData = async () => {
       // Log fromDate and toDate before processing
@@ -214,8 +214,8 @@ export default function FullFeaturedCrudGrid({
         return; // Exit if the dates are invalid
       }
 
-      const start = validFromDate.startOf("day").toISOString();
-      const end = validToDate.endOf("day").toISOString();
+      const start = validFromDate.format("YYYY-MM-DD");
+      const end = validToDate.format("YYYY-MM-DD");
 
       const { data, error } = await supabase
         .from("familyexpenses")
@@ -321,36 +321,22 @@ export default function FullFeaturedCrudGrid({
   const processRowUpdate = async (newRow) => {
     const { isNew, id, ...cleanRow } = newRow;
 
-    // Manual validation
-    if (
-      newRow.amount === null ||
-      newRow.amount === undefined ||
-      newRow.amount === ""
-    ) {
-      setSnackbar({ children: "Amount is required", severity: "error" });
-      throw new Error("Amount is required");
+    // ✅ Normalize date field
+    if (cleanRow.date) {
+      cleanRow.date = dayjs(cleanRow.date).format("YYYY-MM-DD");
     }
 
-    if (isNaN(newRow.amount)) {
+    // Validation
+    if (!cleanRow.amount || isNaN(cleanRow.amount)) {
       setSnackbar({
-        children: "Amount must be a number",
+        children: "Amount must be a valid number",
         severity: "error",
       });
-      throw new Error("Amount must be a number");
+      throw new Error("Invalid amount");
     }
 
     try {
       if (isNew) {
-        const { data: existing, error: fetchError } = await supabase
-          .from("familyexpenses")
-          .select("id")
-          .eq("amount", cleanRow.amount)
-          .limit(1)
-          .maybeSingle();
-
-        if (fetchError) throw fetchError;
-
-        // ✅ Insert new row
         const { data, error } = await supabase
           .from("familyexpenses")
           .insert([cleanRow])
@@ -358,12 +344,8 @@ export default function FullFeaturedCrudGrid({
 
         if (error) throw error;
 
-        const [inserted] = data;
-        setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
-
-        return inserted;
+        return data[0];
       } else {
-        // ✏️ Update existing row
         const { error } = await supabase
           .from("familyexpenses")
           .update(cleanRow)
@@ -371,16 +353,77 @@ export default function FullFeaturedCrudGrid({
 
         if (error) throw error;
 
-        const updated = { ...cleanRow, id };
-        setRows((prev) => prev.map((row) => (row.id === id ? updated : row)));
-
-        return updated;
+        return { ...cleanRow, id };
       }
     } catch (error) {
-      console.error(`${isNew ? "Insert" : "Update"} error:`, error.message);
+      console.error("Update error:", error.message);
       return newRow;
     }
   };
+
+  // const processRowUpdate = async (newRow) => {
+  //   const { isNew, id, ...cleanRow } = newRow;
+
+  //   // Manual validation
+  //   if (
+  //     newRow.amount === null ||
+  //     newRow.amount === undefined ||
+  //     newRow.amount === ""
+  //   ) {
+  //     setSnackbar({ children: "Amount is required", severity: "error" });
+  //     throw new Error("Amount is required");
+  //   }
+
+  //   if (isNaN(newRow.amount)) {
+  //     setSnackbar({
+  //       children: "Amount must be a number",
+  //       severity: "error",
+  //     });
+  //     throw new Error("Amount must be a number");
+  //   }
+
+  //   try {
+  //     if (isNew) {
+  //       const { data: existing, error: fetchError } = await supabase
+  //         .from("familyexpenses")
+  //         .select("id")
+  //         .eq("amount", cleanRow.amount)
+  //         .limit(1)
+  //         .maybeSingle();
+
+  //       if (fetchError) throw fetchError;
+
+  //       // ✅ Insert new row
+  //       const { data, error } = await supabase
+  //         .from("familyexpenses")
+  //         .insert([cleanRow])
+  //         .select();
+
+  //       if (error) throw error;
+
+  //       const [inserted] = data;
+  //       setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
+
+  //       return inserted;
+  //     } else {
+  //       // ✏️ Update existing row
+  //       const { error } = await supabase
+  //         .from("familyexpenses")
+  //         .update(cleanRow)
+  //         .eq("id", id);
+
+  //       if (error) throw error;
+
+  //       const updated = { ...cleanRow, id };
+  //       setRows((prev) => prev.map((row) => (row.id === id ? updated : row)));
+
+  //       return updated;
+  //     }
+  //   } catch (error) {
+  //     console.error(`${isNew ? "Insert" : "Update"} error:`, error.message);
+  //     return newRow;
+  //   }
+  // };
 
   const handleRowModesModelChange = (newModel) => {
     setRowModesModel(newModel);
@@ -402,27 +445,29 @@ export default function FullFeaturedCrudGrid({
 
   // List of expense categories
   const expenseCategories = [
+    "BB & BUBU",
     "Bank Card",
-    "Bank Card 2",
+    "Bank Card Tammy",
     "Car Expenses",
     "Clothing",
     "Dining Out / Takeaway",
     "Doctor / Dentist / Optician",
     "Electricity",
+    "Fees & Subscriptions",
     "Groceries",
     "Health Insurance",
     "Hobbies",
     "Home Repairs / Maintenance",
     "House Appliances",
     "House Insurance",
+    "House Rent",
     "Mobile Intrn / TV",
     "Mobile Tammy",
     "Others",
     "Parking Fees",
-    "BB & BUBU",
+    "Pharmacy",
     "Property Tax",
     "Public Transport Pass",
-    "Rent",
     "Scooter Insurance",
     "Side Activities",
     "Software Subscriptions",
@@ -432,6 +477,7 @@ export default function FullFeaturedCrudGrid({
 
   // List of frequency categories
   const frequency = [
+    "N/A",
     "Daily",
     "Weekly",
     "Bi-Weekly",
@@ -716,6 +762,7 @@ export default function FullFeaturedCrudGrid({
     {
       field: "date",
       headerName: "Date",
+      // type: "date",
       width: 180,
       editable: true,
       align: "center",
