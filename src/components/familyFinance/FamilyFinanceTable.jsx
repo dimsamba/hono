@@ -860,7 +860,7 @@ export default function FullFeaturedCrudGrid({
   return (
     <Box
       sx={{
-        height: "800px",
+        height: "900px",
         width: "100%",
         border: "2px solid lightGray",
         borderRadius: 2,
