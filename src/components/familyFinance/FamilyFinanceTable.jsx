@@ -121,7 +121,7 @@ const MyDateField = (params) => {
       onChange={(newValue) => {
         api.setEditCellValue(
           { id, field, value: newValue?.toISOString() },
-          event
+          event,
         ); // or without `event` if not available
       }}
       format="DD-MM-YYYY"
@@ -157,7 +157,7 @@ export default function FullFeaturedCrudGrid({
   const [rows, setRows] = React.useState(FamilyFinanceTable); // Use the passed FamilyFinanceTable
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
-  const [, setExpensesFromFF] = React.useState(0);
+  // const [] = React.useState(0);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedFrequency, setSelectedFrequency] = useState("");
   const [selectedFrom, setSelectedFrom] = useState("");
@@ -169,6 +169,16 @@ export default function FullFeaturedCrudGrid({
   ];
   const uniqueFrom = [...new Set(rows.map((row) => row.from).filter(Boolean))];
   const [filterAmount, setFilterAmount] = useState(null);
+  const categories = [
+    "Groceries",
+    "Electricity",
+    "Others",
+    "Pharmacy",
+    "Mobile Service x2",
+    "Dining Out / Takeaway",
+  ];
+
+  const [totals, setTotals] = React.useState({});
 
   // ✅ Reset filter automatically after rows change
   useEffect(() => {
@@ -237,6 +247,48 @@ export default function FullFeaturedCrudGrid({
     fetchData();
   }, [fromDate, toDate]);
 
+  // Calculate totals per category between dates
+  React.useEffect(() => {
+    const fetchData = async () => {
+      let query = supabase
+        .from("familyexpenses")
+        .select("amount, category")
+        .in("category", categories)
+        .ilike("category", "%"); // just to be safe, case-insensitive
+
+      // optional: filter by dates if selected
+      if (fromDate && toDate) {
+        const start = dayjs(fromDate).format("YYYY-MM-DD");
+        const end = dayjs(toDate).format("YYYY-MM-DD");
+        query = query.gte("date", start).lte("date", end);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error(error);
+        setTotals({});
+        return;
+      }
+
+      // compute sum per category
+      const sums = {};
+      categories.forEach((cat) => (sums[cat] = 0)); // initialize
+
+      data.forEach((row) => {
+        const cat = row.category;
+        const amount = Number(row.amount || 0);
+        if (sums[cat] !== undefined) {
+          sums[cat] += amount;
+        }
+      });
+
+      setTotals(sums);
+    };
+
+    fetchData();
+  }, [fromDate, toDate]);
+
   const handleRowEditStop = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;
@@ -271,7 +323,7 @@ export default function FullFeaturedCrudGrid({
       if (error) throw error;
 
       setRows((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, ...data[0] } : r))
+        prev.map((r) => (r.id === id ? { ...r, ...data[0] } : r)),
       );
 
       // ❌ Do not rely on NewAmountEditCell to change filter
@@ -283,7 +335,7 @@ export default function FullFeaturedCrudGrid({
 
   const handleDeleteClick = (id) => async () => {
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete this row?"
+      "Are you sure you want to delete this row?",
     );
     if (!confirmDelete) return;
 
@@ -311,8 +363,8 @@ export default function FullFeaturedCrudGrid({
     // setRows((prev) => prev.filter((r) => r.id !== id));
     setRows((prev) =>
       prev.map((r) =>
-        r.id === id ? FamilyFinanceTable.find((row) => row.id === id) || r : r
-      )
+        r.id === id ? FamilyFinanceTable.find((row) => row.id === id) || r : r,
+      ),
     );
 
     setFilterAmount(null); // reset
@@ -361,70 +413,6 @@ export default function FullFeaturedCrudGrid({
     }
   };
 
-  // const processRowUpdate = async (newRow) => {
-  //   const { isNew, id, ...cleanRow } = newRow;
-
-  //   // Manual validation
-  //   if (
-  //     newRow.amount === null ||
-  //     newRow.amount === undefined ||
-  //     newRow.amount === ""
-  //   ) {
-  //     setSnackbar({ children: "Amount is required", severity: "error" });
-  //     throw new Error("Amount is required");
-  //   }
-
-  //   if (isNaN(newRow.amount)) {
-  //     setSnackbar({
-  //       children: "Amount must be a number",
-  //       severity: "error",
-  //     });
-  //     throw new Error("Amount must be a number");
-  //   }
-
-  //   try {
-  //     if (isNew) {
-  //       const { data: existing, error: fetchError } = await supabase
-  //         .from("familyexpenses")
-  //         .select("id")
-  //         .eq("amount", cleanRow.amount)
-  //         .limit(1)
-  //         .maybeSingle();
-
-  //       if (fetchError) throw fetchError;
-
-  //       // ✅ Insert new row
-  //       const { data, error } = await supabase
-  //         .from("familyexpenses")
-  //         .insert([cleanRow])
-  //         .select();
-
-  //       if (error) throw error;
-
-  //       const [inserted] = data;
-  //       setRows((prev) => prev.map((row) => (row.id === id ? inserted : row)));
-
-  //       return inserted;
-  //     } else {
-  //       // ✏️ Update existing row
-  //       const { error } = await supabase
-  //         .from("familyexpenses")
-  //         .update(cleanRow)
-  //         .eq("id", id);
-
-  //       if (error) throw error;
-
-  //       const updated = { ...cleanRow, id };
-  //       setRows((prev) => prev.map((row) => (row.id === id ? updated : row)));
-
-  //       return updated;
-  //     }
-  //   } catch (error) {
-  //     console.error(`${isNew ? "Insert" : "Update"} error:`, error.message);
-  //     return newRow;
-  //   }
-  // };
-
   const handleRowModesModelChange = (newModel) => {
     setRowModesModel(newModel);
     // Notify parent
@@ -445,7 +433,6 @@ export default function FullFeaturedCrudGrid({
 
   // List of expense categories
   const expenseCategories = [
-    "BB & BUBU",
     "Bank Card",
     "Bank Card Tammy",
     "Box TV",
@@ -457,7 +444,6 @@ export default function FullFeaturedCrudGrid({
     "Fees & Subscriptions",
     "Groceries",
     "Health Insurance",
-    "Hobbies",
     "Home Repairs / Maintenance",
     "House Appliances",
     "House Insurance",
@@ -614,7 +600,7 @@ export default function FullFeaturedCrudGrid({
 
     const total = filtered.reduce(
       (sum, row) => sum + (parseFloat(row.amount) || 0),
-      0
+      0,
     );
 
     return { filteredRows: filtered, filteredTotalValue: total };
@@ -1176,6 +1162,51 @@ export default function FullFeaturedCrudGrid({
                   </MenuItem>
                 ))}
             </Select>
+          </FormControl>
+          <FormControl
+            sx={{
+              gridColumn: isNonMobile ? "span 3" : "span 1",
+              display: "grid",
+              gridTemplateColumns: isNonMobile ? "repeat(3, 1fr)" : "1fr ",
+              alignItems: isNonMobile ? "center" : "flex-start",
+              justifyContent: isNonMobile ? "space-between" : "flex-start",
+              gap: "5px",
+              mt: 0.5,
+              mb: 0.5,
+              pl: isNonMobile ? 0.5 : 0.5,
+              rowGap: isNonMobile ? "0px" : "10px",
+              borderRadius: 1,
+              border: "1px solid #007ea7",
+              py: 1,
+            }}
+          >
+            {categories.map((cat) => (
+              <Typography
+                key={cat}
+                variant="h5"
+                sx={{ display: "flex", gap: "6px", alignItems: "baseline" }}
+              >
+                {/* Category label */}
+                <span
+                  style={{
+                    fontWeight: 400,
+                    color: "#6b7280", // softer gray-blue
+                  }}
+                >
+                  {cat}:
+                </span>
+
+                {/* Value */}
+                <span
+                  style={{
+                    fontWeight: 500,
+                    color: "#007ea7",
+                  }}
+                >
+                  €{totals[cat]?.toFixed(2) || "0.00"}
+                </span>
+              </Typography>
+            ))}
           </FormControl>
         </Box>
 

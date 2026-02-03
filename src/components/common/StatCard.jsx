@@ -14,13 +14,12 @@ const StatCard = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
-    <div className="flex justify-between px-1 py-2 sm:p-6 border-2 border-gray-300 rounded-lg">
+    <div className="flex justify-between px-1 py-1 sm:p-6 border-2 border-gray-300 rounded-lg">
       <Box
         display="grid"
         gap="5px"
         gridTemplateColumns="repeat(1, minmax(0, 1fr))"
         sx={{
-          mb: "5px",
           width: "100%",
           flexGrow: 1,
         }}
@@ -33,7 +32,6 @@ const StatCard = ({
           sx={{
             gridColumn: "span 1",
             width: "100%",
-            height: "60px",
           }}
         >
           <Box>{icon}</Box>
@@ -55,7 +53,7 @@ const StatCard = ({
             height: "5px",
             ml: 1,
             mt: 1,
-            mb: 1,
+          //  mb: 1,
           }}
         >
            <Typography variant="h5" sx={{ color: "#004e64", lineHeight: 1 }}>
@@ -90,7 +88,7 @@ const StatCard = ({
               textAlign: "center",
               fontWeight: [500],
               verticalAlign: "middle",
-              mb: 0.5,
+            //  mb: 0.5,
             }}
           >
             {subtitle}
@@ -104,7 +102,7 @@ const StatCard = ({
               textAlign: "center",
               fontWeight: [500],
               verticalAlign: "middle",
-              mb: 0.5,
+             // mb: 0.5,
             }}
           >
             {subtitleRed}
