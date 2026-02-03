@@ -174,6 +174,9 @@ export default function FullFeaturedCrudGrid({
     "Electricity",
     "Others",
     "Pharmacy",
+    "Car Expenses",
+    "Fees & Subscriptions",
+    "Public Transport Pass",
     "Mobile Service x2",
     "Dining Out / Takeaway",
   ];
